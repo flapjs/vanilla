@@ -38,6 +38,13 @@ function find_unused_name() {
   return prefix+`${i}`;
 }
 
+/**
+ * draw a circle on the current canvas
+ * @param {int} x - x position from left wrt canvas
+ * @param {int} y - y position from top wrt canvas
+ * @param {int} r - radius of the circle
+ * @param {float} thickness - line width
+ */
 function draw_cricle(x, y, r, thickness=1) {
   const ctx = get_canvas().getContext("2d");
   ctx.beginPath();
@@ -46,6 +53,10 @@ function draw_cricle(x, y, r, thickness=1) {
   ctx.stroke();
 }
 
+/**
+ * given the name of the vertex, grab the vertex from graph and draw it on screen
+ * @param {string} v 
+ */
 function draw_vertex(v) {
   const vertex = graph.get(v);
   // draw the circle
@@ -61,6 +72,12 @@ function draw_vertex(v) {
   if (vertex.is_final) draw_final_circle(vertex);
 }
 
+/**
+ * create a vertex at the place the user has clicked
+ * @param {float} x - x position of the user mouse click wrt canvas
+ * @param {float} y - y position of the user mouse click wrt canvas
+ * @param {float} radius - the radius of the graphical element
+ */
 function create_vertex(x, y, radius=40) {
   const name = find_unused_name();
   const vertex = {
@@ -76,6 +93,11 @@ function create_vertex(x, y, radius=40) {
   draw_vertex(name);  // draw it
 }
 
+/**
+ * get the position of the mouseclick event wrt canvas
+ * @param {Object} e 
+ * @returns {Array<float>} x and y position of the mouseclick wrt canvas
+ */
 function get_position(e) {
   const rect = e.target.getBoundingClientRect();
   const x = e.clientX - rect.left;
@@ -83,16 +105,28 @@ function get_position(e) {
   return [x, y];
 }
 
+/**
+ * draws a smaller concentric circle within the vertex
+ * @param {Object} vertex - the vertex object in which we want to draw a circle
+ */
 function draw_final_circle(vertex) {
   draw_cricle(vertex.x, vertex.y, vertex.r*0.8);
 }
 
+/**
+ * mark a vertex as start
+ * @param {string} v - name of the vertex
+ */
 function set_start(v) {
   graph.forEach(vertex => vertex.is_start = false);
   graph.get(v).is_start = true;
   redraw();
 }
 
+/**
+ * toggle whether a vertex is accept
+ * @param {string} v - name of the vertex
+ */
 function toggle_final(v) {
   const vertex = graph.get(v);
   vertex.is_final = !vertex.is_final;
@@ -100,6 +134,9 @@ function toggle_final(v) {
   else redraw();  // removing the circle, requires redrawing
 }
 
+/**
+ * binds double click behavior
+ */
 function bind_double_click() {
   get_canvas().addEventListener('dblclick', e => {  // double click to create vertices
     if (e.movementX || e.movementY) return;  // shifted, don't create
@@ -114,7 +151,7 @@ function bind_double_click() {
  * detects if the current click is inside a vertex
  * @param {float} x - x position wrt canvas 
  * @param {float} y - y position wrt canvas
- * @returns returns the first vertex in the graph that contains (x, y), null otherwise
+ * @returns {string} returns the first vertex in the graph that contains (x, y), null otherwise
  */
 function in_vertex(x, y) {
   for (let vertex of graph.values()) {
@@ -128,7 +165,7 @@ function in_vertex(x, y) {
  * detects if the current click is inside edge text
  * @param {float} x - x position wrt canvas 
  * @param {float} y - y position wrt canvas
- * @returns returns the first edge in the graph that contains (x, y), null otherwise
+ * @returns {Object} returns the first edge in the graph that contains (x, y), null otherwise
  */
  function in_edge_text(x, y) {
   for (let vertex of graph.values()) {
@@ -146,7 +183,12 @@ function in_vertex(x, y) {
   return null;
 }
 
-function shift_vertices(dx, dy) {
+/**
+ * shift the entire graph by dx and dy
+ * @param {Object} e - mousemove event
+ */
+function drag_scene(e) {
+  const dx = e.movementX, dy = e.movementY;
   graph.forEach(v => {
     v.x += dx;
     v.y += dy;
@@ -154,11 +196,11 @@ function shift_vertices(dx, dy) {
   redraw();
 }
 
-function drag_scene(e) {
-  const dx = e.movementX, dy = e.movementY;
-  shift_vertices(dx, dy);
-}
-
+/**
+ * builds a drag vertex callback function
+ * @param {string} v - name of the vertex to be dragged 
+ * @returns {function} a callback function to handle dragging a vertex
+ */
 function higher_order_drag_vertex(v) {
   const vertex = graph.get(v);
   return e => {
@@ -168,6 +210,12 @@ function higher_order_drag_vertex(v) {
 }
 let drag_vertex = EMPTY_FUNCTION;  // hack
 
+/**
+ * draw a triangle with three tips provided
+ * @param {Array<float>} tip1 
+ * @param {Array<float>} tip2 
+ * @param {Array<float>} tip3 
+ */
 function draw_triangle(tip1, tip2, tip3) {
   const ctx = get_canvas().getContext('2d');
   ctx.beginPath();
@@ -177,12 +225,27 @@ function draw_triangle(tip1, tip2, tip3) {
   ctx.fill();
 }
 
+/**
+ * projection of the 2d vector u on to v
+ * @param {Array<float>} u - first vector
+ * @param {Array<float>} v - second vector (onto which to project the first)
+ * @returns {Array<float>} the component of the first vector in the direction of the second
+ */
 function proj(u, v) {
   const unit_v = normalize(v);
   const dot_prod = u[0]*unit_v[0] + u[1]*unit_v[1];
   return [dot_prod*unit_v[0], dot_prod*unit_v[1]];
 }
 
+/**
+ * draw an curved array with start, end and a mid
+ * @param {float} start_x - where to begin x
+ * @param {float} start_y - where to begin y
+ * @param {float} end_x - where to end x
+ * @param {float} end_y - where to end y
+ * @param {float} mid_x - control x for quadratic bezier curve
+ * @param {float} mid_y - control y for quadratic bezier curve
+ */
 function draw_arrow(start_x, start_y, end_x, end_y, mid_x, mid_y) {
   if (!mid_x) mid_x = (start_x+end_x)/2;
   if (!mid_y) mid_y = (start_y+end_y)/2;
@@ -204,16 +267,32 @@ function draw_arrow(start_x, start_y, end_x, end_y, mid_x, mid_y) {
   draw_triangle(tip1, tip2, tip3);
 }
 
+/**
+ * compute the length of a vector
+ * @param {Array<float>} vec - a vector whose length we want to compute
+ * @returns {float} the length of the vector
+ */
 function vec_len(vec) {
   let squared_sum = 0;
   vec.forEach(component => squared_sum+=component*component);
   return Math.sqrt(squared_sum);
 }
 
+/**
+ * computes a orthogonal vector
+ * @param {Array<float>} vec - a vector on which to calculate the orthogonal vector
+ * @returns {Array<float>} a vector orthogonal of the original vector
+ */
 function normal_vec(vec) {
   return [-vec[1]/2, vec[0]/2];
 }
 
+/**
+ * normalizes a vector to a specific length
+ * @param {Array<float>} vec - the vector you want to scale
+ * @param {float} final_length - the length you want the final vector to end up
+ * @returns {Array<float>} the normalized vector
+ */
 function normalize(vec, final_length=1) {
   const adjusted_vec = [];
   const length_adj = vec_len(vec)/final_length;
@@ -221,12 +300,27 @@ function normalize(vec, final_length=1) {
   return adjusted_vec;
 }
 
+/**
+ * calculate the linear combination of a1*v1+a2*v2
+ * @param {Array<float>} v1 - vector1
+ * @param {Array<float>} v2 - vector2
+ * @param {float} a1 - scalar1
+ * @param {float} a2 - scalar2
+ * @returns {Array<float>} the result of a1*v1+a2*v2
+ */
 function linear_comb(v1, v2, a1=1, a2=1) {
   const [v1_x, v1_y] = [a1*v1[0], a1*v1[1]];
   const [v2_x, v2_y] = [a2*v2[0], a2*v2[1]];
   return [v1_x+v2_x, v1_y+v2_y];
 }
 
+/**
+ * draw text on the canvas
+ * @param {*} text - the text you want to draw on the screen
+ * @param {*} x - x position wrt canvas
+ * @param {*} y - y position wrt canvas
+ * @param {float} size - font size
+ */
 function draw_text(text, x, y, size) {
   const ctx = get_canvas().getContext('2d');
   ctx.font = `${size}px Sans-Serif`;
@@ -235,6 +329,10 @@ function draw_text(text, x, y, size) {
   ctx.fillText(text, x, y);
 }
 
+/**
+ * draws the edge object on the canvas
+ * @param {Object} edge - the edge object you want to draw
+ */
 function draw_edge(edge) {
   const {transition, from, to, a1, a2} = edge;
   const s = graph.get(from), t = graph.get(to);
@@ -249,6 +347,12 @@ function draw_edge(edge) {
   draw_text(transition, mid_x, mid_y, s.r);
 }
 
+/**
+ * creates an edge between two vertices and draw it on the screen
+ * @param {string} u - from vertex
+ * @param {string} v - to vertex
+ * @param {boolean} self_loop - whether it is a selfloop
+ */
 function create_edge(u, v, self_loop=false) {
   const transition = prompt("Please input the transition", "0");
   if (!transition) return;  // can't have null transition
@@ -259,6 +363,11 @@ function create_edge(u, v, self_loop=false) {
   draw_edge(edge);
 }
 
+/**
+ * creates a callback function to handle edge creation animation
+ * @param {string} v - the vertex from which the edge is stemmed from
+ * @returns {function} a function that handles drawing an edge from v on mousedrag
+ */
 function higher_order_edge_animation(v) {
   const vertex = graph.get(v);  // convert name of vertex to actual vertex
   const canvas = get_canvas();
@@ -287,6 +396,11 @@ function higher_order_edge_animation(v) {
 }
 let edge_animation = EMPTY_FUNCTION;  // hack
 
+/**
+ * creates a callback function that handles dragging an edge
+ * @param {Object} edge - the edge you are dragging
+ * @returns {function} a callback function that handles dragging an edge
+ */
 function higher_order_drag_edge(edge) {
   const s = graph.get(edge.from), t = graph.get(edge.to);
 
@@ -303,6 +417,9 @@ function higher_order_drag_edge(edge) {
 }
 let drag_edge = EMPTY_FUNCTION;
 
+/**
+ * binds callback functions to the mouse dragging behavior
+ */
 function bind_drag() {
   const canvas = get_canvas();
   canvas.addEventListener('mousedown', e => {
@@ -332,6 +449,10 @@ function bind_drag() {
   })
 }
 
+/**
+ * deletes a vertex by its name as well as its associated edges
+ * @param {string} v - the vertex you want to delete
+ */
 function delete_vertex(v) {
   graph.delete(v);  // remove this vertex
   for (let vertex of graph.values()) {
@@ -342,6 +463,12 @@ function delete_vertex(v) {
   redraw();
 }
 
+/**
+ * creates the context menu to change a vertex and display it
+ * @param {string} v - the vertex we clicked on and want to change
+ * @param {float} x - x position of the top left corner of the menu
+ * @param {float} y - y position of the top left corner of the menu
+ */
 function display_vertex_menu(v, x, y) {
   const container = document.createElement('div');
   container.className = 'contextmenu';
@@ -367,12 +494,18 @@ function display_vertex_menu(v, x, y) {
   document.querySelector('body').appendChild(container);
 }
 
+/**
+ * wipes the context menu; does nothing if none exists
+ */
 function remove_context_menu() {
   const menu = document.querySelector('.contextmenu');
   if (!menu) return;
   document.querySelector('body').removeChild(menu);
 }
 
+/**
+ * replaces the default context menu
+ */
 function bind_context_menu() {
   const canvas = get_canvas();
   canvas.addEventListener('contextmenu', e => {
