@@ -19,6 +19,11 @@ function redraw() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   graph.forEach(draw_vertex);
+  for (let v of graph.values()) {
+    for (let [transition, u] of v.out) {
+      draw_edge(v, graph.get(u), transition);
+    }
+  }
 }
 
 /**
@@ -34,20 +39,22 @@ function find_unused_name() {
   return prefix+`${i}`;
 }
 
-function draw_vertex(v) {
+function draw_vertex(vertex) {
   const ctx = get_canvas().getContext("2d");
   // draw the circle
   ctx.beginPath();
-  ctx.arc(v.x, v.y, v.r, 0, 2*Math.PI);
-  ctx.lineWidth = Math.round(v.r/10);
+  ctx.arc(vertex.x, vertex.y, vertex.r, 0, 2*Math.PI);
+  ctx.lineWidth = Math.round(vertex.r/10);
   ctx.stroke();
   // draw the text inside
-  ctx.font = `${v.r}px Sans-Serif`;
+  ctx.font = `${vertex.r}px Sans-Serif`;
   ctx.textAlign = 'center';  // align left right center
   ctx.textBaseline = 'middle';  // align top bottom center
-  ctx.fillText(v.name, v.x, v.y);
-  if (v.is_start) {  // it is the starting vertex
-    const tip1 = [v.x-v.r, v.y], tip2 = [v.x-1.5*v.r, v.y-v.r/2], tip3 = [v.x-1.5*v.r, v.y+v.r/2];
+  ctx.fillText(vertex.name, vertex.x, vertex.y);
+  if (vertex.is_start) {  // it is the starting vertex
+    const tip1 = [vertex.x-vertex.r, vertex.y],
+          tip2 = [vertex.x-1.5*vertex.r, vertex.y-vertex.r/2],
+          tip3 = [vertex.x-1.5*vertex.r, vertex.y+vertex.r/2];
     draw_triangle(tip1, tip2, tip3);
   }
 }
@@ -157,6 +164,18 @@ function normalize(vec, final_length=1) {
   return adjusted_vec;
 }
 
+function draw_edge(s, t, transition) {
+  const vec = [t.x-s.x, t.y-s.y];
+  const normalized = normalize(vec, s.r);
+  const start_x = s.x+normalized[0], start_y = s.y+normalized[1], end_x = t.x-normalized[0], end_y = t.y-normalized[1];
+  draw_arrow(start_x, start_y, end_x, end_y);
+  const ctx = get_canvas().getContext('2d');
+  ctx.font = `${s.r}px Sans-Serif`;
+  ctx.textAlign = 'center';  // align left right center
+  ctx.textBaseline = 'bottom';  // align top bottom center
+  ctx.fillText(transition, (start_x+end_x)/2, (start_y+end_y)/2);
+}
+
 function create_edge(u, v) {
   const transition_trigger = prompt("Please input the transition", "0");
   if (!transition_trigger) return;  // can't have null transition
@@ -164,15 +183,7 @@ function create_edge(u, v) {
   const s = graph.get(u), t = graph.get(v);
   s.out.add([transition_trigger, v]);
   t.in.add([transition_trigger, u]);
-  const vec = [t.x-s.x, t.y-s.y];
-  const normalized = normalize(vec, s.r);
-  const start_x = s.x+normalized[0], start_y = s.y+normalized[1], end_x = t.x-normalized[0], end_y = t.y-normalized[1];
-  draw_arrow(start_x, start_y, end_x, end_y);
-  const ctx = get_canvas().getContext('2d');
-  ctx.font = `${v.r}px Sans-Serif`;
-  ctx.textAlign = 'center';  // align left right center
-  ctx.textBaseline = 'bottom';  // align top bottom center
-  ctx.fillText(transition_trigger, (start_x+end_x)/2, (start_y+end_y)/2);
+  draw_edge(s, t, transition_trigger);
 }
 
 function higher_order_drag_edge_from(v) {
