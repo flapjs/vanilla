@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', init);
 window.addEventListener('resize', redraw);
 
 const [LEFT_BTN, MID_BTN, RIGHT_BTN] = [0, 1, 2];
+const EMPTY_FUNCTION = () => {};
 
 // this is the graph
 const graph = new Map();
@@ -18,12 +19,10 @@ function redraw() {
   const canvas = get_canvas();
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  graph.forEach(draw_vertex);
-  for (let v of graph.values()) {
-    for (let [transition, u] of v.out) {
-      draw_edge(v, graph.get(u), transition);
-    }
-  }
+  graph.forEach(vertex => {
+    draw_vertex(vertex.name);
+    vertex.out.forEach(draw_edge);
+  });
 }
 
 /**
@@ -47,24 +46,19 @@ function draw_cricle(x, y, r, thickness=1) {
   ctx.stroke();
 }
 
-function draw_vertex(vertex) {
-  const ctx = get_canvas().getContext("2d");
+function draw_vertex(v) {
+  const vertex = graph.get(v);
   // draw the circle
   draw_cricle(vertex.x, vertex.y, vertex.r);
   // draw the text inside
-  ctx.font = `${vertex.r}px Sans-Serif`;
-  ctx.textAlign = 'center';  // align left right center
-  ctx.textBaseline = 'middle';  // align top bottom center
-  ctx.fillText(vertex.name, vertex.x, vertex.y);
+  draw_text(vertex.name, vertex.x, vertex.y, vertex.r);
   if (vertex.is_start) {  // it is the starting vertex
     const tip1 = [vertex.x-vertex.r, vertex.y],
           tip2 = [vertex.x-1.5*vertex.r, vertex.y-vertex.r/2],
           tip3 = [vertex.x-1.5*vertex.r, vertex.y+vertex.r/2];
     draw_triangle(tip1, tip2, tip3);
   }
-  if (vertex.is_final) {
-    draw_final_circle(vertex);
-  }
+  if (vertex.is_final) draw_final_circle(vertex);
 }
 
 function create_vertex(x, y, radius=40) {
@@ -77,10 +71,9 @@ function create_vertex(x, y, radius=40) {
     is_start: graph.size === 0,
     is_final: false,
     out: new Set(),
-    in: new Set()
   };
   graph.set(name, vertex);  // add to the list
-  draw_vertex(vertex);  // draw it
+  draw_vertex(name);  // draw it
 }
 
 function get_position(e) {
@@ -125,9 +118,25 @@ function bind_double_click() {
  * @returns returns the first vertex in the graph that contains (x, y), null otherwise
  */
 function in_vertex(x, y) {
-  for (let [k, v] of graph.entries()) {
-    const diff_squared = (x-v.x)*(x-v.x)+(y-v.y)*(y-v.y);
-    if (diff_squared < v.r*v.r) return k;
+  for (let vertex of graph.values()) {
+    const diff = [x-vertex.x, y-vertex.y];
+    if (vec_len(diff) < vertex.r) return vertex.name;
+  }
+  return null;
+}
+
+/**
+ * detects if the current click is inside edge text
+ * @param {float} x - x position wrt canvas 
+ * @param {float} y - y position wrt canvas
+ * @returns returns the first edge in the graph that contains (x, y), null otherwise
+ */
+ function in_edge_text(x, y) {
+  for (let vertex of graph.values()) {
+    for (let edge of vertex.out) {
+      const diff = [x-edge.mid_x, y-edge.mid_y];
+      if (vec_len(diff) < vertex.r/2) return edge;
+    }
   }
   return null;
 }
@@ -141,22 +150,18 @@ function shift_vertices(dx, dy) {
 }
 
 function drag_scene(e) {
-  remove_context_menu();
   const dx = e.movementX, dy = e.movementY;
   shift_vertices(dx, dy);
 }
 
 function higher_order_drag_vertex(v) {
-  remove_context_menu();
   const vertex = graph.get(v);
   return e => {
-    const dx = e.movementX, dy = e.movementY;
-    vertex.x += dx;
-    vertex.y += dy;
+    [vertex.x, vertex.y] = get_position(e);
     redraw();
   }
 }
-let drag_vertex = null;  // hack
+let drag_vertex = EMPTY_FUNCTION;  // hack
 
 function draw_triangle(tip1, tip2, tip3) {
   const ctx = get_canvas().getContext('2d');
@@ -167,14 +172,27 @@ function draw_triangle(tip1, tip2, tip3) {
   ctx.fill();
 }
 
-function draw_arrow(start_x, start_y, end_x, end_y) {
-  const vec = normalize([end_x-start_x, end_y-start_y], 15);  // arrow length is 15
+function proj(u, v) {
+  const unit_v = normalize(v);
+  const dot_prod = u[0]*unit_v[0] + u[1]*unit_v[1];
+  return [dot_prod*unit_v[0], dot_prod*unit_v[1]];
+}
+
+function draw_arrow(start_x, start_y, end_x, end_y, mid_x, mid_y) {
+  if (!mid_x) mid_x = (start_x+end_x)/2;
+  if (!mid_y) mid_y = (start_y+end_y)/2;
+  const vec1 = [mid_x-start_x, mid_y-start_y];
+  const vec2 = [end_x-start_x, end_y-start_y];
+  const v1_on_v2 = proj(vec1, vec2);
+  const ortho_comp = [(vec1[0]-v1_on_v2[0])/3, (vec1[1]-v1_on_v2[1])/3];
   const ctx = get_canvas().getContext('2d');
   ctx.beginPath();
   ctx.moveTo(start_x, start_y);
-  ctx.lineTo(end_x-vec[0], end_y-vec[1]);
+  // we boost the curve by the orthogonal component of v1 wrt v2
+  ctx.quadraticCurveTo(mid_x+ortho_comp[0], mid_y+ortho_comp[1], end_x, end_y);
   ctx.stroke();
-  const normal = [-vec[1]/2, vec[0]/2];
+  const vec = normalize([end_x-mid_x, end_y-mid_y], 15);  // arrow length is 15
+  const normal = normal_vec(vec);
   const tip1 = [end_x, end_y],
         tip2 = [end_x-vec[0]+normal[0], end_y-vec[1]+normal[1]],
         tip3 = [end_x-vec[0]-normal[0], end_y-vec[1]-normal[1]];
@@ -187,6 +205,10 @@ function vec_len(vec) {
   return Math.sqrt(squared_sum);
 }
 
+function normal_vec(vec) {
+  return [-vec[1]/2, vec[0]/2];
+}
+
 function normalize(vec, final_length=1) {
   const adjusted_vec = [];
   const length_adj = vec_len(vec)/final_length;
@@ -194,30 +216,48 @@ function normalize(vec, final_length=1) {
   return adjusted_vec;
 }
 
-function draw_edge(s, t, transition) {
-  const vec = [t.x-s.x, t.y-s.y];
-  const normalized = normalize(vec, s.r);
-  const start_x = s.x+normalized[0], start_y = s.y+normalized[1], end_x = t.x-normalized[0], end_y = t.y-normalized[1];
-  draw_arrow(start_x, start_y, end_x, end_y);
+function linear_comb(v1, v2, a1, a2) {
+  const [v1_x, v1_y] = [a1*v1[0], a1*v1[1]];
+  const [v2_x, v2_y] = [a2*v2[0], a2*v2[1]];
+  return [v1_x+v2_x, v1_y+v2_y];
+}
+
+function draw_text(text, x, y, size) {
   const ctx = get_canvas().getContext('2d');
-  ctx.font = `${s.r}px Sans-Serif`;
-  ctx.textAlign = 'center';  // align left right center
-  ctx.textBaseline = 'bottom';  // align top bottom center
-  ctx.fillText(transition, (start_x+end_x)/2, (start_y+end_y)/2);
+  ctx.font = `${size}px Sans-Serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, x, y);
 }
 
-function create_edge(u, v) {
-  const transition_trigger = prompt("Please input the transition", "0");
-  if (!transition_trigger) return;  // can't have null transition
+function draw_edge(edge) {
+  const {transition, from, to, mid_x, mid_y} = edge;
+  const s = graph.get(from), t = graph.get(to);
+  const vec = [t.x-s.x, t.y-s.y];  // from->to vector
+  const inner_vec = normalize(vec, s.r);
+  const start_x = s.x+inner_vec[0], start_y = s.y+inner_vec[1];
+  const end_x = t.x-inner_vec[0], end_y = t.y-inner_vec[1];
+  draw_arrow(start_x, start_y, end_x, end_y, mid_x, mid_y);
+  draw_text(transition, mid_x, mid_y, s.r);
+}
+
+function create_edge(u, v, self_loop=false) {
+  const transition = prompt("Please input the transition", "0");
+  if (!transition) return;  // can't have null transition
   // now we add the edge to the graph and draw it
-  const s = graph.get(u), t = graph.get(v);
-  s.out.add([transition_trigger, v]);
-  t.in.add([transition_trigger, u]);
-  draw_edge(s, t, transition_trigger);
+  const from = graph.get(u), to = graph.get(v);
+  const edge = {
+    transition: transition,
+    from: u,
+    to: v,
+    mid_x: (from.x+to.x)/2,
+    mid_y: (from.y+to.y)/2
+  };
+  graph.get(u).out.add(edge);
+  draw_edge(edge);
 }
 
-function higher_order_drag_edge_from(v) {
-  remove_context_menu();
+function higher_order_edge_animation(v) {
   const vertex = graph.get(v);  // convert name of vertex to actual vertex
   const canvas = get_canvas();
   const ctx = canvas.getContext('2d');
@@ -243,33 +283,47 @@ function higher_order_drag_edge_from(v) {
     draw_arrow(vertex.x+truncate_x, vertex.y+truncate_y, x, y);
   }
 }
-let drag_edge = null;  // hack
+let edge_animation = EMPTY_FUNCTION;  // hack
+
+function higher_order_drag_edge(edge) {
+  return e => {
+    [edge.mid_x, edge.mid_y] = get_position(e);
+    redraw();
+  }
+}
+let drag_edge = EMPTY_FUNCTION;
 
 function bind_drag() {
   const canvas = get_canvas();
   canvas.addEventListener('mousedown', e => {
     const [x, y] = get_position(e);
     const clicked_vertex = in_vertex(x, y);
-    if ((e.button == RIGHT_BTN || e.ctrlKey) && clicked_vertex) {  // right drag edge
-      drag_edge = higher_order_drag_edge_from(clicked_vertex);
-      canvas.addEventListener('mousemove', drag_edge);
+    const clicked_edge = in_edge_text(x, y);
+    if ((e.button == RIGHT_BTN || e.ctrlKey) && clicked_vertex) {  // right create edge
+      edge_animation = higher_order_edge_animation(clicked_vertex);
+      canvas.addEventListener('mousemove', edge_animation);
     } else if (e.button == LEFT_BTN) {  // left drag
-      if (!clicked_vertex) {  // left drag scene
-        canvas.addEventListener('mousemove', drag_scene);
-      } else {  // left drag vertex
+      if (clicked_vertex) {  // left drag vertex
         drag_vertex = higher_order_drag_vertex(clicked_vertex);  // create the function
         canvas.addEventListener('mousemove', drag_vertex);
-      }
+      } else if (clicked_edge) {
+        drag_edge = higher_order_drag_edge(clicked_edge);
+        canvas.addEventListener('mousemove', drag_edge);
+      } else {  // left drag scene
+        canvas.addEventListener('mousemove', drag_scene);
+      } 
     }
   });
   canvas.addEventListener('mouseup', () => {
     canvas.removeEventListener('mousemove', drag_scene);
     canvas.removeEventListener('mousemove', drag_vertex);
     canvas.removeEventListener('mousemove', drag_edge);
+    canvas.removeEventListener('mousemove', edge_animation);
   })
 }
 
-function display_vertex_menu(vertex, x, y) {
+function display_vertex_menu(v, x, y) {
+  const vertex = graph.get(v);
   const container = document.createElement('div');
   container.className = 'contextmenu';
   const rename_div = document.createElement('div');
@@ -305,7 +359,7 @@ function bind_context_menu() {
     remove_context_menu();
     const [x, y] = get_position(e);
     const v = in_vertex(x, y);
-    if (v) display_vertex_menu(graph.get(v), e.clientX, e.clientY);
+    if (v) display_vertex_menu(v, e.clientX, e.clientY);
   });
   canvas.addEventListener('mousedown', e => {
     if (e.button === LEFT_BTN) remove_context_menu();
@@ -316,7 +370,6 @@ function bind_context_menu() {
  * run after all the contents are loaded
  */
 function init() {
-  console.log('loaded');
   redraw();  // first time is actually to resize the canvas
 
   bind_double_click();
