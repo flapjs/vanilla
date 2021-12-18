@@ -39,13 +39,18 @@ function find_unused_name() {
   return prefix+`${i}`;
 }
 
+function draw_cricle(x, y, r, thickness=1) {
+  const ctx = get_canvas().getContext("2d");
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, 2*Math.PI);
+  ctx.lineWidth = Math.round(thickness);
+  ctx.stroke();
+}
+
 function draw_vertex(vertex) {
   const ctx = get_canvas().getContext("2d");
   // draw the circle
-  ctx.beginPath();
-  ctx.arc(vertex.x, vertex.y, vertex.r, 0, 2*Math.PI);
-  ctx.lineWidth = Math.round(vertex.r/10);
-  ctx.stroke();
+  draw_cricle(vertex.x, vertex.y, vertex.r);
   // draw the text inside
   ctx.font = `${vertex.r}px Sans-Serif`;
   ctx.textAlign = 'center';  // align left right center
@@ -57,6 +62,9 @@ function draw_vertex(vertex) {
           tip3 = [vertex.x-1.5*vertex.r, vertex.y+vertex.r/2];
     draw_triangle(tip1, tip2, tip3);
   }
+  if (vertex.is_final) {
+    draw_final_circle(vertex);
+  }
 }
 
 function create_vertex(x, y, radius=40) {
@@ -67,7 +75,7 @@ function create_vertex(x, y, radius=40) {
     y: y,
     r: radius,
     is_start: graph.size === 0,
-    is_end: false,
+    is_final: false,
     out: new Set(),
     in: new Set()
   };
@@ -82,11 +90,31 @@ function get_position(e) {
   return [x, y];
 }
 
+function draw_final_circle(vertex) {
+  draw_cricle(vertex.x, vertex.y, vertex.r*0.8);
+}
+
+function set_start(v) {
+  graph.forEach(vertex => vertex.is_start = false);
+  graph.get(v).is_start = true;
+  redraw();
+}
+
+function toggle_final(v, to=true) {
+  const vertex = graph.get(v);
+  if (vertex.is_final == to) return;  // prevent drawing too many circles
+  vertex.is_final = to;
+  if (to) draw_final_circle(vertex);  // adding a circle
+  else redraw();  // removing the circle, requires redrawing
+}
+
 function bind_double_click() {
   get_canvas().addEventListener('dblclick', e => {  // double click to create vertices
     if (e.movementX || e.movementY) return;  // shifted, don't create
     const [x, y] = get_position(e);
-    create_vertex(x, y);
+    const v = in_vertex(x, y);
+    if (v) toggle_final(v);
+    else create_vertex(x, y);
   })
 }
 
@@ -113,11 +141,13 @@ function shift_vertices(dx, dy) {
 }
 
 function drag_scene(e) {
+  remove_context_menu();
   const dx = e.movementX, dy = e.movementY;
   shift_vertices(dx, dy);
 }
 
 function higher_order_drag_vertex(v) {
+  remove_context_menu();
   const vertex = graph.get(v);
   return e => {
     const dx = e.movementX, dy = e.movementY;
@@ -187,6 +217,7 @@ function create_edge(u, v) {
 }
 
 function higher_order_drag_edge_from(v) {
+  remove_context_menu();
   const vertex = graph.get(v);  // convert name of vertex to actual vertex
   const canvas = get_canvas();
   const ctx = canvas.getContext('2d');
@@ -219,16 +250,16 @@ function bind_drag() {
   canvas.addEventListener('mousedown', e => {
     const [x, y] = get_position(e);
     const clicked_vertex = in_vertex(x, y);
-    if (e.button == LEFT_BTN) {  // left drag
+    if ((e.button == RIGHT_BTN || e.ctrlKey) && clicked_vertex) {  // right drag edge
+      drag_edge = higher_order_drag_edge_from(clicked_vertex);
+      canvas.addEventListener('mousemove', drag_edge);
+    } else if (e.button == LEFT_BTN) {  // left drag
       if (!clicked_vertex) {  // left drag scene
         canvas.addEventListener('mousemove', drag_scene);
       } else {  // left drag vertex
         drag_vertex = higher_order_drag_vertex(clicked_vertex);  // create the function
         canvas.addEventListener('mousemove', drag_vertex);
       }
-    } else if (e.button == RIGHT_BTN && clicked_vertex) {  // right drag edge
-      drag_edge = higher_order_drag_edge_from(clicked_vertex);
-      canvas.addEventListener('mousemove', drag_edge);
     }
   });
   canvas.addEventListener('mouseup', () => {
@@ -238,11 +269,46 @@ function bind_drag() {
   })
 }
 
+function display_vertex_menu(vertex, x, y) {
+  const container = document.createElement('div');
+  container.className = 'contextmenu';
+  const rename_div = document.createElement('div');
+  const switches_div = document.createElement('div');
+  container.appendChild(rename_div);
+  container.appendChild(switches_div);
+  const rename = document.createElement('input');
+  rename_div.appendChild(rename);
+  const start_check = document.createElement('input');
+  start_check.type = 'checkbox';
+  if (vertex.is_start) start_check.checked = true;
+  start_check.addEventListener('change', function() { if (this.checked) set_start(vertex.name); });
+  const final_check = document.createElement('input');
+  final_check.type = 'checkbox';
+  if (vertex.is_final) final_check.checked = true;
+  final_check.addEventListener('change', function() { toggle_final(vertex.name, this.checked); });
+  switches_div.appendChild(start_check);
+  switches_div.appendChild(final_check);
+  container.style = `position:absolute; left:${x}px; top:${y}px`;
+  document.querySelector('body').appendChild(container);
+}
+
+function remove_context_menu() {
+  const menu = document.querySelector('.contextmenu');
+  if (!menu) return;
+  document.querySelector('body').removeChild(menu);
+}
+
 function bind_context_menu() {
-  get_canvas().addEventListener('contextmenu', e => {
+  const canvas = get_canvas();
+  canvas.addEventListener('contextmenu', e => {
     e.preventDefault();  // stop the context from showing
-    // add custom menu here if clicked within one of the vertices
-    // console.log(e);
+    remove_context_menu();
+    const [x, y] = get_position(e);
+    const v = in_vertex(x, y);
+    if (v) display_vertex_menu(graph.get(v), e.clientX, e.clientY);
+  });
+  canvas.addEventListener('mousedown', e => {
+    if (e.button === LEFT_BTN) remove_context_menu();
   });
 }
 
