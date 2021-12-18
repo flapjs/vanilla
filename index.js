@@ -93,11 +93,10 @@ function set_start(v) {
   redraw();
 }
 
-function toggle_final(v, to=true) {
+function toggle_final(v) {
   const vertex = graph.get(v);
-  if (vertex.is_final == to) return;  // prevent drawing too many circles
-  vertex.is_final = to;
-  if (to) draw_final_circle(vertex);  // adding a circle
+  vertex.is_final = !vertex.is_final;
+  if (vertex.is_final) draw_final_circle(vertex);  // adding a circle
   else redraw();  // removing the circle, requires redrawing
 }
 
@@ -134,7 +133,13 @@ function in_vertex(x, y) {
  function in_edge_text(x, y) {
   for (let vertex of graph.values()) {
     for (let edge of vertex.out) {
-      const diff = [x-edge.mid_x, y-edge.mid_y];
+      const {_, __, to, a1, a2} = edge;
+      const other = graph.get(to);
+      const v1 = [other.x-vertex.x, other.y-vertex.y];
+      const v2 = normalize(normal_vec(v1), vertex.r);
+      const mid_vec = linear_comb(v1, v2, a1, a2);
+      const [mid_x, mid_y] = [vertex.x+mid_vec[0], vertex.y+mid_vec[1]];
+      const diff = [x-mid_x, y-mid_y];
       if (vec_len(diff) < vertex.r/2) return edge;
     }
   }
@@ -216,7 +221,7 @@ function normalize(vec, final_length=1) {
   return adjusted_vec;
 }
 
-function linear_comb(v1, v2, a1, a2) {
+function linear_comb(v1, v2, a1=1, a2=1) {
   const [v1_x, v1_y] = [a1*v1[0], a1*v1[1]];
   const [v2_x, v2_y] = [a2*v2[0], a2*v2[1]];
   return [v1_x+v2_x, v1_y+v2_y];
@@ -231,12 +236,15 @@ function draw_text(text, x, y, size) {
 }
 
 function draw_edge(edge) {
-  const {transition, from, to, mid_x, mid_y} = edge;
+  const {transition, from, to, a1, a2} = edge;
   const s = graph.get(from), t = graph.get(to);
-  const vec = [t.x-s.x, t.y-s.y];  // from->to vector
-  const inner_vec = normalize(vec, s.r);
-  const start_x = s.x+inner_vec[0], start_y = s.y+inner_vec[1];
-  const end_x = t.x-inner_vec[0], end_y = t.y-inner_vec[1];
+  const v1 = [t.x-s.x, t.y-s.y];  // basis vector 1 (from->to)
+  const v2 = normalize(normal_vec(v1), s.r);  // basis vector 2
+  const inner_vec = normalize(v1, s.r);
+  const [start_x, start_y] = [s.x+inner_vec[0], s.y+inner_vec[1]];
+  const [end_x, end_y] = [t.x-inner_vec[0], t.y-inner_vec[1]];
+  const mid_vec = linear_comb(v1, v2, a1, a2);
+  const [mid_x, mid_y] = [s.x+mid_vec[0], s.y+mid_vec[1]];
   draw_arrow(start_x, start_y, end_x, end_y, mid_x, mid_y);
   draw_text(transition, mid_x, mid_y, s.r);
 }
@@ -245,14 +253,8 @@ function create_edge(u, v, self_loop=false) {
   const transition = prompt("Please input the transition", "0");
   if (!transition) return;  // can't have null transition
   // now we add the edge to the graph and draw it
-  const from = graph.get(u), to = graph.get(v);
-  const edge = {
-    transition: transition,
-    from: u,
-    to: v,
-    mid_x: (from.x+to.x)/2,
-    mid_y: (from.y+to.y)/2
-  };
+  const default_a1 = 0.5, default_a2 = 0;  // right in the center
+  const edge = { transition: transition, from: u, to: v, a1: default_a1, a2: default_a2 };
   graph.get(u).out.add(edge);
   draw_edge(edge);
 }
@@ -286,8 +288,16 @@ function higher_order_edge_animation(v) {
 let edge_animation = EMPTY_FUNCTION;  // hack
 
 function higher_order_drag_edge(edge) {
+  const s = graph.get(edge.from), t = graph.get(edge.to);
+
   return e => {
-    [edge.mid_x, edge.mid_y] = get_position(e);
+    const [mid_x, mid_y] = get_position(e);
+    const mid_vec = [mid_x-s.x, mid_y-s.y];
+    const v1 = [t.x-s.x, t.y-s.y];
+    const v2 = normalize(normal_vec(v1), s.r);
+    const proj_on_v1 = proj(mid_vec, v1);
+    const proj_on_v2 = proj(mid_vec, v2);
+    [edge.a1, edge.a2] = [proj_on_v1[0]/v1[0], proj_on_v2[0]/v2[0]];
     redraw();
   }
 }
@@ -339,7 +349,7 @@ function display_vertex_menu(v, x, y) {
   const final_check = document.createElement('input');
   final_check.type = 'checkbox';
   if (vertex.is_final) final_check.checked = true;
-  final_check.addEventListener('change', function() { toggle_final(vertex.name, this.checked); });
+  final_check.addEventListener('change', function() { toggle_final(vertex.name); });
   switches_div.appendChild(start_check);
   switches_div.appendChild(final_check);
   container.style = `position:absolute; left:${x}px; top:${y}px`;
