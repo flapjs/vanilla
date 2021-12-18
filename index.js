@@ -332,27 +332,38 @@ function bind_drag() {
   })
 }
 
+function delete_vertex(v) {
+  graph.delete(v);  // remove this vertex
+  for (let vertex of graph.values()) {
+    for (let edge of vertex.out) {
+      if (edge.to == v) vertex.out.delete(edge);  // remove all edges leading to it
+    }
+  }
+  redraw();
+}
+
 function display_vertex_menu(v, x, y) {
-  const vertex = graph.get(v);
   const container = document.createElement('div');
   container.className = 'contextmenu';
   const rename_div = document.createElement('div');
-  const switches_div = document.createElement('div');
+  const buttons_div = document.createElement('div');
+  const delete_div = document.createElement('div');
+  delete_div.innerText = 'delete';
+  delete_div.addEventListener('click', () => { remove_context_menu(); delete_vertex(v); });
   container.appendChild(rename_div);
-  container.appendChild(switches_div);
+  container.appendChild(buttons_div);
+  container.appendChild(delete_div);
   const rename = document.createElement('input');
   rename_div.appendChild(rename);
-  const start_check = document.createElement('input');
-  start_check.type = 'checkbox';
-  if (vertex.is_start) start_check.checked = true;
-  start_check.addEventListener('change', function() { if (this.checked) set_start(vertex.name); });
-  const final_check = document.createElement('input');
-  final_check.type = 'checkbox';
-  if (vertex.is_final) final_check.checked = true;
-  final_check.addEventListener('change', function() { toggle_final(vertex.name); });
-  switches_div.appendChild(start_check);
-  switches_div.appendChild(final_check);
-  container.style = `position:absolute; left:${x}px; top:${y}px`;
+  const start_btn = document.createElement('button');
+  start_btn.innerText = 'make start';
+  start_btn.addEventListener('click', () => set_start(v));
+  const final_btn = document.createElement('button');
+  final_btn.innerText = 'toggle final';
+  final_btn.addEventListener('click', () => toggle_final(v));
+  buttons_div.appendChild(start_btn);
+  buttons_div.appendChild(final_btn);
+  container.style = `position:absolute; left:${x}px; top:${y}px; color:blue`;
   document.querySelector('body').appendChild(container);
 }
 
