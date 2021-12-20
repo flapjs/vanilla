@@ -20,6 +20,9 @@ function get_canvas() {
   return document.getElementById('machine_drawing');
 }
 
+/**
+ * redraw the entire canvas based on the graph
+ */
 function redraw() {
   const canvas = get_canvas();
   canvas.width = window.innerWidth;
@@ -341,6 +344,11 @@ function draw_text(text, x, y, size) {
   ctx.fillText(text, x, y);
 }
 
+/**
+ * computes the geometric start and end of the edge wrt canvas
+ * @param {Object} edge - the edge we want to compute the start and end of
+ * @returns {Array<Object>} [start, end], both 2d vectors
+ */
 function compute_edge_start_end(edge) {
   const {from, to} = edge;
   const s = graph.get(from), t = graph.get(to);
@@ -358,6 +366,11 @@ function compute_edge_start_end(edge) {
   return [start, end];
 }
 
+/**
+ * computes the geometric start, end, and quadratic bezier curve control
+ * @param {Object} edge - the edge we want to compute the start and end and mid of
+ * @returns {Array<Object>} [start, end, mid], all 2d vectors
+ */
 function compute_edge_geometry(edge) {
   const {from, to, a1, a2} = edge;
   const s = graph.get(from);
@@ -554,11 +567,20 @@ function display_vertex_menu(v, x, y) {
   document.querySelector('body').appendChild(container);
 }
 
+/**
+ * delete an edge of the graph and redraw
+ * @param {Object} edge the edge we want to get rid of
+ */
 function delete_edge(edge) {
   graph.get(edge.from).out.delete(edge);
   redraw();
 }
 
+/**
+ * rename the transition of an edge
+ * @param {Object} edge the edge object of which we want to rename the transition
+ * @param {string} new_transition - new transition symbol
+ */
 function rename_edge(edge, new_transition) {
   edge.transition = new_transition;
   redraw();
