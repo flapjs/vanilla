@@ -11,6 +11,7 @@ const ARROW_WIDTH = 10;
 const EMPTY_TRANSITION = 'ε';
 const HIST_KEY = "%history";
 const HIST_TIP_KEY = "%hist_tip";
+const HIST_PTR_KEY = "%hist_ptr";
 
 // this is the graph
 let graph = {};
@@ -23,24 +24,24 @@ let hist_ptr = -1, hist_tip = -1;
  * @returns {Array<Object>} an array of graphs
  */
 function get_history() {
-  const hist_str = localStorage.getItem(HIST_KEY);
-  if (!hist_str) return [];
-  else {
-    hist_tip = localStorage.getItem(HIST_TIP_KEY);
-    return JSON.parse(hist_str);
-  }
+  if (!localStorage.getItem(HIST_KEY)) push_history([]);  // push empty history
+  // otherwise, already have history written to localstore
+  hist_tip = localStorage.getItem(HIST_TIP_KEY);
+  hist_ptr = localStorage.getItem(HIST_PTR_KEY);
+  return JSON.parse(localStorage.getItem(HIST_KEY));
 }
 
 /**
  * push the current state of the graph onto history
  */
-function push_history() {
-  const history = get_history();
+function push_history(history=null) {
+  if (!history) history = get_history();
   history[++hist_ptr] = graph;
   hist_tip = hist_ptr;  // we just pushed, so that is the new tip
   const hist_str = JSON.stringify(history);
   localStorage.setItem(HIST_KEY, hist_str);
   localStorage.setItem(HIST_TIP_KEY, hist_tip);
+  localStorage.setItem(HIST_PTR_KEY, hist_ptr);
 }
 
 /**
@@ -50,6 +51,7 @@ function undo() {
   if (hist_ptr <= 0) return;  // can't go backward
   const history = get_history();
   graph = history[--hist_ptr];
+  localStorage.setItem(HIST_PTR_KEY, hist_ptr);
   redraw()
 }
 
@@ -60,6 +62,7 @@ function redo() {
   const history = get_history();
   if (hist_ptr == hist_tip) return;  // can't go forward
   graph = history[++hist_ptr];
+  localStorage.setItem(HIST_PTR_KEY, hist_ptr);
   redraw();
 }
 
@@ -841,11 +844,6 @@ function bind_run_input() {
  * offers ctrl-z and ctrl-shift-z features
  */
 function bind_undo_redo() {
-  if (!localStorage.getItem(HIST_KEY)) push_history();  // create empty hist
-  const history = get_history();
-  hist_ptr = hist_tip;
-  graph = history[hist_ptr];
-  redraw();
   document.addEventListener('keypress', e => {
     if (e.code !== 'KeyZ' || e.metaKey || e.altKey) return;
     if (e.ctrlKey && e.shiftKey) redo();
@@ -857,9 +855,11 @@ function bind_undo_redo() {
  * run after all the contents are loaded
  */
 function init() {
+  graph = get_history().at(hist_ptr);
+  redraw();
   bind_double_click();
   bind_drag();
   bind_context_menu();
   bind_run_input();
-  bind_undo_redo();  // takes care of first time drawing
+  bind_undo_redo();
 }
