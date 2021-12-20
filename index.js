@@ -18,6 +18,10 @@ let graph = {};
 // history pointers
 let hist_ptr = -1, hist_tip = -1;
 
+/**
+ * get history array from localstore and parse
+ * @returns {Array<Object>} an array of graphs
+ */
 function get_history() {
   const hist_str = localStorage.getItem(HIST_KEY);
   if (!hist_str) return [];
@@ -39,6 +43,9 @@ function push_history() {
   localStorage.setItem(HIST_TIP_KEY, hist_tip);
 }
 
+/**
+ * undos the last operation
+ */
 function undo() {
   if (hist_ptr <= 0) return;  // can't go backward
   const history = get_history();
@@ -46,6 +53,9 @@ function undo() {
   redraw()
 }
 
+/**
+ * redo the last undo
+ */
 function redo() {
   const history = get_history();
   if (hist_ptr == hist_tip) return;  // can't go forward
