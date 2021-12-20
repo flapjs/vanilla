@@ -3,14 +3,70 @@ window.addEventListener('resize', redraw);
 
 const [LEFT_BTN, MID_BTN, RIGHT_BTN] = [0, 1, 2];
 const EMPTY_FUNCTION = () => {};  // place holder function
-const CLICK_HOLD_TIME = 350;  // [ms] the maximum time between mousedown and mouseup that is still considered a click
+const CLICK_HOLD_TIME = 300;  // [ms] the maximum time between mousedown and mouseup that is still considered a click
 const DEFAULT_VERTEX_RADIUS = 40;
 const START_TRIANGLE_SCALE = 0.6;  // wrt vertex radius
 const ARROW_LENGTH = 15;
 const ARROW_WIDTH = 10;
+const EMPTY_TRANSITION = 'ε';
 
 // this is the graph
 const graph = new Map();
+
+function compute_alphabet() {
+  const alphabet = new Set();
+  for (let vertex of graph.values()) {
+    for (let edge of vertex.out) alphabet.add(edge.transition);
+  }
+  return alphabet;
+}
+
+function find_start() {
+  for (let [v, vertex] of graph.entries()) {
+    if (vertex.is_start) return v;
+  }
+}
+
+/**
+ * compute the set of closure of current states (in-place and returns)
+ * @param {Set<string>} cur_states - current states the machine is in
+ * @returns {Set<string>} the closure of cur_states
+ */
+function closure(cur_states) {
+  let old_size = 0;  // initialize size to be zero
+  while (cur_states.size > old_size) {  // if we have added new state to the mix, then keep going
+    old_size = cur_states.size;
+    for (let v of cur_states) {
+      for (let edge of graph.get(v).out) {
+        if (edge.transition === EMPTY_TRANSITION) cur_states.add(edge.to);
+      }
+    }
+  }
+  return cur_states;
+}
+
+function contains_final(cur_states) {
+  for (let v of cur_states) {
+    if (graph.get(v).is_final) return true;
+  }
+  return false;
+}
+
+function run_input(input) {
+  if (!graph.size) return false;  // empty graph
+  let cur_states = closure(new Set([find_start()]));  // find closure of start
+  for (let c of input) {
+    const new_states = new Set();
+    for (let v of cur_states) {
+      for (let edge of graph.get(v).out) {
+        if (edge.transition === c) new_states.add(edge.to);
+      }
+    }
+    cur_states = closure(new_states);
+    if (!cur_states.size) return false;  // can't go anywhere
+  }
+  return contains_final(cur_states);
+}
 
 /**
  * get the machine drawing canvas
@@ -29,7 +85,7 @@ function redraw() {
   canvas.height = window.innerHeight;
   for (let v of graph.keys()) {
     draw_vertex(v);
-    graph.get(v).out.forEach(draw_edge);
+    for (let edge of graph.get(v).out) draw_edge(edge);
   }
 }
 
@@ -125,7 +181,7 @@ function draw_final_circle(vertex) {
  * @param {string} v - name of the vertex
  */
 function set_start(v) {
-  graph.forEach(vertex => vertex.is_start = false);
+  for (let vertex of graph.values) vertex.is_start = false;
   graph.get(v).is_start = true;
   redraw();
 }
@@ -203,10 +259,10 @@ function in_any_vertex(x, y) {
  */
 function drag_scene(e) {
   const dx = e.movementX, dy = e.movementY;
-  graph.forEach(v => {
-    v.x += dx;
-    v.y += dy;
-  });
+  for (let vertex of graph.values()) {
+    vertex.x += dx;
+    vertex.y += dy;
+  }
   redraw();
 }
 
@@ -288,7 +344,7 @@ function draw_arrow(start_x, start_y, end_x, end_y, mid_x, mid_y) {
  */
 function vec_len(vec) {
   let squared_sum = 0;
-  vec.forEach(component => squared_sum+=component*component);
+  for (let component of vec) squared_sum+=component*component;
   return Math.sqrt(squared_sum);
 }
 
@@ -310,7 +366,7 @@ function normal_vec(vec, clockwise=false) {
 function normalize(vec, final_length=1) {
   const adjusted_vec = [];
   const length_adj = vec_len(vec)/final_length;
-  vec.forEach(component => adjusted_vec.push(component/length_adj));
+  for (let component of vec) adjusted_vec.push(component/length_adj);
   return adjusted_vec;
 }
 
@@ -408,7 +464,7 @@ function draw_edge(edge) {
  * @param {float} angle2 - the angle which the cursor entered the to vertex
  */
 function create_edge(u, v, angle1, angle2) {
-  const transition = prompt("Please input the transition", "0");
+  const transition = prompt("Please input the transition", EMPTY_TRANSITION);
   if (!transition) return;  // can't have null transition
   const vertex = graph.get(u);
   for (let existing_edge of vertex.out) {
@@ -552,10 +608,12 @@ function rename_vertex(v, new_name) {
   else {
     graph.set(new_name, graph.get(v));  // duplicate
     graph.delete(v);  // remove old
-    graph.forEach(vertex => vertex.out.forEach(edge => {
-      if (edge.from === v) edge.from = new_name;
-      if (edge.to === v) edge.to = new_name;
-    }));
+    for (let vertex of graph.values()) {
+      for (let edge of vertex.out) {
+        if (edge.from === v) edge.from = new_name;
+        if (edge.to === v) edge.to = new_name;
+      }
+    }
   }
   redraw();
 }
@@ -659,8 +717,7 @@ function bind_context_menu() {
   canvas.addEventListener('contextmenu', e => {
     e.preventDefault();  // stop the context from showing
     remove_context_menu();  // remove old
-    console.log(e.timeStamp - last_time_mouse_press);
-    if (e.timeStamp - last_time_mouse_press > 350) return;  // hack
+    if (e.timeStamp - last_time_mouse_press > CLICK_HOLD_TIME) return;  // hack
     const [x, y] = get_position(e);
     const v = in_any_vertex(x, y);
     const edge = in_edge_text(x, y);
@@ -673,6 +730,15 @@ function bind_context_menu() {
   });
 }
 
+function bind_run_input() {
+  const input_divs = document.getElementsByClassName('machine_input');
+  for (let i = 0; i < input_divs.length; i++) {
+    const textbox = input_divs[i].querySelector('input');
+    const run_btn = input_divs[i].querySelector('button');
+    run_btn.addEventListener('click', () => console.log(run_input(textbox.value)));
+  }
+}
+
 /**
  * run after all the contents are loaded
  */
@@ -682,4 +748,5 @@ function init() {
   bind_double_click();
   bind_drag();
   bind_context_menu();
+  bind_run_input();
 }
