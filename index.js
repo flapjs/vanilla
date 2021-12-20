@@ -27,10 +27,10 @@ function redraw() {
   const canvas = get_canvas();
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  graph.forEach(vertex => {
-    draw_vertex(vertex.name);
-    vertex.out.forEach(draw_edge);
-  });
+  for (let v of graph.keys()) {
+    draw_vertex(v);
+    graph.get(v).out.forEach(draw_edge);
+  }
 }
 
 /**
@@ -70,7 +70,7 @@ function draw_vertex(v) {
   // draw the circle
   draw_cricle(vertex.x, vertex.y, vertex.r);
   // draw the text inside
-  draw_text(vertex.name, vertex.x, vertex.y, vertex.r);
+  draw_text(v, vertex.x, vertex.y, vertex.r);
   if (vertex.is_start) {  // it is the starting vertex
     const tip1 = [vertex.x-vertex.r, vertex.y],
           tip2 = [tip1[0]-START_TRIANGLE_SCALE*vertex.r, tip1[1]-START_TRIANGLE_SCALE*vertex.r],
@@ -89,7 +89,6 @@ function draw_vertex(v) {
 function create_vertex(x, y, radius=DEFAULT_VERTEX_RADIUS) {
   const name = find_unused_name();
   const vertex = {
-    name: name,
     x: x,
     y: y,
     r: radius,
@@ -411,6 +410,10 @@ function draw_edge(edge) {
 function create_edge(u, v, angle1, angle2) {
   const transition = prompt("Please input the transition", "0");
   if (!transition) return;  // can't have null transition
+  const vertex = graph.get(u);
+  for (let existing_edge of vertex.out) {
+    if (existing_edge.to === v && existing_edge.transition === transition) return;  // already has it
+  }
   // now we add the edge to the graph and draw it
   let edge;
   if (u !== v) {  // easy case since start and end are different
@@ -420,7 +423,7 @@ function create_edge(u, v, angle1, angle2) {
     const a1 = 0.5, a2 = 1;
     edge = { transition: transition, from: u, to: v, a1: a1, a2: a2, angle1: angle1, angle2: angle2 };
   }
-  graph.get(u).out.add(edge);
+  vertex.out.add(edge);
   draw_edge(edge);
 }
 
@@ -484,7 +487,7 @@ function higher_order_drag_edge(edge) {
     const v2 = normalize(normal_vec(v1), s.r);
     const proj_on_v1 = proj(mid, v1);
     const proj_on_v2 = proj(mid, v2);
-    [edge.a1, edge.a2] = [proj_on_v1[0]/v1[0], proj_on_v2[0]/v2[0]];
+    [edge.a1, edge.a2] = [proj_on_v1[0]/(v1[0]+0.001), proj_on_v2[0]/(v2[0]+0.001)];
     redraw();
   }
 }
@@ -527,11 +530,32 @@ function bind_drag() {
  * @param {string} v - the vertex you want to delete
  */
 function delete_vertex(v) {
+  remove_context_menu();
   graph.delete(v);  // remove this vertex
   for (let vertex of graph.values()) {
     for (let edge of vertex.out) {
       if (edge.to == v) vertex.out.delete(edge);  // remove all edges leading to it
     }
+  }
+  redraw();
+}
+
+/**
+ * renames the vertex with the new name, if name exists, nothing will be changed and user will be prompted
+ * @param {string} v - the vertex to rename
+ * @param {*} new_name - new name of the vertex
+ */
+function rename_vertex(v, new_name) {
+  remove_context_menu();
+  if (v === new_name) return;  // nothing to do
+  else if (graph.has(new_name)) alert(new_name + ' already exists');
+  else {
+    graph.set(new_name, graph.get(v));  // duplicate
+    graph.delete(v);  // remove old
+    graph.forEach(vertex => vertex.out.forEach(edge => {
+      if (edge.from === v) edge.from = new_name;
+      if (edge.to === v) edge.to = new_name;
+    }));
   }
   redraw();
 }
@@ -549,11 +573,15 @@ function display_vertex_menu(v, x, y) {
   const buttons_div = document.createElement('div');
   const delete_div = document.createElement('div');
   delete_div.innerText = 'delete';
-  delete_div.addEventListener('click', () => { remove_context_menu(); delete_vertex(v); });
+  delete_div.addEventListener('click', () => delete_vertex(v));
   container.appendChild(rename_div);
   container.appendChild(buttons_div);
   container.appendChild(delete_div);
   const rename = document.createElement('input');
+  rename.value = v;  // prepopulate vertex name
+  rename.addEventListener('keyup', e => {
+    if (e.key === 'Enter') rename_vertex(v, rename.value);
+  });
   rename_div.appendChild(rename);
   const start_btn = document.createElement('button');
   start_btn.innerText = 'make start';
@@ -572,6 +600,7 @@ function display_vertex_menu(v, x, y) {
  * @param {Object} edge the edge we want to get rid of
  */
 function delete_edge(edge) {
+  remove_context_menu();
   graph.get(edge.from).out.delete(edge);
   redraw();
 }
@@ -582,6 +611,7 @@ function delete_edge(edge) {
  * @param {string} new_transition - new transition symbol
  */
 function rename_edge(edge, new_transition) {
+  remove_context_menu();
   edge.transition = new_transition;
   redraw();
 }
@@ -598,12 +628,13 @@ function rename_edge(edge, new_transition) {
   const rename_div = document.createElement('div');
   const delete_div = document.createElement('div');
   delete_div.innerText = 'delete';
-  delete_div.addEventListener('click', () => { remove_context_menu(); delete_edge(edge); });
+  delete_div.addEventListener('click', () => delete_edge(edge));
   container.appendChild(rename_div);
   container.appendChild(delete_div);
   const rename = document.createElement('input');
-  rename.addEventListener('keyup', function(e) {
-    if (e.key === 'Enter') rename_edge(this.value);
+  rename.value = edge.transition;  // prepopulate
+  rename.addEventListener('keyup', e => {
+    if (e.key === 'Enter') rename_edge(edge, rename.value);
   });
   rename_div.appendChild(rename);
   container.style = `position:absolute; left:${x}px; top:${y}px; color:blue`;
