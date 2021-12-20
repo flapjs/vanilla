@@ -9,9 +9,49 @@ const START_TRIANGLE_SCALE = 0.6;  // wrt vertex radius
 const ARROW_LENGTH = 15;
 const ARROW_WIDTH = 10;
 const EMPTY_TRANSITION = 'ε';
+const HIST_KEY = "%history";
+const HIST_TIP_KEY = "%hist_tip";
 
 // this is the graph
-const graph = new Map();
+let graph = {};
+
+// history pointers
+let hist_ptr = -1, hist_tip = -1;
+
+function get_history() {
+  const hist_str = localStorage.getItem(HIST_KEY);
+  if (!hist_str) return [];
+  else {
+    hist_tip = localStorage.getItem(HIST_TIP_KEY);
+    return JSON.parse(hist_str);
+  }
+}
+
+/**
+ * push the current state of the graph onto history
+ */
+function push_history() {
+  const history = get_history();
+  history[++hist_ptr] = graph;
+  hist_tip = hist_ptr;  // we just pushed, so that is the new tip
+  const hist_str = JSON.stringify(history);
+  localStorage.setItem(HIST_KEY, hist_str);
+  localStorage.setItem(HIST_TIP_KEY, hist_tip);
+}
+
+function undo() {
+  if (hist_ptr <= 0) return;  // can't go backward
+  const history = get_history();
+  graph = history[--hist_ptr];
+  redraw()
+}
+
+function redo() {
+  const history = get_history();
+  if (hist_ptr == hist_tip) return;  // can't go forward
+  graph = history[++hist_ptr];
+  redraw();
+}
 
 /**
  * finds all letters used in the transitions
@@ -19,7 +59,7 @@ const graph = new Map();
  */
 function compute_alphabet() {
   const alphabet = new Set();
-  for (let vertex of graph.values()) {
+  for (let vertex of Object.values(graph)) {
     for (let edge of vertex.out) alphabet.add(edge.transition);
   }
   return alphabet;
@@ -30,7 +70,7 @@ function compute_alphabet() {
  * @returns {string} the start of the graph, null of graph empty
  */
 function find_start() {
-  for (let [v, vertex] of graph.entries()) {
+  for (let [v, vertex] of Object.entries(graph)) {
     if (vertex.is_start) return v;
   }
   return null;
@@ -46,7 +86,7 @@ function closure(cur_states) {
   while (cur_states.size > old_size) {  // if we have added new state to the mix, then keep going
     old_size = cur_states.size;
     for (let v of cur_states) {
-      for (let edge of graph.get(v).out) {
+      for (let edge of graph[v].out) {
         if (edge.transition === EMPTY_TRANSITION) cur_states.add(edge.to);
       }
     }
@@ -61,7 +101,7 @@ function closure(cur_states) {
  */
 function contains_final(cur_states) {
   for (let v of cur_states) {
-    if (graph.get(v).is_final) return true;
+    if (graph[v].is_final) return true;
   }
   return false;
 }
@@ -72,12 +112,12 @@ function contains_final(cur_states) {
  * @returns {boolean} true iff the input is accepted by the machine
  */
 function run_input(input) {
-  if (!graph.size) return false;  // empty graph
+  if (!Object.keys(graph).length) return false;  // empty graph
   let cur_states = closure(new Set([find_start()]));  // find closure of start
   for (let c of input) {
     const new_states = new Set();
     for (let v of cur_states) {
-      for (let edge of graph.get(v).out) {
+      for (let edge of graph[v].out) {
         if (edge.transition === c) new_states.add(edge.to);
       }
     }
@@ -102,9 +142,9 @@ function redraw() {
   const canvas = get_canvas();
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  for (let v of graph.keys()) {
+  for (let v of Object.keys(graph)) {
     draw_vertex(v);
-    for (let edge of graph.get(v).out) draw_edge(edge);
+    for (let edge of graph[v].out) draw_edge(edge);
   }
 }
 
@@ -115,8 +155,8 @@ function redraw() {
 function find_unused_name() {
   const prefix = 'q';  // using standard notation
   let i;
-  for (i = 0; i <= graph.size; i++) {  // we don't need to look further than how many elements in the set
-    if (!graph.has(prefix+`${i}`)) break;
+  for (i = 0; i <= Object.keys(graph).length; i++) {  // we don't need to look further than how many elements in the set
+    if (!(prefix+`${i}` in graph)) break;
   }
   return prefix+`${i}`;
 }
@@ -141,7 +181,7 @@ function draw_cricle(x, y, r, thickness=1) {
  * @param {string} v 
  */
 function draw_vertex(v) {
-  const vertex = graph.get(v);
+  const vertex = graph[v];
   // draw the circle
   draw_cricle(vertex.x, vertex.y, vertex.r);
   // draw the text inside
@@ -167,12 +207,13 @@ function create_vertex(x, y, radius=DEFAULT_VERTEX_RADIUS) {
     x: x,
     y: y,
     r: radius,
-    is_start: graph.size === 0,
+    is_start: Object.keys(graph).length === 0,
     is_final: false,
-    out: new Set(),
+    out: [],
   };
-  graph.set(name, vertex);  // add to the list
+  graph[name] = vertex;  // add to the list
   draw_vertex(name);  // draw it
+  push_history();
 }
 
 /**
@@ -200,9 +241,10 @@ function draw_final_circle(vertex) {
  * @param {string} v - name of the vertex
  */
 function set_start(v) {
-  for (let vertex of graph.values) vertex.is_start = false;
-  graph.get(v).is_start = true;
+  for (let vertex of Object.values(graph)) vertex.is_start = false;
+  graph[v].is_start = true;
   redraw();
+  push_history();
 }
 
 /**
@@ -210,10 +252,11 @@ function set_start(v) {
  * @param {string} v - name of the vertex
  */
 function toggle_final(v) {
-  const vertex = graph.get(v);
+  const vertex = graph[v];
   vertex.is_final = !vertex.is_final;
   if (vertex.is_final) draw_final_circle(vertex);  // adding a circle
   else redraw();  // removing the circle, requires redrawing
+  push_history();
 }
 
 /**
@@ -237,7 +280,7 @@ function bind_double_click() {
  * @returns {boolean} whether (x, y) is in v
  */
 function in_vertex(x, y, v) {
-  const vertex = graph.get(v);
+  const vertex = graph[v];
   const diff = [x-vertex.x, y-vertex.y];
   return vec_len(diff) < vertex.r;
 }
@@ -249,7 +292,7 @@ function in_vertex(x, y, v) {
  * @returns {string} returns the first vertex in the graph that contains (x, y), null otherwise
  */
 function in_any_vertex(x, y) {
-  for (let v of graph.keys()) {
+  for (let v of Object.keys(graph)) {
     if (in_vertex(x, y, v)) return v;
   }
   return null;
@@ -262,7 +305,7 @@ function in_any_vertex(x, y) {
  * @returns {Object} returns the first edge in the graph that contains (x, y), null otherwise
  */
  function in_edge_text(x, y) {
-  for (let vertex of graph.values()) {
+  for (let vertex of Object.values(graph)) {
     for (let edge of vertex.out) {
       const [, , mid] = compute_edge_geometry(edge);
       const diff = [x-mid[0], y-mid[1]];
@@ -278,7 +321,7 @@ function in_any_vertex(x, y) {
  */
 function drag_scene(e) {
   const dx = e.movementX, dy = e.movementY;
-  for (let vertex of graph.values()) {
+  for (let vertex of Object.values(graph)) {
     vertex.x += dx;
     vertex.y += dy;
   }
@@ -291,10 +334,16 @@ function drag_scene(e) {
  * @returns {function} a callback function to handle dragging a vertex
  */
 function higher_order_drag_vertex(v) {
-  const vertex = graph.get(v);
+  const vertex = graph[v];
+  let moved = false;
+  get_canvas().addEventListener('mouseup', () => {  // additional event listener to push_history
+    if (moved) push_history();
+  }, { once:true });  // save once only
+
   return e => {
     [vertex.x, vertex.y] = get_position(e);
     redraw();
+    moved = true;
   }
 }
 let drag_vertex = EMPTY_FUNCTION;
@@ -425,7 +474,7 @@ function draw_text(text, x, y, size) {
  */
 function compute_edge_start_end(edge) {
   const {from, to} = edge;
-  const s = graph.get(from), t = graph.get(to);
+  const s = graph[from], t = graph[to];
   let start, end;
   if (from === to) {
     const {angle1, angle2} = edge;  // additioanl attributes storing the start and end angle
@@ -447,7 +496,7 @@ function compute_edge_start_end(edge) {
  */
 function compute_edge_geometry(edge) {
   const {from, to, a1, a2} = edge;
-  const s = graph.get(from);
+  const s = graph[from];
   const [start, end] = compute_edge_start_end(edge);
   // construct the two basis vectors
   const v1 = [end[0]-start[0], end[1]-start[1]];
@@ -471,7 +520,7 @@ function draw_edge(edge) {
   const {transition, from} = edge;
   const [start, end, mid] = compute_edge_geometry(edge);
   draw_arrow(...start, ...end, ...mid);
-  const text_size = graph.get(from).r;  // using the radius of the vertex as text size
+  const text_size = graph[from].r;  // using the radius of the vertex as text size
   draw_text(transition, ...mid, text_size);
 }
 
@@ -485,7 +534,7 @@ function draw_edge(edge) {
 function create_edge(u, v, angle1, angle2) {
   const transition = prompt("Please input the transition", EMPTY_TRANSITION);
   if (!transition) return;  // can't have null transition
-  const vertex = graph.get(u);
+  const vertex = graph[u];
   for (let existing_edge of vertex.out) {
     if (existing_edge.to === v && existing_edge.transition === transition) return;  // already has it
   }
@@ -498,8 +547,9 @@ function create_edge(u, v, angle1, angle2) {
     const a1 = 0.5, a2 = 1;
     edge = { transition: transition, from: u, to: v, a1: a1, a2: a2, angle1: angle1, angle2: angle2 };
   }
-  vertex.out.add(edge);
+  vertex.out.push(edge);
   draw_edge(edge);
+  push_history();
 }
 
 /**
@@ -508,7 +558,7 @@ function create_edge(u, v, angle1, angle2) {
  * @returns {function} a function that handles drawing an edge from v on mousedrag
  */
 function higher_order_edge_animation(v) {
-  const vertex = graph.get(v);  // convert name of vertex to actual vertex
+  const vertex = graph[v];  // convert name of vertex to actual vertex
   const canvas = get_canvas();
   const ctx = canvas.getContext('2d');
   const cached_canvas = canvas.cloneNode();
@@ -523,7 +573,7 @@ function higher_order_edge_animation(v) {
   canvas.addEventListener('mouseup', e => {  // additional event listener to restore canvas and snap to vertex
     const [x, y] = get_position(e);
     const cur_v = in_any_vertex(x, y);
-    const cur_vertex = graph.get(cur_v);
+    const cur_vertex = graph[cur_v];
     restore();
     if (cur_v && has_left_before) {
       angle2 = Math.atan2(y-cur_vertex.y, x-cur_vertex.x);
@@ -552,7 +602,11 @@ let edge_animation = EMPTY_FUNCTION;
  * @returns {function} a callback function that handles dragging an edge
  */
 function higher_order_drag_edge(edge) {
-  const s = graph.get(edge.from);
+  const s = graph[edge.from];
+  let moved = false;
+  get_canvas().addEventListener('mouseup', () => {  // additional event listener to push_history
+    if (moved) push_history();
+  }, { once:true });  // save once only
 
   return e => {
     const [mouse_x, mouse_y] = get_position(e);
@@ -564,6 +618,7 @@ function higher_order_drag_edge(edge) {
     const proj_on_v2 = proj(mid, v2);
     [edge.a1, edge.a2] = [proj_on_v1[0]/(v1[0]+0.001), proj_on_v2[0]/(v2[0]+0.001)];
     redraw();
+    moved = true;
   }
 }
 let drag_edge = EMPTY_FUNCTION;
@@ -606,13 +661,14 @@ function bind_drag() {
  */
 function delete_vertex(v) {
   remove_context_menu();
-  graph.delete(v);  // remove this vertex
-  for (let vertex of graph.values()) {
-    for (let edge of vertex.out) {
-      if (edge.to == v) vertex.out.delete(edge);  // remove all edges leading to it
+  delete graph[v];  // remove this vertex
+  for (let vertex of Object.values(graph)) {
+    for (let [i, edge] of vertex.out.entries()) {
+      if (edge.to === v) vertex.out.splice(i, 1);  // remove all edges leading to it
     }
   }
   redraw();
+  push_history();
 }
 
 /**
@@ -623,11 +679,11 @@ function delete_vertex(v) {
 function rename_vertex(v, new_name) {
   remove_context_menu();
   if (v === new_name) return;  // nothing to do
-  else if (graph.has(new_name)) alert(new_name + ' already exists');
+  else if (new_name in graph) alert(new_name + ' already exists');
   else {
-    graph.set(new_name, graph.get(v));  // duplicate
-    graph.delete(v);  // remove old
-    for (let vertex of graph.values()) {
+    graph[new_name] = graph[v];  // duplicate
+    delete graph[v];  // remove old
+    for (let vertex of Object.values(graph)) {
       for (let edge of vertex.out) {
         if (edge.from === v) edge.from = new_name;
         if (edge.to === v) edge.to = new_name;
@@ -635,6 +691,7 @@ function rename_vertex(v, new_name) {
     }
   }
   redraw();
+  push_history();
 }
 
 /**
@@ -678,8 +735,16 @@ function display_vertex_menu(v, x, y) {
  */
 function delete_edge(edge) {
   remove_context_menu();
-  graph.get(edge.from).out.delete(edge);
+  for (let vertex of Object.values(graph)) {
+    for (let [i, e] of vertex.out.entries()) {
+      if (e.from === edge.from && e.to === edge.to && e.transition === edge.transition) {
+        vertex.out.splice(i, 1);
+        break;
+      }
+    }
+  }
   redraw();
+  push_history();
 }
 
 /**
@@ -691,6 +756,7 @@ function rename_edge(edge, new_transition) {
   remove_context_menu();
   edge.transition = new_transition;
   redraw();
+  push_history();
 }
 
 /**
@@ -762,13 +828,28 @@ function bind_run_input() {
 }
 
 /**
+ * offers ctrl-z and ctrl-shift-z features
+ */
+function bind_undo_redo() {
+  if (!localStorage.getItem(HIST_KEY)) push_history();  // create empty hist
+  const history = get_history();
+  hist_ptr = hist_tip;
+  graph = history[hist_ptr];
+  redraw();
+  document.addEventListener('keypress', e => {
+    if (e.code !== 'KeyZ' || e.metaKey || e.altKey) return;
+    if (e.ctrlKey && e.shiftKey) redo();
+    else if (e.ctrlKey) undo();
+  });
+}
+
+/**
  * run after all the contents are loaded
  */
 function init() {
-  redraw();  // first time is actually to resize the canvas
-
   bind_double_click();
   bind_drag();
   bind_context_menu();
   bind_run_input();
+  bind_undo_redo();  // takes care of first time drawing
 }
