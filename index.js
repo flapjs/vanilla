@@ -13,6 +13,10 @@ const EMPTY_TRANSITION = 'ε';
 // this is the graph
 const graph = new Map();
 
+/**
+ * finds all letters used in the transitions
+ * @returns {Set<string>} a set of letters used in the transitions
+ */
 function compute_alphabet() {
   const alphabet = new Set();
   for (let vertex of graph.values()) {
@@ -21,10 +25,15 @@ function compute_alphabet() {
   return alphabet;
 }
 
+/**
+ * finds the start vertex
+ * @returns {string} the start of the graph, null of graph empty
+ */
 function find_start() {
   for (let [v, vertex] of graph.entries()) {
     if (vertex.is_start) return v;
   }
+  return null;
 }
 
 /**
@@ -45,6 +54,11 @@ function closure(cur_states) {
   return cur_states;
 }
 
+/**
+ * checks if the set of states provided contains a final state
+ * @param {Set<string>} cur_states - the set of current states we want to check if any is a final state
+ * @returns {boolean} true iff some state in cur_states is a final state
+ */
 function contains_final(cur_states) {
   for (let v of cur_states) {
     if (graph.get(v).is_final) return true;
@@ -52,6 +66,11 @@ function contains_final(cur_states) {
   return false;
 }
 
+/**
+ * check if the input is accepted
+ * @param {string} input 
+ * @returns {boolean} true iff the input is accepted by the machine
+ */
 function run_input(input) {
   if (!graph.size) return false;  // empty graph
   let cur_states = closure(new Set([find_start()]));  // find closure of start
@@ -730,6 +749,9 @@ function bind_context_menu() {
   });
 }
 
+/**
+ * binds each machine input to the run_input function
+ */
 function bind_run_input() {
   const input_divs = document.getElementsByClassName('machine_input');
   for (let i = 0; i < input_divs.length; i++) {
