@@ -153,8 +153,8 @@ function get_canvas() {
  */
 function redraw() {
   const canvas = get_canvas();
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth*window.devicePixelRatio;
+  canvas.height = window.innerHeight*window.devicePixelRatio;
   for (let v of Object.keys(graph)) {
     draw_vertex(v);
     for (let edge of graph[v].out) draw_edge(edge);
@@ -236,8 +236,8 @@ function create_vertex(x, y, radius=DEFAULT_VERTEX_RADIUS) {
  */
 function get_position(e) {
   const rect = e.target.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  const x = (e.clientX - rect.left)*window.devicePixelRatio;
+  const y = (e.clientY - rect.top)*window.devicePixelRatio;
   return [x, y];
 }
 
