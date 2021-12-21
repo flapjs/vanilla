@@ -4,7 +4,7 @@ window.addEventListener('resize', redraw);
 const [LEFT_BTN, MID_BTN, RIGHT_BTN] = [0, 1, 2];
 const EMPTY_FUNCTION = () => {};  // place holder function
 const CLICK_HOLD_TIME = 300;  // [ms] the maximum time between mousedown and mouseup that is still considered a click
-const DEFAULT_VERTEX_RADIUS = 40;
+let DEFAULT_VERTEX_RADIUS = 40;
 const START_TRIANGLE_SCALE = 0.6;  // wrt vertex radius
 const ARROW_LENGTH = 15;
 const ARROW_WIDTH = 10;
@@ -12,6 +12,7 @@ const EMPTY_TRANSITION = 'ε';
 const HIST_KEY = "%history";
 const HIST_TIP_KEY = "%hist_tip";
 const HIST_PTR_KEY = "%hist_ptr";
+const ZOOM_SPEED = 0.001;
 
 // this is the graph
 let graph = {};
@@ -640,8 +641,11 @@ let drag_edge = EMPTY_FUNCTION;
  * binds callback functions to the mouse dragging behavior
  */
 function bind_drag() {
+  let mutex = false;
   const canvas = get_canvas();
   canvas.addEventListener('mousedown', e => {
+    if (mutex) return;  // something has already bind the mouse drag event
+    mutex = true;  // lock
     const [x, y] = get_position(e);
     const clicked_vertex = in_any_vertex(x, y);
     const clicked_edge = in_edge_text(x, y);
@@ -665,6 +669,7 @@ function bind_drag() {
     canvas.removeEventListener('mousemove', drag_vertex);
     canvas.removeEventListener('mousemove', drag_edge);
     canvas.removeEventListener('mousemove', edge_animation);
+    mutex = false;  // release the resource
   })
 }
 
@@ -852,6 +857,24 @@ function bind_undo_redo() {
 }
 
 /**
+ * zooming in and out
+ */
+function bind_scroll() {
+  get_canvas().addEventListener('wheel', e => {
+    e.preventDefault();  // prevent browser scrolling or zooming
+    const [x, y] = get_position(e);
+    const zoom_const = 1 - ZOOM_SPEED*e.deltaY;
+    for (let vertex of Object.values(graph)) {
+      vertex.x = x + zoom_const*(vertex.x-x);
+      vertex.y = y + zoom_const*(vertex.y-y);
+      vertex.r *= zoom_const;
+      DEFAULT_VERTEX_RADIUS = vertex.r;  // to keep everthing consistent
+    }
+    redraw();
+  });
+}
+
+/**
  * run after all the contents are loaded
  */
 function init() {
@@ -862,4 +885,5 @@ function init() {
   bind_context_menu();
   bind_run_input();
   bind_undo_redo();
+  bind_scroll();
 }
