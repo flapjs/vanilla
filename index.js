@@ -4,6 +4,7 @@ window.addEventListener('resize', redraw);
 const [LEFT_BTN, MID_BTN, RIGHT_BTN] = [0, 1, 2];
 const EMPTY_FUNCTION = () => {};  // place holder function
 const CLICK_HOLD_TIME = 300;  // [ms] the maximum time between mousedown and mouseup that is still considered a click
+const DOUBLE_CLICK_TIME = 300;  // [ms] the maximum time between successive clicks to be considered a double click
 let DEFAULT_VERTEX_RADIUS = 40;
 const START_TRIANGLE_SCALE = 0.6;  // wrt vertex radius
 const ARROW_LENGTH = 15;
@@ -875,6 +876,36 @@ function bind_scroll() {
 }
 
 /**
+ * helper function to abstract away double clicking
+ * @param {string} key - ex. KeyZ, KeyA
+ * @param {Function} callback - a function to be called when double click happens
+ */
+function on_double_press(key, callback) {
+  let last_time = 0;
+  document.addEventListener('keypress', e => {
+    if (e.code === key) {
+      if (e.timeStamp-last_time < DOUBLE_CLICK_TIME) {
+        callback();
+        last_time = 0;  // prevent triple click
+      } else {
+        last_time = e.timeStamp;
+      }
+    }
+  });
+}
+
+/**
+ * press dd does delete
+ */
+function bind_dd() {
+  on_double_press('KeyD', () => {
+    graph = {};
+    redraw();
+    push_history();
+  });
+}
+
+/**
  * run after all the contents are loaded
  */
 function init() {
@@ -886,4 +917,5 @@ function init() {
   bind_run_input();
   bind_undo_redo();
   bind_scroll();
+  bind_dd();
 }
