@@ -1,9 +1,9 @@
 * {
   margin: 0px;
   padding: 0px;
-  /* border: 0px; */
   font-family: sans-serif;
   overflow: hidden;
+  user-select: none;
 }
 
 .context_menu {
