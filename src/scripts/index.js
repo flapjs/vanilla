@@ -1,19 +1,8 @@
+import * as linalg from './linalg.js'
+import * as consts from './consts.js'
+
 document.addEventListener('DOMContentLoaded', init);
 window.addEventListener('resize', redraw);
-
-const [LEFT_BTN, MID_BTN, RIGHT_BTN] = [0, 1, 2];
-const EMPTY_FUNCTION = () => {};  // place holder function
-const CLICK_HOLD_TIME = 300;  // [ms] the maximum time between mousedown and mouseup that is still considered a click
-const DOUBLE_CLICK_TIME = 300;  // [ms] the maximum time between successive clicks to be considered a double click
-let DEFAULT_VERTEX_RADIUS = 40;
-const START_TRIANGLE_SCALE = 0.6;  // wrt vertex radius
-const ARROW_LENGTH = 15;
-const ARROW_WIDTH = 10;
-const EMPTY_TRANSITION = 'ε';
-const HIST_KEY = "%history";
-const HIST_TIP_KEY = "%hist_tip";
-const HIST_PTR_KEY = "%hist_ptr";
-const ZOOM_SPEED = 0.001;
 
 // this is the graph
 let graph = {};
@@ -26,11 +15,11 @@ let hist_ptr = -1, hist_tip = -1;
  * @returns {Array<Object>} an array of graphs
  */
 function get_history() {
-  if (!localStorage.getItem(HIST_KEY)) push_history([]);  // push empty history
+  if (!localStorage.getItem(consts.HIST_KEY)) push_history([]);  // push empty history
   // otherwise, already have history written to localstore
-  hist_tip = localStorage.getItem(HIST_TIP_KEY);
-  hist_ptr = localStorage.getItem(HIST_PTR_KEY);
-  return JSON.parse(localStorage.getItem(HIST_KEY));
+  hist_tip = localStorage.getItem(consts.HIST_TIP_KEY);
+  hist_ptr = localStorage.getItem(consts.HIST_PTR_KEY);
+  return JSON.parse(localStorage.getItem(consts.HIST_KEY));
 }
 
 /**
@@ -41,9 +30,9 @@ function push_history(history=null) {
   history[++hist_ptr] = graph;
   hist_tip = hist_ptr;  // we just pushed, so that is the new tip
   const hist_str = JSON.stringify(history);
-  localStorage.setItem(HIST_KEY, hist_str);
-  localStorage.setItem(HIST_TIP_KEY, hist_tip);
-  localStorage.setItem(HIST_PTR_KEY, hist_ptr);
+  localStorage.setItem(consts.HIST_KEY, hist_str);
+  localStorage.setItem(consts.HIST_TIP_KEY, hist_tip);
+  localStorage.setItem(consts.HIST_PTR_KEY, hist_ptr);
 }
 
 /**
@@ -53,7 +42,7 @@ function undo() {
   if (hist_ptr <= 0) return;  // can't go backward
   const history = get_history();
   graph = history[--hist_ptr];
-  localStorage.setItem(HIST_PTR_KEY, hist_ptr);
+  localStorage.setItem(consts.HIST_PTR_KEY, hist_ptr);
   redraw()
 }
 
@@ -64,7 +53,7 @@ function redo() {
   const history = get_history();
   if (hist_ptr == hist_tip) return;  // can't go forward
   graph = history[++hist_ptr];
-  localStorage.setItem(HIST_PTR_KEY, hist_ptr);
+  localStorage.setItem(consts.HIST_PTR_KEY, hist_ptr);
   redraw();
 }
 
@@ -102,7 +91,7 @@ function closure(cur_states) {
     old_size = cur_states.size;
     for (let v of cur_states) {
       for (let edge of graph[v].out) {
-        if (edge.transition === EMPTY_TRANSITION) cur_states.add(edge.to);
+        if (edge.transition === consts.EMPTY_TRANSITION) cur_states.add(edge.to);
       }
     }
   }
@@ -200,11 +189,11 @@ function draw_vertex(v) {
   // draw the circle
   draw_cricle(vertex.x, vertex.y, vertex.r);
   // draw the text inside
-  draw_text(v, vertex.x, vertex.y, vertex.r);
+  draw_text(v, [vertex.x, vertex.y], vertex.r);
   if (vertex.is_start) {  // it is the starting vertex
     const tip1 = [vertex.x-vertex.r, vertex.y],
-          tip2 = [tip1[0]-START_TRIANGLE_SCALE*vertex.r, tip1[1]-START_TRIANGLE_SCALE*vertex.r],
-          tip3 = [tip1[0]-START_TRIANGLE_SCALE*vertex.r, tip1[1]+START_TRIANGLE_SCALE*vertex.r];
+          tip2 = linalg.sub(tip1, linalg.scale(consts.START_TRIANGLE_SCALE, [vertex.r, vertex.r])),
+          tip3 = linalg.sub(tip1, linalg.scale(consts.START_TRIANGLE_SCALE, [vertex.r, -vertex.r]));
     draw_triangle(tip1, tip2, tip3);
   }
   if (vertex.is_final) draw_final_circle(vertex);
@@ -216,7 +205,7 @@ function draw_vertex(v) {
  * @param {float} y - y position of the user mouse click wrt canvas
  * @param {float} radius - the radius of the graphical element
  */
-function create_vertex(x, y, radius=DEFAULT_VERTEX_RADIUS) {
+function create_vertex(x, y, radius) {
   const name = find_unused_name();
   const vertex = {
     x: x,
@@ -248,7 +237,7 @@ function get_position(e) {
  * @param {Object} vertex - the vertex object in which we want to draw a circle
  */
 function draw_final_circle(vertex) {
-  draw_cricle(vertex.x, vertex.y, vertex.r*0.8);
+  draw_cricle(vertex.x, vertex.y, vertex.r*consts.FINAL_CIRCLE_SIZE);
 }
 
 /**
@@ -283,7 +272,7 @@ function bind_double_click() {
     const [x, y] = get_position(e);
     const v = in_any_vertex(x, y);
     if (v) toggle_final(v);
-    else create_vertex(x, y);
+    else create_vertex(x, y, (Object.keys(graph).length) ? Object.values(graph)[0].r : consts.DEFAULT_VERTEX_RADIUS);
   })
 }
 
@@ -297,7 +286,7 @@ function bind_double_click() {
 function in_vertex(x, y, v) {
   const vertex = graph[v];
   const diff = [x-vertex.x, y-vertex.y];
-  return vec_len(diff) < vertex.r;
+  return linalg.vec_len(diff) < vertex.r;
 }
 
 /**
@@ -324,7 +313,7 @@ function in_any_vertex(x, y) {
     for (let edge of vertex.out) {
       const [, , mid] = compute_edge_geometry(edge);
       const diff = [x-mid[0], y-mid[1]];
-      if (vec_len(diff) < vertex.r/2) return edge;
+      if (linalg.vec_len(diff) < vertex.r/2) return edge;
     }
   }
   return null;
@@ -361,7 +350,6 @@ function higher_order_drag_vertex(v) {
     moved = true;
   }
 }
-let drag_vertex = EMPTY_FUNCTION;
 
 /**
  * draw a triangle with three tips provided
@@ -379,107 +367,42 @@ function draw_triangle(tip1, tip2, tip3) {
 }
 
 /**
- * projection of the 2d vector u on to v
- * @param {Array<float>} u - first vector
- * @param {Array<float>} v - second vector (onto which to project the first)
- * @returns {Array<float>} the component of the first vector in the direction of the second
- */
-function proj(u, v) {
-  const unit_v = normalize(v);
-  const dot_prod = u[0]*unit_v[0] + u[1]*unit_v[1];
-  return [dot_prod*unit_v[0], dot_prod*unit_v[1]];
-}
-
-/**
  * draw an curved array with start, end and a mid
- * @param {float} start_x - where to begin x
- * @param {float} start_y - where to begin y
- * @param {float} end_x - where to end x
- * @param {float} end_y - where to end y
- * @param {float} mid_x - control x for quadratic bezier curve
- * @param {float} mid_y - control y for quadratic bezier curve
+ * @param {Array<float>} start - where to begin
+ * @param {Array<float>} end - where to end
+ * @param {Array<float>} mid - control point for quadratic bezier curve
  */
-function draw_arrow(start_x, start_y, end_x, end_y, mid_x, mid_y) {
-  if (!mid_x) mid_x = (start_x+end_x)/2;
-  if (!mid_y) mid_y = (start_y+end_y)/2;
-  const vec1 = [mid_x-start_x, mid_y-start_y];
-  const vec2 = [end_x-start_x, end_y-start_y];
-  const v1_on_v2 = proj(vec1, vec2);
-  const ortho_comp = [(vec1[0]-v1_on_v2[0])/3, (vec1[1]-v1_on_v2[1])/3];
+function draw_arrow(start, end, mid) {
+  if (!mid) mid = linalg.scale(1/2, linalg.add(start, end));  // find mid if DNE
+  const start_to_mid = linalg.sub(mid, start), mid_to_end = linalg.sub(end, mid), start_to_end = linalg.sub(end, start);
+  const v1_on_v2 = linalg.proj(start_to_mid, start_to_end);
+  const ortho_comp = linalg.scale(consts.EDGE_CURVATURE, linalg.sub(start_to_mid, v1_on_v2));
   const ctx = get_canvas().getContext('2d');
   ctx.beginPath();
-  ctx.moveTo(start_x, start_y);
+  ctx.moveTo(...start);
   // we boost the curve by the orthogonal component of v1 wrt v2
-  ctx.quadraticCurveTo(mid_x+ortho_comp[0], mid_y+ortho_comp[1], end_x, end_y);
+  ctx.quadraticCurveTo(...linalg.add(mid, ortho_comp), ...end);
   ctx.stroke();
-  const vec = normalize([end_x-mid_x, end_y-mid_y], ARROW_LENGTH);
-  const normal = normalize(normal_vec(vec), ARROW_WIDTH/2);  // half of the total width
-  const tip1 = [end_x, end_y],
-        tip2 = [end_x-vec[0]+normal[0], end_y-vec[1]+normal[1]],
-        tip3 = [end_x-vec[0]-normal[0], end_y-vec[1]-normal[1]];
+  const arrow_tip = linalg.normalize(linalg.sub(mid_to_end, ortho_comp), consts.ARROW_LENGTH);  
+  const normal_to_tip = linalg.normalize(linalg.normal_vec(arrow_tip), consts.ARROW_WIDTH/2);  // half the total width
+  const tip1 = end,
+        tip2 = linalg.add(linalg.sub(end, arrow_tip), normal_to_tip),
+        tip3 = linalg.sub(linalg.sub(end, arrow_tip), normal_to_tip);
   draw_triangle(tip1, tip2, tip3);
 }
 
 /**
- * compute the length of a vector
- * @param {Array<float>} vec - a vector whose length we want to compute
- * @returns {float} the length of the vector
- */
-function vec_len(vec) {
-  let squared_sum = 0;
-  for (let component of vec) squared_sum+=component*component;
-  return Math.sqrt(squared_sum);
-}
-
-/**
- * computes a orthogonal vector
- * @param {Array<float>} vec - a vector on which to calculate the orthogonal vector
- * @returns {Array<float>} a vector orthogonal of the original vector
- */
-function normal_vec(vec, clockwise=false) {
-  return clockwise ? [vec[1], -vec[0]] : [-vec[1], vec[0]];
-}
-
-/**
- * normalizes a vector to a specific length
- * @param {Array<float>} vec - the vector you want to scale
- * @param {float} final_length - the length you want the final vector to end up
- * @returns {Array<float>} the normalized vector
- */
-function normalize(vec, final_length=1) {
-  const adjusted_vec = [];
-  const length_adj = vec_len(vec)/final_length;
-  for (let component of vec) adjusted_vec.push(component/length_adj);
-  return adjusted_vec;
-}
-
-/**
- * calculate the linear combination of a1*v1+a2*v2
- * @param {Array<float>} v1 - vector1
- * @param {Array<float>} v2 - vector2
- * @param {float} a1 - scalar1
- * @param {float} a2 - scalar2
- * @returns {Array<float>} the result of a1*v1+a2*v2
- */
-function linear_comb(v1, v2, a1=1, a2=1) {
-  const [v1_x, v1_y] = [a1*v1[0], a1*v1[1]];
-  const [v2_x, v2_y] = [a2*v2[0], a2*v2[1]];
-  return [v1_x+v2_x, v1_y+v2_y];
-}
-
-/**
  * draw text on the canvas
- * @param {*} text - the text you want to draw on the screen
- * @param {*} x - x position wrt canvas
- * @param {*} y - y position wrt canvas
+ * @param {string} text - the text you want to draw on the screen
+ * @param {Array<float>} pos - the position wrt canvas
  * @param {float} size - font size
  */
-function draw_text(text, x, y, size) {
+function draw_text(text, pos, size) {
   const ctx = get_canvas().getContext('2d');
   ctx.font = `${size}px Sans-Serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(text, x, y);
+  ctx.fillText(text, ...pos);
 }
 
 /**
@@ -497,7 +420,7 @@ function compute_edge_start_end(edge) {
     end = [t.x+t.r*Math.cos(angle2), t.y+t.r*Math.sin(angle2)];
   } else {
     const from_to = [t.x-s.x, t.y-s.y];
-    const inner_vec = normalize(from_to, s.r);
+    const inner_vec = linalg.normalize(from_to, s.r);
     start = [s.x+inner_vec[0], s.y+inner_vec[1]];
     end = [t.x-inner_vec[0], t.y-inner_vec[1]];
   }
@@ -514,13 +437,12 @@ function compute_edge_geometry(edge) {
   const s = graph[from];
   const [start, end] = compute_edge_start_end(edge);
   // construct the two basis vectors
-  const v1 = [end[0]-start[0], end[1]-start[1]];
-  let v2 = normalize(normal_vec(v1), s.r);
-  let mid_vec = linear_comb(v1, v2, a1, a2);
-  let mid = [start[0]+mid_vec[0], start[1]+mid_vec[1]];
+  const v1 = linalg.sub(end, start), v2 = linalg.normalize(linalg.normal_vec(v1), s.r);
+  const mid_vec = linalg.linear_comb(v1, v2, a1, a2);
+  const mid = linalg.add(start, mid_vec);
   if (from === to && in_vertex(...mid, from)) {  // if edge falls inside the from vertex
     v2 = [-v2[0], -v2[1]];  // flip the second basis vector temporarily
-    mid_vec = linear_comb(v1, v2, a1, a2);
+    mid_vec = linalg.linear_comb(v1, v2, a1, a2);
     mid = [start[0]+mid_vec[0], start[1]+mid_vec[1]];
     edge.a2 = -edge.a2;  // also change the internal direction to make the flip permanent
   }
@@ -534,9 +456,9 @@ function compute_edge_geometry(edge) {
 function draw_edge(edge) {
   const {transition, from} = edge;
   const [start, end, mid] = compute_edge_geometry(edge);
-  draw_arrow(...start, ...end, ...mid);
+  draw_arrow(start, end, mid);
   const text_size = graph[from].r;  // using the radius of the vertex as text size
-  draw_text(transition, ...mid, text_size);
+  draw_text(transition, mid, text_size);
 }
 
 /**
@@ -547,7 +469,7 @@ function draw_edge(edge) {
  * @param {float} angle2 - the angle which the cursor entered the to vertex
  */
 function create_edge(u, v, angle1, angle2) {
-  const transition = prompt("Please input the transition", EMPTY_TRANSITION);
+  const transition = prompt("Please input the transition", consts.EMPTY_TRANSITION);
   if (!transition) return;  // can't have null transition
   const vertex = graph[u];
   for (let existing_edge of vertex.out) {
@@ -605,11 +527,10 @@ function higher_order_edge_animation(v) {
       angle1 = Math.atan2(y-vertex.y, x-vertex.x);
     }
     restore();
-    const [truncate_x, truncate_y] = normalize([x-vertex.x, y-vertex.y], vertex.r);
-    draw_arrow(vertex.x+truncate_x, vertex.y+truncate_y, x, y);
+    const [truncate_x, truncate_y] = linalg.normalize([x-vertex.x, y-vertex.y], vertex.r);
+    draw_arrow([vertex.x+truncate_x, vertex.y+truncate_y], [x, y]);
   }
 }
-let edge_animation = EMPTY_FUNCTION;
 
 /**
  * creates a callback function that handles dragging an edge
@@ -624,25 +545,25 @@ function higher_order_drag_edge(edge) {
   }, { once:true });  // save once only
 
   return e => {
-    const [mouse_x, mouse_y] = get_position(e);
+    const mouse_pos = get_position(e);
     const [start, end] = compute_edge_start_end(edge);
-    const mid = [mouse_x-start[0], mouse_y-start[1]];
-    const v1 = [end[0]-start[0], end[1]-start[1]];
-    const v2 = normalize(normal_vec(v1), s.r);
-    const proj_on_v1 = proj(mid, v1);
-    const proj_on_v2 = proj(mid, v2);
-    [edge.a1, edge.a2] = [proj_on_v1[0]/(v1[0]+0.001), proj_on_v2[0]/(v2[0]+0.001)];
+    const mid = linalg.sub(mouse_pos, start);
+    const v1 = linalg.sub(end, start);
+    const v2 = linalg.normalize(linalg.normal_vec(v1), s.r);  // basis
+    const [inv_v1, inv_v2] = linalg.inv(v1, v2);
+    [edge.a1, edge.a2] = linalg.linear_comb(inv_v1, inv_v2, ...mid);  // matrix vector product
     redraw();
     moved = true;
   }
 }
-let drag_edge = EMPTY_FUNCTION;
 
 /**
  * binds callback functions to the mouse dragging behavior
  */
 function bind_drag() {
-  let mutex = false;
+  let mutex = false;  // drag lock not activiated
+  // declare the callbacks as empty function so that intellisense recognizes them as function
+  let edge_animation = consts.EMPTY_FUNCTION, drag_edge = consts.EMPTY_FUNCTION, drag_vertex = consts.EMPTY_FUNCTION;
   const canvas = get_canvas();
   canvas.addEventListener('mousedown', e => {
     if (mutex) return;  // something has already bind the mouse drag event
@@ -650,10 +571,10 @@ function bind_drag() {
     const [x, y] = get_position(e);
     const clicked_vertex = in_any_vertex(x, y);
     const clicked_edge = in_edge_text(x, y);
-    if ((e.button == RIGHT_BTN || e.ctrlKey) && clicked_vertex) {  // right create edge
+    if ((e.button == consts.RIGHT_BTN || e.ctrlKey) && clicked_vertex) {  // right create edge
       edge_animation = higher_order_edge_animation(clicked_vertex);
       canvas.addEventListener('mousemove', edge_animation);
-    } else if (e.button == LEFT_BTN) {  // left drag
+    } else if (e.button == consts.LEFT_BTN) {  // left drag
       if (clicked_edge) {  // left drag edge
         drag_edge = higher_order_drag_edge(clicked_edge);
         canvas.addEventListener('mousemove', drag_edge);
@@ -821,7 +742,7 @@ function bind_context_menu() {
   canvas.addEventListener('contextmenu', e => {
     e.preventDefault();  // stop the context from showing
     remove_context_menu();  // remove old
-    if (e.timeStamp - last_time_mouse_press > CLICK_HOLD_TIME) return;  // hack
+    if (e.timeStamp - last_time_mouse_press > consts.CLICK_HOLD_TIME) return;  // hack
     const [x, y] = get_position(e);
     const v = in_any_vertex(x, y);
     const edge = in_edge_text(x, y);
@@ -829,8 +750,8 @@ function bind_context_menu() {
     else if (edge) display_edge_menu(edge, e.clientX, e.clientY);
   });
   canvas.addEventListener('mousedown', e => {
-    if (e.button === LEFT_BTN) remove_context_menu();
-    else if (e.button === RIGHT_BTN) last_time_mouse_press = e.timeStamp;
+    if (e.button === consts.LEFT_BTN) remove_context_menu();
+    else if (e.button === consts.RIGHT_BTN) last_time_mouse_press = e.timeStamp;
   });
 }
 
@@ -864,12 +785,11 @@ function bind_scroll() {
   get_canvas().addEventListener('wheel', e => {
     e.preventDefault();  // prevent browser scrolling or zooming
     const [x, y] = get_position(e);
-    const zoom_const = 1 - ZOOM_SPEED*e.deltaY;
+    const zoom_const = 1 - consts.ZOOM_SPEED*e.deltaY;
     for (let vertex of Object.values(graph)) {
       vertex.x = x + zoom_const*(vertex.x-x);
       vertex.y = y + zoom_const*(vertex.y-y);
       vertex.r *= zoom_const;
-      DEFAULT_VERTEX_RADIUS = vertex.r;  // to keep everthing consistent
     }
     redraw();
   });
@@ -884,7 +804,7 @@ function on_double_press(key, callback) {
   let last_time = 0;
   document.addEventListener('keypress', e => {
     if (e.code === key) {
-      if (e.timeStamp-last_time < DOUBLE_CLICK_TIME) {
+      if (e.timeStamp-last_time < consts.DOUBLE_CLICK_TIME) {
         callback();
         last_time = 0;  // prevent triple click
       } else {
