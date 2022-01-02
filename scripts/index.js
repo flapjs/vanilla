@@ -437,9 +437,10 @@ function compute_edge_geometry(edge) {
   const s = graph[from];
   const [start, end] = compute_edge_start_end(edge);
   // construct the two basis vectors
-  const v1 = linalg.sub(end, start), v2 = linalg.normalize(linalg.normal_vec(v1), s.r);
-  const mid_vec = linalg.linear_comb(v1, v2, a1, a2);
-  const mid = linalg.add(start, mid_vec);
+  const v1 = linalg.sub(end, start)
+  let v2 = linalg.normalize(linalg.normal_vec(v1), s.r);
+  let mid_vec = linalg.linear_comb(v1, v2, a1, a2);
+  let mid = linalg.add(start, mid_vec);
   if (from === to && in_vertex(...mid, from)) {  // if edge falls inside the from vertex
     v2 = [-v2[0], -v2[1]];  // flip the second basis vector temporarily
     mid_vec = linalg.linear_comb(v1, v2, a1, a2);
