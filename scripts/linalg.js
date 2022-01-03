@@ -16,7 +16,7 @@ export function vec_len(vec) {
  * @returns {float} <u, v> (u dot v)
  */
 export function dot(u, v) {
-  return u[0]*v[0] + u[1]*v[1]
+  return u[0]*v[0] + u[1]*v[1];
 }
 
 /**
@@ -49,7 +49,7 @@ export function normal_vec(vec, clockwise=false) {
 export function normalize(vec, final_length=1) {
   const adjusted_vec = [];
   const length_adj = vec_len(vec)/final_length;
-  for (let component of vec) adjusted_vec.push(component/length_adj);
+  for (let component of vec) {adjusted_vec.push(component/length_adj);}
   return adjusted_vec;
 }
 
@@ -75,11 +75,11 @@ export function add(v1, v2) {
 
 /**
  * 2d vector subtraction
- * @param {Array<float>} v1 
- * @param {Array<float>} v2 
+ * @param {Array<float>} v1
+ * @param {Array<float>} v2
  * @returns v1-v2
  */
- export function sub(v1, v2) {
+export function sub(v1, v2) {
   return [v1[0]-v2[0], v1[1]-v2[1]];
 }
 

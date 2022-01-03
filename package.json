@@ -1,0 +1,26 @@
+{
+  "name": "flapjs",
+  "version": "1.0.0",
+  "description": "This is a vanilla js rewrite of the [`flap.js`](https://github.com/flapjs/webapp) project. Alternatively, you can consider this a minimal [JFLAP](https://www.jflap.org/) clone in javscript so people only need their browser.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/*.test.js",
+    "lint": "node_modules/.bin/eslint --fix scripts --ext .js",
+    "doc": "node_modules/.bin/jsdoc -d docs scripts/*.js README.md"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flapjs/vanilla.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/flapjs/vanilla/issues"
+  },
+  "homepage": "https://github.com/flapjs/vanilla#readme",
+  "devDependencies": {
+    "eslint": "^8.6.0",
+    "jest": "^27.4.5",
+    "jsdoc": "^3.6.7"
+  }
+}
