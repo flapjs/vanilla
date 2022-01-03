@@ -29,4 +29,10 @@ More detail regarding `a1`, `a2`, `angle1`, `angle2` will be discussed below.
 There is no front end frameworks involved. For drawing the nodes, the `canvas` element from `html5` is used. As the name suggests, when drawing on a `canvas`, we are manipulating individual pixels on the screen. Therefore, most graphical operations require a complete redraw of the screen.
 
 The drawing of edges uses the quadratic bezier curve provided by `canvas`. We specify the control point relative to where the vertices are placed so that the edges move with the vertices. In the diagram below, the red dot is the start, green dot is the control and the blue dot is the end. Moreover, the control point is stored in terms of the basis `v1` and `v2` so we get to write the control in terms of where the vertices are placed. The linear combination `a1*v1 + a2*v2` gives the coordinate of the control in terms of the standard basis (sans a translation constant).
+
 ![edge_mechanics](edge_mechanics.png)
+
+Now, you may wonder what is the additional `angle1` and `angle2` when we have a self loop. These two angles are where the mouse left the vertex and where it came back in the vertex. We use these two angles to determine the starting and ending point of the self loop.
+
+## Running Input
+The simple package currently only has support for NFA (and by extention DFA). We simply do a BFS to see if we can reach a state whose `is_final` attribute is true.
