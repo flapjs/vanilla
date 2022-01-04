@@ -822,6 +822,7 @@ function on_double_press(key, callback) {
  */
 function bind_dd() {
   on_double_press('KeyD', () => {
+    if (!Object.keys(graph).length) return;  // nothing to delete
     graph = {};
     redraw();
     push_history();
