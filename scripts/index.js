@@ -218,7 +218,7 @@ function create_vertex(x, y, radius) {
     out: [],
   };
   graph[name] = vertex;  // add to the list
-  draw_vertex(name);  // draw it
+  redraw();
   push_history();
 }
 
@@ -766,7 +766,7 @@ function bind_run_input() {
   for (let i = 0; i < input_divs.length; i++) {
     const textbox = input_divs[i].querySelector('input');
     const run_btn = input_divs[i].querySelector('button');
-    run_btn.addEventListener('click', () => console.log(run_input(textbox.value)));
+    run_btn.addEventListener('click', () => alert(run_input(textbox.value)));
   }
 }
 
