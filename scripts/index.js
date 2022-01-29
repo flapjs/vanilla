@@ -2,74 +2,26 @@
 
 import * as linalg from './linalg.js';
 import * as consts from './consts.js';
+import * as hist from './history.js';
+import * as drawing from './drawing.js';
 
 document.addEventListener('DOMContentLoaded', init);
-window.addEventListener('resize', redraw);
+window.addEventListener('resize', () => drawing.draw(graph));
 
 // this is the graph
 let graph = {};
 
-// history pointers
-let hist_ptr = -1, hist_tip = -1;
-
-/**
- * get history array from localstore and parse
- * @returns {Array<Object>} an array of graphs
- */
-function get_history() {
-  if (!localStorage.getItem(consts.HIST_KEY)) {push_history([]);}  // push empty history
-  // otherwise, already have history written to localstore
-  hist_tip = localStorage.getItem(consts.HIST_TIP_KEY);
-  hist_ptr = localStorage.getItem(consts.HIST_PTR_KEY);
-  return JSON.parse(localStorage.getItem(consts.HIST_KEY));
-}
-
-/**
- * push the current state of the graph onto history
- */
-function push_history(history=null) {
-  if (!history) {history = get_history();}
-  history[++hist_ptr] = graph;
-  hist_tip = hist_ptr;  // we just pushed, so that is the new tip
-  const hist_str = JSON.stringify(history);
-  localStorage.setItem(consts.HIST_KEY, hist_str);
-  localStorage.setItem(consts.HIST_TIP_KEY, hist_tip);
-  localStorage.setItem(consts.HIST_PTR_KEY, hist_ptr);
-}
-
-/**
- * undos the last operation
- */
-function undo() {
-  if (hist_ptr <= 0) {return;}  // can't go backward
-  const history = get_history();
-  graph = history[--hist_ptr];
-  localStorage.setItem(consts.HIST_PTR_KEY, hist_ptr);
-  redraw();
-}
-
-/**
- * redo the last undo
- */
-function redo() {
-  const history = get_history();
-  if (hist_ptr === hist_tip) {return;}  // can't go forward
-  graph = history[++hist_ptr];
-  localStorage.setItem(consts.HIST_PTR_KEY, hist_ptr);
-  redraw();
-}
-
-/**
- * finds all letters used in the transitions
- * @returns {Set<string>} a set of letters used in the transitions
- */
-function compute_alphabet() {
-  const alphabet = new Set();
-  for (let vertex of Object.values(graph)) {
-    for (let edge of vertex.out) {alphabet.add(edge.transition);}
-  }
-  return alphabet;
-}
+// /**
+//  * finds all letters used in the transitions
+//  * @returns {Set<string>} a set of letters used in the transitions
+//  */
+// function compute_alphabet() {
+//   const alphabet = new Set();
+//   for (let vertex of Object.values(graph)) {
+//     for (let edge of vertex.out) {alphabet.add(edge.transition);}
+//   }
+//   return alphabet;
+// }
 
 /**
  * finds the start vertex
@@ -134,27 +86,6 @@ function run_input(input) {
 }
 
 /**
- * get the machine drawing canvas
- * @returns the canvas object on which the machine is drawn
- */
-function get_canvas() {
-  return document.getElementById('machine_drawing');
-}
-
-/**
- * redraw the entire canvas based on the graph
- */
-function redraw() {
-  const canvas = get_canvas();
-  canvas.width = window.innerWidth*window.devicePixelRatio;
-  canvas.height = window.innerHeight*window.devicePixelRatio;
-  for (let v of Object.keys(graph)) {
-    draw_vertex(v);
-    for (let edge of graph[v].out) {draw_edge(edge);}
-  }
-}
-
-/**
  * go through the list of used names for a vertex and find the smallest unused
  * @returns the smallest unused name for a vertex
  */
@@ -168,40 +99,6 @@ function find_unused_name() {
 }
 
 /**
- * draw a circle on the current canvas
- * @param {int} x - x position from left wrt canvas
- * @param {int} y - y position from top wrt canvas
- * @param {int} r - radius of the circle
- * @param {float} thickness - line width
- */
-function draw_cricle(x, y, r, thickness=1) {
-  const ctx = get_canvas().getContext('2d');
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, 2*Math.PI);
-  ctx.lineWidth = Math.round(thickness);
-  ctx.stroke();
-}
-
-/**
- * given the name of the vertex, grab the vertex from graph and draw it on screen
- * @param {string} v 
- */
-function draw_vertex(v) {
-  const vertex = graph[v];
-  // draw the circle
-  draw_cricle(vertex.x, vertex.y, vertex.r);
-  // draw the text inside
-  draw_text(v, [vertex.x, vertex.y], vertex.r);
-  if (vertex.is_start) {  // it is the starting vertex
-    const tip1 = [vertex.x-vertex.r, vertex.y],
-      tip2 = linalg.sub(tip1, linalg.scale(consts.START_TRIANGLE_SCALE, [vertex.r, vertex.r])),
-      tip3 = linalg.sub(tip1, linalg.scale(consts.START_TRIANGLE_SCALE, [vertex.r, -vertex.r]));
-    draw_triangle(tip1, tip2, tip3);
-  }
-  if (vertex.is_final) {draw_final_circle(vertex);}
-}
-
-/**
  * create a vertex at the place the user has clicked
  * @param {float} x - x position of the user mouse click wrt canvas
  * @param {float} y - y position of the user mouse click wrt canvas
@@ -210,6 +107,7 @@ function draw_vertex(v) {
 function create_vertex(x, y, radius) {
   const name = find_unused_name();
   const vertex = {
+    name: name,
     x: x,
     y: y,
     r: radius,
@@ -218,8 +116,8 @@ function create_vertex(x, y, radius) {
     out: [],
   };
   graph[name] = vertex;  // add to the list
-  redraw();
-  push_history();
+  drawing.draw(graph);
+  hist.push_history(graph);
 }
 
 /**
@@ -235,22 +133,14 @@ function get_position(e) {
 }
 
 /**
- * draws a smaller concentric circle within the vertex
- * @param {Object} vertex - the vertex object in which we want to draw a circle
- */
-function draw_final_circle(vertex) {
-  draw_cricle(vertex.x, vertex.y, vertex.r*consts.FINAL_CIRCLE_SIZE);
-}
-
-/**
  * mark a vertex as start
  * @param {string} v - name of the vertex
  */
 function set_start(v) {
   for (let vertex of Object.values(graph)) {vertex.is_start = false;}
   graph[v].is_start = true;
-  redraw();
-  push_history();
+  drawing.draw(graph);
+  hist.push_history(graph);
 }
 
 /**
@@ -260,16 +150,16 @@ function set_start(v) {
 function toggle_final(v) {
   const vertex = graph[v];
   vertex.is_final = !vertex.is_final;
-  if (vertex.is_final) {draw_final_circle(vertex);}  // adding a circle
-  else {redraw();}  // removing the circle, requires redrawing
-  push_history();
+  if (vertex.is_final) {drawing.draw_final_circle(vertex);}  // adding a circle
+  else {drawing.draw(graph);}  // removing the circle, requires drawing
+  hist.push_history(graph);
 }
 
 /**
  * binds double click behavior
  */
 function bind_double_click() {
-  get_canvas().addEventListener('dblclick', e => {  // double click to create vertices
+  drawing.get_canvas().addEventListener('dblclick', e => {  // double click to create vertices
     if (e.movementX || e.movementY) {return;}  // shifted, don't create
     const [x, y] = get_position(e);
     const v = in_any_vertex(x, y);
@@ -313,7 +203,7 @@ function in_any_vertex(x, y) {
 function in_edge_text(x, y) {
   for (let vertex of Object.values(graph)) {
     for (let edge of vertex.out) {
-      const [, , mid] = compute_edge_geometry(edge);
+      const [, , mid] = drawing.compute_edge_geometry(graph, edge);
       const diff = [x-mid[0], y-mid[1]];
       if (linalg.vec_len(diff) < vertex.r/2) {return edge;}
     }
@@ -331,7 +221,7 @@ function drag_scene(e) {
     vertex.x += dx;
     vertex.y += dy;
   }
-  redraw();
+  drawing.draw(graph);
 }
 
 /**
@@ -342,126 +232,15 @@ function drag_scene(e) {
 function higher_order_drag_vertex(v) {
   const vertex = graph[v];
   let moved = false;
-  get_canvas().addEventListener('mouseup', () => {  // additional event listener to push_history
-    if (moved) {push_history();}
+  drawing.get_canvas().addEventListener('mouseup', () => {  // additional event listener to hist.push_history
+    if (moved) {hist.push_history(graph);}
   }, { once:true });  // save once only
 
   return e => {
     [vertex.x, vertex.y] = get_position(e);
-    redraw();
+    drawing.draw(graph);
     moved = true;
   };
-}
-
-/**
- * draw a triangle with three tips provided
- * @param {Array<float>} tip1 
- * @param {Array<float>} tip2 
- * @param {Array<float>} tip3 
- */
-function draw_triangle(tip1, tip2, tip3) {
-  const ctx = get_canvas().getContext('2d');
-  ctx.beginPath();
-  ctx.moveTo(...tip1);
-  ctx.lineTo(...tip2);
-  ctx.lineTo(...tip3);
-  ctx.fill();
-}
-
-/**
- * draw an curved array with start, end and a mid
- * @param {Array<float>} start - where to begin
- * @param {Array<float>} end - where to end
- * @param {Array<float>} mid - control point for quadratic bezier curve
- */
-function draw_arrow(start, end, mid) {
-  if (!mid) {mid = linalg.scale(1/2, linalg.add(start, end));}  // find mid if DNE
-  const start_to_mid = linalg.sub(mid, start), mid_to_end = linalg.sub(end, mid), start_to_end = linalg.sub(end, start);
-  const v1_on_v2 = linalg.proj(start_to_mid, start_to_end);
-  const ortho_comp = linalg.scale(consts.EDGE_CURVATURE, linalg.sub(start_to_mid, v1_on_v2));
-  const ctx = get_canvas().getContext('2d');
-  ctx.beginPath();
-  ctx.moveTo(...start);
-  // we boost the curve by the orthogonal component of v1 wrt v2
-  ctx.quadraticCurveTo(...linalg.add(mid, ortho_comp), ...end);
-  ctx.stroke();
-  const arrow_tip = linalg.normalize(linalg.sub(mid_to_end, ortho_comp), consts.ARROW_LENGTH);  
-  const normal_to_tip = linalg.normalize(linalg.normal_vec(arrow_tip), consts.ARROW_WIDTH/2);  // half the total width
-  const tip1 = end,
-    tip2 = linalg.add(linalg.sub(end, arrow_tip), normal_to_tip),
-    tip3 = linalg.sub(linalg.sub(end, arrow_tip), normal_to_tip);
-  draw_triangle(tip1, tip2, tip3);
-}
-
-/**
- * draw text on the canvas
- * @param {string} text - the text you want to draw on the screen
- * @param {Array<float>} pos - the position wrt canvas
- * @param {float} size - font size
- */
-function draw_text(text, pos, size) {
-  const ctx = get_canvas().getContext('2d');
-  ctx.font = `${size}px Sans-Serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(text, ...pos);
-}
-
-/**
- * computes the geometric start and end of the edge wrt canvas
- * @param {Object} edge - the edge we want to compute the start and end of
- * @returns {Array<Object>} [start, end], both 2d vectors
- */
-function compute_edge_start_end(edge) {
-  const {from, to} = edge;
-  const s = graph[from], t = graph[to];
-  let start, end;
-  if (from === to) {
-    const {angle1, angle2} = edge;  // additioanl attributes storing the start and end angle
-    start = [s.x+s.r*Math.cos(angle1), s.y+s.r*Math.sin(angle1)];
-    end = [t.x+t.r*Math.cos(angle2), t.y+t.r*Math.sin(angle2)];
-  } else {
-    const from_to = [t.x-s.x, t.y-s.y];
-    const inner_vec = linalg.normalize(from_to, s.r);
-    start = [s.x+inner_vec[0], s.y+inner_vec[1]];
-    end = [t.x-inner_vec[0], t.y-inner_vec[1]];
-  }
-  return [start, end];
-}
-
-/**
- * computes the geometric start, end, and quadratic bezier curve control
- * @param {Object} edge - the edge we want to compute the start and end and mid of
- * @returns {Array<Object>} [start, end, mid], all 2d vectors
- */
-function compute_edge_geometry(edge) {
-  const {from, to, a1, a2} = edge;
-  const s = graph[from];
-  const [start, end] = compute_edge_start_end(edge);
-  // construct the two basis vectors
-  const v1 = linalg.sub(end, start);
-  let v2 = linalg.normalize(linalg.normal_vec(v1), s.r);
-  let mid_vec = linalg.linear_comb(v1, v2, a1, a2);
-  let mid = linalg.add(start, mid_vec);
-  if (from === to && in_vertex(...mid, from)) {  // if edge falls inside the from vertex
-    v2 = [-v2[0], -v2[1]];  // flip the second basis vector temporarily
-    mid_vec = linalg.linear_comb(v1, v2, a1, a2);
-    mid = [start[0]+mid_vec[0], start[1]+mid_vec[1]];
-    edge.a2 = -edge.a2;  // also change the internal direction to make the flip permanent
-  }
-  return [start, end, mid];
-}
-
-/**
- * draws the edge object on the canvas
- * @param {Object} edge - the edge object you want to draw
- */
-function draw_edge(edge) {
-  const {transition, from} = edge;
-  const [start, end, mid] = compute_edge_geometry(edge);
-  draw_arrow(start, end, mid);
-  const text_size = graph[from].r;  // using the radius of the vertex as text size
-  draw_text(transition, mid, text_size);
 }
 
 /**
@@ -488,8 +267,8 @@ function create_edge(u, v, angle1, angle2) {
     edge = { transition: transition, from: u, to: v, a1: a1, a2: a2, angle1: angle1, angle2: angle2 };
   }
   vertex.out.push(edge);
-  draw_edge(edge);
-  push_history();
+  drawing.draw(graph);
+  hist.push_history(graph);
 }
 
 /**
@@ -499,7 +278,7 @@ function create_edge(u, v, angle1, angle2) {
  */
 function higher_order_edge_animation(v) {
   const vertex = graph[v];  // convert name of vertex to actual vertex
-  const canvas = get_canvas();
+  const canvas = drawing.get_canvas();
   const ctx = canvas.getContext('2d');
   const cached_canvas = canvas.cloneNode();
   cached_canvas.getContext('2d').drawImage(canvas, 0, 0);  // save the original image
@@ -531,7 +310,7 @@ function higher_order_edge_animation(v) {
     }
     restore();
     const [truncate_x, truncate_y] = linalg.normalize([x-vertex.x, y-vertex.y], vertex.r);
-    draw_arrow([vertex.x+truncate_x, vertex.y+truncate_y], [x, y]);
+    drawing.draw_arrow([vertex.x+truncate_x, vertex.y+truncate_y], [x, y]);
   };
 }
 
@@ -543,19 +322,19 @@ function higher_order_edge_animation(v) {
 function higher_order_drag_edge(edge) {
   const s = graph[edge.from];
   let moved = false;
-  get_canvas().addEventListener('mouseup', () => {  // additional event listener to push_history
-    if (moved) {push_history();}
+  drawing.get_canvas().addEventListener('mouseup', () => {  // additional event listener to hist.push_history
+    if (moved) {hist.push_history(graph);}
   }, { once:true });  // save once only
 
   return e => {
     const mouse_pos = get_position(e);
-    const [start, end] = compute_edge_start_end(edge);
+    const [start, end] = drawing.compute_edge_start_end(graph, edge);
     const mid = linalg.sub(mouse_pos, start);
     const v1 = linalg.sub(end, start);
     const v2 = linalg.normalize(linalg.normal_vec(v1), s.r);  // basis
     const [inv_v1, inv_v2] = linalg.inv(v1, v2);
     [edge.a1, edge.a2] = linalg.linear_comb(inv_v1, inv_v2, ...mid);  // matrix vector product
-    redraw();
+    drawing.draw(graph);
     moved = true;
   };
 }
@@ -567,7 +346,7 @@ function bind_drag() {
   let mutex = false;  // drag lock not activiated
   // declare the callbacks as empty function so that intellisense recognizes them as function
   let edge_animation = consts.EMPTY_FUNCTION, drag_edge = consts.EMPTY_FUNCTION, drag_vertex = consts.EMPTY_FUNCTION;
-  const canvas = get_canvas();
+  const canvas = drawing.get_canvas();
   canvas.addEventListener('mousedown', e => {
     if (mutex) {return;}  // something has already bind the mouse drag event
     mutex = true;  // lock
@@ -610,8 +389,8 @@ function delete_vertex(v) {
       if (edge.to === v) {vertex.out.splice(i, 1);}  // remove all edges leading to it
     }
   }
-  redraw();
-  push_history();
+  drawing.draw(graph);
+  hist.push_history(graph);
 }
 
 /**
@@ -633,8 +412,8 @@ function rename_vertex(v, new_name) {
       }
     }
   }
-  redraw();
-  push_history();
+  drawing.draw(graph);
+  hist.push_history(graph);
 }
 
 /**
@@ -673,7 +452,7 @@ function display_vertex_menu(v, x, y) {
 }
 
 /**
- * delete an edge of the graph and redraw
+ * delete an edge of the graph and draw
  * @param {Object} edge the edge we want to get rid of
  */
 function delete_edge(edge) {
@@ -686,8 +465,8 @@ function delete_edge(edge) {
       }
     }
   }
-  redraw();
-  push_history();
+  drawing.draw(graph);
+  hist.push_history(graph);
 }
 
 /**
@@ -698,8 +477,8 @@ function delete_edge(edge) {
 function rename_edge(edge, new_transition) {
   remove_context_menu();
   edge.transition = new_transition;
-  redraw();
-  push_history();
+  drawing.draw(graph);
+  hist.push_history(graph);
 }
 
 /**
@@ -740,7 +519,7 @@ function remove_context_menu() {
  * replaces the default context menu
  */
 function bind_context_menu() {
-  const canvas = get_canvas();
+  const canvas = drawing.get_canvas();
   let last_time_mouse_press;
   canvas.addEventListener('contextmenu', e => {
     e.preventDefault();  // stop the context from showing
@@ -776,8 +555,9 @@ function bind_run_input() {
 function bind_undo_redo() {
   document.addEventListener('keypress', e => {
     if (e.code !== 'KeyZ' || e.metaKey || e.altKey) {return;}
-    if (e.ctrlKey && e.shiftKey) {redo();}
-    else if (e.ctrlKey) {undo();}
+    if (e.ctrlKey && e.shiftKey) { graph = hist.redo(); }
+    else if (e.ctrlKey) { graph = hist.undo(); }
+    drawing.draw(graph);
   });
 }
 
@@ -785,7 +565,7 @@ function bind_undo_redo() {
  * zooming in and out
  */
 function bind_scroll() {
-  get_canvas().addEventListener('wheel', e => {
+  drawing.get_canvas().addEventListener('wheel', e => {
     e.preventDefault();  // prevent browser scrolling or zooming
     const [x, y] = get_position(e);
     const zoom_const = 1 - consts.ZOOM_SPEED*e.deltaY;
@@ -794,7 +574,7 @@ function bind_scroll() {
       vertex.y = y + zoom_const*(vertex.y-y);
       vertex.r *= zoom_const;
     }
-    redraw();
+    drawing.draw(graph);
   });
 }
 
@@ -824,8 +604,8 @@ function bind_dd() {
   on_double_press('KeyD', () => {
     if (!Object.keys(graph).length) return;  // nothing to delete
     graph = {};
-    redraw();
-    push_history();
+    drawing.draw(graph);
+    hist.push_history(graph);
   });
 }
 
@@ -833,8 +613,8 @@ function bind_dd() {
  * run after all the contents are loaded
  */
 function init() {
-  graph = get_history().at(hist_ptr);
-  redraw();
+  graph = hist.retrieve_latest_graph();
+  drawing.draw(graph);
   bind_double_click();
   bind_drag();
   bind_context_menu();
