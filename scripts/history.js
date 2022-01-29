@@ -10,7 +10,7 @@ let hist_ptr = -1, hist_tip = -1;
  * @returns {Array<Object>} an array of graphs
  */
 export function get_history() {
-  if (!localStorage.getItem(consts.HIST_KEY)) {push_history([], []);}  // push empty history
+  if (!localStorage.getItem(consts.HIST_KEY)) {push_history({}, []);}  // push empty history
   // otherwise, already have history written to localstore
   hist_tip = localStorage.getItem(consts.HIST_TIP_KEY);
   hist_ptr = localStorage.getItem(consts.HIST_PTR_KEY);
