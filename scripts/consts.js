@@ -12,6 +12,9 @@ export const RIGHT_BTN = 2;
 /** @constant {function} EMPTY_FUNCTION - place holder function */
 export const EMPTY_FUNCTION = () => {};
 
+/** @constant {Object} EMPTY_GRAPH - empty graph object */
+export const EMPTY_GRAPH = {};
+
 /** @constant {float} CLICK_HOLD_TIME - [ms] the maximum time between mousedown and mouseup still considered as click */
 export const CLICK_HOLD_TIME = 300;
 
@@ -32,6 +35,12 @@ export const ARROW_WIDTH = 10;
 
 /** @constant {string} EMPTY_TRANSITION - default transition too */
 export const EMPTY_TRANSITION = 'ε';
+
+/** @constant {string} EMPTY_SYMBOL - no operation stack symbol */
+export const EMPTY_SYMBOL = 'ε';
+
+/** @constant {string} ARROW_SYMBOL - arrow symbol */
+export const ARROW_SYMBOL = '→';
 
 /** @constant {string} HIST_KEY - localstore key to the history stack */
 export const HIST_KEY = '%history';

@@ -4,86 +4,13 @@ import * as linalg from './linalg.js';
 import * as consts from './consts.js';
 import * as hist from './history.js';
 import * as drawing from './drawing.js';
+import * as compute from './compute.js';
 
 document.addEventListener('DOMContentLoaded', init);
 window.addEventListener('resize', () => drawing.draw(graph));
 
 // this is the graph
-let graph = {};
-
-// /**
-//  * finds all letters used in the transitions
-//  * @returns {Set<string>} a set of letters used in the transitions
-//  */
-// function compute_alphabet() {
-//   const alphabet = new Set();
-//   for (let vertex of Object.values(graph)) {
-//     for (let edge of vertex.out) {alphabet.add(edge.transition);}
-//   }
-//   return alphabet;
-// }
-
-/**
- * finds the start vertex
- * @returns {string} the start of the graph, null of graph empty
- */
-function find_start() {
-  for (let [v, vertex] of Object.entries(graph)) {
-    if (vertex.is_start) {return v;}
-  }
-  return null;
-}
-
-/**
- * compute the set of closure of current states (in-place and returns)
- * @param {Set<string>} cur_states - current states the machine is in
- * @returns {Set<string>} the closure of cur_states
- */
-function closure(cur_states) {
-  let old_size = 0;  // initialize size to be zero
-  while (cur_states.size > old_size) {  // if we have added new state to the mix, then keep going
-    old_size = cur_states.size;
-    for (let v of cur_states) {
-      for (let edge of graph[v].out) {
-        if (edge.transition === consts.EMPTY_TRANSITION) {cur_states.add(edge.to);}
-      }
-    }
-  }
-  return cur_states;
-}
-
-/**
- * checks if the set of states provided contains a final state
- * @param {Set<string>} cur_states - the set of current states we want to check if any is a final state
- * @returns {boolean} true iff some state in cur_states is a final state
- */
-function contains_final(cur_states) {
-  for (let v of cur_states) {
-    if (graph[v].is_final) {return true;}
-  }
-  return false;
-}
-
-/**
- * check if the input is accepted
- * @param {string} input 
- * @returns {boolean} true iff the input is accepted by the machine
- */
-function run_input(input) {
-  if (!Object.keys(graph).length) {return false;}  // empty graph
-  let cur_states = closure(new Set([find_start()]));  // find closure of start
-  for (let c of input) {
-    const new_states = new Set();
-    for (let v of cur_states) {
-      for (let edge of graph[v].out) {
-        if (edge.transition === c) {new_states.add(edge.to);}
-      }
-    }
-    cur_states = closure(new_states);
-    if (!cur_states.size) {return false;}  // can't go anywhere
-  }
-  return contains_final(cur_states);
-}
+let graph = consts.EMPTY_GRAPH;
 
 /**
  * go through the list of used names for a vertex and find the smallest unused
@@ -249,10 +176,16 @@ function higher_order_drag_vertex(v) {
  * @param {string} v - to vertex
  * @param {float} angle1 - the angle which the cursor left the from vertex
  * @param {float} angle2 - the angle which the cursor entered the to vertex
+ * @param {string} pop_symbol - the symbol to pop on top of the stack
+ * @param {string} push_symbol - the symbol to push on top of the stack
  */
 function create_edge(u, v, angle1, angle2) {
   const transition = prompt('Please input the transition', consts.EMPTY_TRANSITION);
+  let pop_symbol = prompt('Please input the pop symbol', consts.EMPTY_SYMBOL);
+  let push_symbol = prompt('Please input the push symbol', consts.EMPTY_SYMBOL);
   if (!transition) {return;}  // can't have null transition
+  else if (!pop_symbol) {pop_symbol = null;}
+  else if (!push_symbol) {push_symbol = null;}
   const vertex = graph[u];
   for (let existing_edge of vertex.out) {
     if (existing_edge.to === v && existing_edge.transition === transition) {return;}  // already has it
@@ -261,10 +194,12 @@ function create_edge(u, v, angle1, angle2) {
   let edge;
   if (u !== v) {  // easy case since start and end are different
     const a1 = 0.5, a2 = 0;  // right in the center
-    edge = { transition: transition, from: u, to: v, a1: a1, a2: a2 };
+    edge = { transition: transition, from: u, to: v, a1: a1, a2: a2,
+             pop_symbol: pop_symbol, push_symbol: push_symbol };
   } else {  // self loop
     const a1 = 0.5, a2 = 1;
-    edge = { transition: transition, from: u, to: v, a1: a1, a2: a2, angle1: angle1, angle2: angle2 };
+    edge = { transition: transition, from: u, to: v, a1: a1, a2: a2, angle1: angle1, angle2: angle2,
+             pop_symbol: pop_symbol, push_symbol: push_symbol };
   }
   vertex.out.push(edge);
   drawing.draw(graph);
@@ -545,7 +480,7 @@ function bind_run_input() {
   for (let i = 0; i < input_divs.length; i++) {
     const textbox = input_divs[i].querySelector('input');
     const run_btn = input_divs[i].querySelector('button');
-    run_btn.addEventListener('click', () => alert(run_input(textbox.value)));
+    run_btn.addEventListener('click', () => alert(compute.run_input(textbox.value)));
   }
 }
 
@@ -603,18 +538,25 @@ function on_double_press(key, callback) {
 function bind_dd() {
   on_double_press('KeyD', () => {
     if (!Object.keys(graph).length) return;  // nothing to delete
-    graph = {};
+    graph = EMPTY_GRAPH;
     drawing.draw(graph);
     hist.push_history(graph);
   });
 }
 
 /**
+ * get the lastest graph from localstore and display
+ */
+function init_graph() {
+  graph = hist.retrieve_latest_graph();
+  drawing.draw(graph);
+}
+
+/**
  * run after all the contents are loaded
  */
 function init() {
-  graph = hist.retrieve_latest_graph();
-  drawing.draw(graph);
+  init_graph();
   bind_double_click();
   bind_drag();
   bind_context_menu();

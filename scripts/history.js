@@ -45,8 +45,8 @@ export function push_history(graph, history=null) {
  * @returns {Object} the last graph
  */
 export function undo() {
-  if (hist_ptr <= 0) {return;}  // can't go backward
   const history = get_history();
+  if (hist_ptr <= 0) {return history[hist_ptr];}  // can't go backward
   const graph = history[--hist_ptr];
   localStorage.setItem(consts.HIST_PTR_KEY, hist_ptr);
   return graph;
@@ -58,7 +58,7 @@ export function undo() {
  */
 export function redo() {
   const history = get_history();
-  if (hist_ptr === hist_tip) {return;}  // can't go forward
+  if (hist_ptr === hist_tip) {return history[hist_ptr];}  // can't go forward
   const graph = history[++hist_ptr];
   localStorage.setItem(consts.HIST_PTR_KEY, hist_ptr);
   return graph;

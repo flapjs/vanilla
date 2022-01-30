@@ -160,9 +160,10 @@ export function compute_edge_geometry(graph, edge) {
  * @param {float} text_size - the font size of the transition label
  */
 export function draw_edge(graph, edge, text_size) {
-  const {transition} = edge;
+  let {transition, pop_symbol, push_symbol} = edge;
   const [start, end, mid] = compute_edge_geometry(graph, edge);
   draw_arrow(start, end, mid);
+  if (pop_symbol || push_symbol) transition += ','+pop_symbol+consts.ARROW_SYMBOL+push_symbol;
   draw_text(transition, mid, text_size);
 }
 
