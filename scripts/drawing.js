@@ -107,6 +107,52 @@ export function draw_arrow(start, end, mid) {
 }
 
 /**
+ * checks if (x, y) wrt canvas is inside vertex v
+ * @param {Object} graph - the graph of interest
+ * @param {float} x - x position
+ * @param {float} y - y position
+ * @param {string} v - name of the vertex 
+ * @returns {boolean} whether (x, y) is in v
+ */
+export function in_vertex(graph, x, y, v) {
+  const vertex = graph[v];
+  const diff = [x-vertex.x, y-vertex.y];
+  return linalg.vec_len(diff) < vertex.r;
+}
+
+/**
+ * detects if the current click is inside a vertex
+ * @param {Object} graph - the graph of interest
+ * @param {float} x - x position wrt canvas 
+ * @param {float} y - y position wrt canvas
+ * @returns {string} returns the first vertex in the graph that contains (x, y), null otherwise
+ */
+export function in_any_vertex(graph, x, y) {
+  for (let v of Object.keys(graph)) {
+    if (in_vertex(graph, x, y, v)) {return v;}
+  }
+  return null;
+}
+
+/**
+ * detects if the current click is inside edge text
+ * @param {Object} graph - the graph of interest
+ * @param {float} x - x position wrt canvas 
+ * @param {float} y - y position wrt canvas
+ * @returns {Object} returns the first edge in the graph that contains (x, y), null otherwise
+ */
+export function in_edge_text(graph, x, y) {
+  for (let vertex of Object.values(graph)) {
+    for (let edge of vertex.out) {
+      const [, , mid] = compute_edge_geometry(graph, edge);
+      const diff = [x-mid[0], y-mid[1]];
+      if (linalg.vec_len(diff) < vertex.r/2) {return edge;}
+    }
+  }
+  return null;
+}
+
+/**
  * computes the geometric start and end of the edge wrt canvas
  * @param {Object} graph - the graph containing the edge
  * @param {Object} edge - the edge we want to compute the start and end of
@@ -144,7 +190,7 @@ export function compute_edge_geometry(graph, edge) {
   let v2 = linalg.normalize(linalg.normal_vec(v1), s.r);
   let mid_vec = linalg.linear_comb(v1, v2, a1, a2);
   let mid = linalg.add(start, mid_vec);
-  if (from === to && in_vertex(...mid, from)) {  // if edge falls inside the from vertex
+  if (from === to && in_vertex(graph, ...mid, from)) {  // if edge falls inside the from vertex
     v2 = [-v2[0], -v2[1]];  // flip the second basis vector temporarily
     mid_vec = linalg.linear_comb(v1, v2, a1, a2);
     mid = [start[0]+mid_vec[0], start[1]+mid_vec[1]];
@@ -163,7 +209,7 @@ export function draw_edge(graph, edge, text_size) {
   let {transition, pop_symbol, push_symbol} = edge;
   const [start, end, mid] = compute_edge_geometry(graph, edge);
   draw_arrow(start, end, mid);
-  if (pop_symbol || push_symbol) transition += ','+pop_symbol+consts.ARROW_SYMBOL+push_symbol;
+  if (pop_symbol || push_symbol) {transition += ','+pop_symbol+consts.ARROW_SYMBOL+push_symbol;}
   draw_text(transition, mid, text_size);
 }
 

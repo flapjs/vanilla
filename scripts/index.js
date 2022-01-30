@@ -9,8 +9,7 @@ import * as compute from './compute.js';
 document.addEventListener('DOMContentLoaded', init);
 window.addEventListener('resize', () => drawing.draw(graph));
 
-// this is the graph
-let graph = consts.EMPTY_GRAPH;
+let graph = consts.EMPTY_GRAPH;  // global graph
 
 /**
  * go through the list of used names for a vertex and find the smallest unused
@@ -89,53 +88,10 @@ function bind_double_click() {
   drawing.get_canvas().addEventListener('dblclick', e => {  // double click to create vertices
     if (e.movementX || e.movementY) {return;}  // shifted, don't create
     const [x, y] = get_position(e);
-    const v = in_any_vertex(x, y);
+    const v = drawing.in_any_vertex(graph, x, y);
     if (v) {toggle_final(v);}
     else {create_vertex(x, y, (Object.keys(graph).length) ? Object.values(graph)[0].r : consts.DEFAULT_VERTEX_RADIUS);}
   });
-}
-
-/**
- * checks if (x, y) wrt canvas is inside vertex v
- * @param {float} x - x position
- * @param {float} y - y position
- * @param {string} v - name of the vertex 
- * @returns {boolean} whether (x, y) is in v
- */
-function in_vertex(x, y, v) {
-  const vertex = graph[v];
-  const diff = [x-vertex.x, y-vertex.y];
-  return linalg.vec_len(diff) < vertex.r;
-}
-
-/**
- * detects if the current click is inside a vertex
- * @param {float} x - x position wrt canvas 
- * @param {float} y - y position wrt canvas
- * @returns {string} returns the first vertex in the graph that contains (x, y), null otherwise
- */
-function in_any_vertex(x, y) {
-  for (let v of Object.keys(graph)) {
-    if (in_vertex(x, y, v)) {return v;}
-  }
-  return null;
-}
-
-/**
- * detects if the current click is inside edge text
- * @param {float} x - x position wrt canvas 
- * @param {float} y - y position wrt canvas
- * @returns {Object} returns the first edge in the graph that contains (x, y), null otherwise
- */
-function in_edge_text(x, y) {
-  for (let vertex of Object.values(graph)) {
-    for (let edge of vertex.out) {
-      const [, , mid] = drawing.compute_edge_geometry(graph, edge);
-      const diff = [x-mid[0], y-mid[1]];
-      if (linalg.vec_len(diff) < vertex.r/2) {return edge;}
-    }
-  }
-  return null;
 }
 
 /**
@@ -195,11 +151,11 @@ function create_edge(u, v, angle1, angle2) {
   if (u !== v) {  // easy case since start and end are different
     const a1 = 0.5, a2 = 0;  // right in the center
     edge = { transition: transition, from: u, to: v, a1: a1, a2: a2,
-             pop_symbol: pop_symbol, push_symbol: push_symbol };
+      pop_symbol: pop_symbol, push_symbol: push_symbol };
   } else {  // self loop
     const a1 = 0.5, a2 = 1;
     edge = { transition: transition, from: u, to: v, a1: a1, a2: a2, angle1: angle1, angle2: angle2,
-             pop_symbol: pop_symbol, push_symbol: push_symbol };
+      pop_symbol: pop_symbol, push_symbol: push_symbol };
   }
   vertex.out.push(edge);
   drawing.draw(graph);
@@ -226,7 +182,7 @@ function higher_order_edge_animation(v) {
 
   canvas.addEventListener('mouseup', e => {  // additional event listener to restore canvas and snap to vertex
     const [x, y] = get_position(e);
-    const cur_v = in_any_vertex(x, y);
+    const cur_v = drawing.in_any_vertex(graph, x, y);
     const cur_vertex = graph[cur_v];
     restore();
     if (cur_v && has_left_before) {
@@ -237,7 +193,7 @@ function higher_order_edge_animation(v) {
 
   return e => {
     const [x, y] = get_position(e);
-    if (in_any_vertex(x, y) === v) {return;}  // haven't left the vertex yet
+    if (drawing.in_any_vertex(graph, x, y) === v) {return;}  // haven't left the vertex yet
     // now we are away from the vertex
     if (!has_left_before) {
       has_left_before = true;
@@ -286,8 +242,8 @@ function bind_drag() {
     if (mutex) {return;}  // something has already bind the mouse drag event
     mutex = true;  // lock
     const [x, y] = get_position(e);
-    const clicked_vertex = in_any_vertex(x, y);
-    const clicked_edge = in_edge_text(x, y);
+    const clicked_vertex = drawing.in_any_vertex(graph, x, y);
+    const clicked_edge = drawing.in_edge_text(graph, x, y);
     if ((e.button === consts.RIGHT_BTN || e.ctrlKey) && clicked_vertex) {  // right create edge
       edge_animation = higher_order_edge_animation(clicked_vertex);
       canvas.addEventListener('mousemove', edge_animation);
@@ -461,8 +417,8 @@ function bind_context_menu() {
     remove_context_menu();  // remove old
     if (e.timeStamp - last_time_mouse_press > consts.CLICK_HOLD_TIME) {return;}  // hack
     const [x, y] = get_position(e);
-    const v = in_any_vertex(x, y);
-    const edge = in_edge_text(x, y);
+    const v = drawing.in_any_vertex(graph, x, y);
+    const edge = drawing.in_edge_text(graph, x, y);
     if (v) {display_vertex_menu(v, e.clientX, e.clientY);}
     else if (edge) {display_edge_menu(edge, e.clientX, e.clientY);}
   });
@@ -537,8 +493,8 @@ function on_double_press(key, callback) {
  */
 function bind_dd() {
   on_double_press('KeyD', () => {
-    if (!Object.keys(graph).length) return;  // nothing to delete
-    graph = EMPTY_GRAPH;
+    if (!Object.keys(graph).length) {return;}  // nothing to delete
+    graph = consts.EMPTY_GRAPH;
     drawing.draw(graph);
     hist.push_history(graph);
   });

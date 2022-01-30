@@ -1,5 +1,7 @@
 /** @module compute */
 
+import * as consts from './consts.js';
+
 /**
  * finds all letters used in the transitions
  * @param {Object} graph - the graph whose alphebet is to be computed
