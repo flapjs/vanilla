@@ -81,7 +81,7 @@ export function is_PDA(graph) {
  * @returns {boolean} true iff the input is accepted by the machine
  */
 export function run_input_NFA(graph, input) {
-  let cur_states = closure(new Set([find_start()]));  // find closure of start
+  let cur_states = closure(graph, new Set([find_start(graph)]));  // find closure of start
   for (let c of input) {
     const new_states = new Set();
     for (let v of cur_states) {
@@ -89,10 +89,10 @@ export function run_input_NFA(graph, input) {
         if (edge.transition === c) {new_states.add(edge.to);}
       }
     }
-    cur_states = closure(new_states);
+    cur_states = closure(graph, new_states);
     if (!cur_states.size) {return false;}  // can't go anywhere
   }
-  return contains_final(cur_states);
+  return contains_final(graph, cur_states);
 }
 
 export function BFS_step(graph, v, stack, remaining_input, allowed_steps=512) {
@@ -136,5 +136,5 @@ export function run_input_PDA(graph, input) {
 export function run_input(graph, input) {
   if (!Object.keys(graph).length) {return false;}  // empty graph
   else if (is_PDA(graph)) { return run_input_PDA(graph, input); }
-  else if (is_NFA(graph)) { return run_input_NFA(graph, input); }
+  else { return run_input_NFA(graph, input); }
 }
