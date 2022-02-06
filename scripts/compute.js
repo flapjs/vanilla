@@ -1,6 +1,8 @@
 /** @module compute */
 
 import * as consts from './consts.js';
+// import * as graph_ops from './graph_ops.js';
+import { Queue } from './util.js';
 
 /**
  * finds all letters used in the transitions
@@ -34,13 +36,9 @@ export function find_start(graph) {
  * @returns {Set<string>} the closure of cur_states
  */
 export function closure(graph, cur_states) {
-  let old_size = 0;  // initialize size to be zero
-  while (cur_states.size > old_size) {  // if we have added new state to the mix, then keep going
-    old_size = cur_states.size;
-    for (let v of cur_states) {
-      for (let edge of graph[v].out) {
-        if (edge.transition === consts.EMPTY_TRANSITION) {cur_states.add(edge.to);}
-      }
+  for (let v of cur_states) {  // sets are interated in insertion order, so is BFS by default
+    for (let edge of graph[v].out) {
+      if (edge.transition === consts.EMPTY_TRANSITION) {cur_states.add(edge.to);}
     }
   }
   return cur_states;
@@ -59,14 +57,30 @@ export function contains_final(graph, cur_states) {
   return false;
 }
 
+export function is_NFA(graph) {
+
+}
+
+export function is_DFA(graph) {
+
+}
+
+export function is_PDA(graph) {
+  for (let vertex of Object.values(graph)) {
+    for (let edge of vertex.out) {
+      if (!edge.pop_symbol || !edge.push_symbol) {return false;}
+    }
+  }
+  return true;
+}
+
 /**
  * check if the input is accepted
  * @param {Object} graph - machine graph
  * @param {string} input - input string
  * @returns {boolean} true iff the input is accepted by the machine
  */
-export function run_input(graph, input) {
-  if (!Object.keys(graph).length) {return false;}  // empty graph
+export function run_input_NFA(graph, input) {
   let cur_states = closure(new Set([find_start()]));  // find closure of start
   for (let c of input) {
     const new_states = new Set();
@@ -79,4 +93,48 @@ export function run_input(graph, input) {
     if (!cur_states.size) {return false;}  // can't go anywhere
   }
   return contains_final(cur_states);
+}
+
+export function BFS_step(graph, v, stack, remaining_input, allowed_steps=512) {
+  const q = new Queue();
+  q.enqueue([v, stack, remaining_input]);
+  while (q.length && allowed_steps --> 0) {
+    [v, stack, remaining_input] = q.dequeue();
+    if (graph[v].is_final && !remaining_input.length) {return true;}  // found a path to accept
+    for (let edge of graph[v].out) {  // otherwise add all valid neighbors to queue and keep searching
+      const {transition, to, pop_symbol, push_symbol} = edge;
+      const stack_copy = [...stack], input_copy = [...remaining_input];  // deep clone the input and stack for enqueuing
+      if (transition !== consts.EMPTY_TRANSITION && transition !== input_copy.pop()) {continue;}  // input mismatch
+      if (pop_symbol !== consts.EMPTY_SYMBOL && pop_symbol !== stack_copy.pop()) {continue;}  // stack mismatch
+      // now we can go since both transition and stack match
+      if (push_symbol !== consts.EMPTY_SYMBOL) {stack_copy.push(push_symbol);}  // add to the stack
+      q.enqueue([to, stack_copy, input_copy]);
+    }
+  }
+  return false;  // either stuck or exhausted step limit
+}
+
+/**
+ * check if the input is accepted
+ * @param {Object} graph - machine graph
+ * @param {string} input - input string
+ * @returns {boolean} true iff the input is accepted by the machine
+ */
+export function run_input_PDA(graph, input) {
+  const v = find_start(graph);
+  const stack = [];  // empty
+  const remaining_input = input.split('').reverse();
+  return BFS_step(graph, v, stack, remaining_input);
+}
+
+/**
+ * determines whether the machine is PDA or normal NFA and checks if the input is accepted
+ * @param {Object} graph - machine graph
+ * @param {string} input - input string
+ * @returns {boolean} true iff the input is accepted by the machine
+ */
+export function run_input(graph, input) {
+  if (!Object.keys(graph).length) {return false;}  // empty graph
+  else if (is_PDA(graph)) { return run_input_PDA(graph, input); }
+  else if (is_NFA(graph)) { return run_input_NFA(graph, input); }
 }

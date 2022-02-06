@@ -436,7 +436,7 @@ function bind_run_input() {
   for (let i = 0; i < input_divs.length; i++) {
     const textbox = input_divs[i].querySelector('input');
     const run_btn = input_divs[i].querySelector('button');
-    run_btn.addEventListener('click', () => alert(compute.run_input(textbox.value)));
+    run_btn.addEventListener('click', () => alert(compute.run_input(graph, textbox.value)));
   }
 }
 
