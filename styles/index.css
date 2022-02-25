@@ -11,11 +11,18 @@
   z-index: 99;
 }
 
+.machine_toggle {
+  z-index: 999;
+  position: absolute;
+  left: 3%;
+  top: 5%;
+}
+
 .machine_inputs {
   z-index: 999;
   position: absolute;
-  left: 5%;
-  top: 5%;
+  left: 3%;
+  top: 10%;
 }
 
 canvas {
@@ -26,6 +33,10 @@ canvas {
 .tutorials {
   z-index: 999;
   position: absolute;
-  left: 5%;
-  top: 10%;
+  left: 3%;
+  top: 15%;
+}
+
+input {
+  width: 30px;
 }

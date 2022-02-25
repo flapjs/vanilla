@@ -12,6 +12,9 @@ export const RIGHT_BTN = 2;
 /** @constant {function} EMPTY_FUNCTION - place holder function */
 export const EMPTY_FUNCTION = () => {};
 
+/** @constant {Object} EMPTY_GRAPH - empty graph object */
+export const EMPTY_GRAPH = {};
+
 /** @constant {float} CLICK_HOLD_TIME - [ms] the maximum time between mousedown and mouseup still considered as click */
 export const CLICK_HOLD_TIME = 300;
 
@@ -33,14 +36,35 @@ export const ARROW_WIDTH = 10;
 /** @constant {string} EMPTY_TRANSITION - default transition too */
 export const EMPTY_TRANSITION = 'ε';
 
-/** @constant {string} HIST_KEY - localstore key to the history stack */
-export const HIST_KEY = '%history';
+/** @constant {string} EMPTY_SYMBOL - no operation stack symbol */
+export const EMPTY_SYMBOL = 'ε';
 
-/** @constant {string} HIST_TIP_KEY - localstore key to pointer to the top of the history stack */
-export const HIST_TIP_KEY = '%hist_tip';
+/** @constant {string} ARROW_SYMBOL - arrow symbol */
+export const ARROW_SYMBOL = '→';
 
-/** @constant {string} HIST_PTR_KEY - localstore key to pointer to the currently displayed graph */
-export const HIST_PTR_KEY = '%hist_ptr';
+/** @constant {string} DEFAULT_MACHINE - choice from ['NFA', 'Pushdown', 'Turing'] */
+export const DEFAULT_MACHINE = 'NFA';
+
+/** @constant {Object} HIST_KEYS - localstore key to the history stack */
+export const HIST_KEYS = {
+  'NFA': '%nfa_history',
+  'Pushdown': '%pushdown_history',
+  'Turing': '%turing_history'
+}
+
+/** @constant {Object} HIST_TIP_KEYS - localstore key to pointer to the top of the history stack */
+export const HIST_TIP_KEYS = {
+  'NFA': '%nfa_hist_tip',
+  'Pushdown': '%pushdown_hist_tip',
+  'Turing': '%turing_hist_tip'
+}
+
+/** @constant {Object} HIST_PTR_KEYS - localstore key to pointer to the currently displayed graph */
+export const HIST_PTR_KEYS = {
+  'NFA': '%nfa_hist_ptr',
+  'Pushdown': '%pushdown_hist_ptr',
+  'Turing': '%turing_hist_ptr'
+}
 
 /** @constant {float} ZOOM_SPEED - final zoom is ZOOM_SPEED*scroll_wheel_ticks */
 export const ZOOM_SPEED = 0.001;
