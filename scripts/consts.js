@@ -16,10 +16,10 @@ export const EMPTY_FUNCTION = () => {};
 export const EMPTY_GRAPH = {};
 
 /** @constant {float} CLICK_HOLD_TIME - [ms] the maximum time between mousedown and mouseup still considered as click */
-export const CLICK_HOLD_TIME = 300;
+export const CLICK_HOLD_TIME = 240;
 
 /** @constant {float} DOUBLE_CLICK_TIME - [ms] the maximum time between successive clicks considered as double click */
-export const DOUBLE_CLICK_TIME = 300;
+export const DOUBLE_CLICK_TIME = 240;
 
 /** @constant {int} DEFAULT_VERTEX_RADIUS - [px] it is not a constant since we might zoom in and out */
 export const DEFAULT_VERTEX_RADIUS = 40;
