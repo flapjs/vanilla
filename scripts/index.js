@@ -416,9 +416,10 @@ function display_edge_menu(edge, x, y) {
  * wipes the context menu; does nothing if none exists
  */
 function remove_context_menu() {
-  const menu = document.querySelector('.contextmenu');
-  if (!menu) {return;}
-  document.querySelector('body').removeChild(menu);
+  const menus = document.querySelectorAll('.contextmenu');
+  for (let menu of menus) {
+    document.querySelector('body').removeChild(menu);
+  }
 }
 
 /**
