@@ -4,8 +4,8 @@ import * as consts from './consts.js';
 
 // default keys and their pointers
 let hist_key = consts.HIST_KEYS[consts.DEFAULT_MACHINE],
-    hist_ptr_key = consts.HIST_PTR_KEYS[consts.DEFAULT_MACHINE],
-    hist_tip_key = consts.HIST_TIP_KEYS[consts.DEFAULT_MACHINE];
+  hist_ptr_key = consts.HIST_PTR_KEYS[consts.DEFAULT_MACHINE],
+  hist_tip_key = consts.HIST_TIP_KEYS[consts.DEFAULT_MACHINE];
 let hist_ptr = -1, hist_tip = -1;
 
 /**

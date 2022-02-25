@@ -150,9 +150,9 @@ function create_edge(u, v, angle1, angle2) {
   const vertex = graph[u];
   // now we add the edge to the graph and draw it
   let a1 = 0.5, a2 = 0;
-  if (u == v) { a1 = 0.5, a2 = 1; }  // self loop
+  if (u === v) { a1 = 0.5, a2 = 1; }  // self loop
   const edge = { transition: consts.EMPTY_TRANSITION, from: u, to: v, a1: a1, a2: a2, angle1: angle1, angle2: angle2,
-                 pop_symbol: consts.EMPTY_SYMBOL, push_symbol: consts.EMPTY_SYMBOL };
+    pop_symbol: consts.EMPTY_SYMBOL, push_symbol: consts.EMPTY_SYMBOL };
   vertex.out.push(edge);
   drawing.draw(graph);
   hist.push_history(graph);
@@ -274,7 +274,7 @@ function delete_vertex(v) {
   remove_context_menu();
   if (graph[v].is_start) {  // we will need a start replacement
     for (let u of Object.keys(graph)) {
-      if (u === v) continue;
+      if (u === v) {continue;}
       set_start(u);
       break;
     }

@@ -1,7 +1,7 @@
 /** @module compute */
 
 import * as consts from './consts.js';
-// import * as graph_ops from './graph_ops.js';
+import * as graph_ops from './graph_ops.js';
 import { Queue } from './util.js';
 
 /**
@@ -130,9 +130,9 @@ function run_input_Turing(graph, input) {
  * @param {string} input - input string
  * @returns {boolean} true iff the input is accepted by the machine
  */
-export function run_input(graph, machine_type, input) {
+export function run_input(graph, input) {
   if (!Object.keys(graph).length) {return false;}  // empty graph
-  if (machine_type === 'NFA') run_input_NFA(graph, input);
-  else if (machine_type === 'Pushdown') run_input_Pushdown(graph, input);
-  else if (machine_type === 'Turing') run_input_Turing(graph, input);
+  else if (graph_ops.is_NFA()) {return run_input_NFA(graph, input);}
+  else if (graph_ops.is_Pushdown()) {return run_input_Pushdown(graph, input);}
+  // else if (machine_type === 'Turing') {return run_input_Turing(graph, input);}
 }

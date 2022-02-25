@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: graph_ops.js</title>
+    <title>JSDoc: Source: util.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: graph_ops.js</h1>
+    <h1 class="page-title">Source: util.js</h1>
 
     
 
@@ -26,18 +26,22 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** @module graph_ops */
+            <pre class="prettyprint source linenums"><code>/** @module util */
 
-function is_edge_valid(graph, edge) {
-
-}
-
-export function is_NFA() {
-  return document.getElementById('select_machine').value === 'NFA';
-}
-
-export function is_Pushdown() {
-  return document.getElementById('select_machine').value === 'Pushdown';
+export class Queue {
+  constructor() {
+    this.arr = [];
+    this.head_idx = 0;
+    this.tail_idx = 0;
+  }
+  enqueue(item) { this.arr[this.tail_idx++] = item; }
+  front() { return this.arr[this.head_idx]; }
+  dequeue() {
+    const val = this.arr[this.head_idx];
+    if (val) { delete this.arr[this.head_idx++]; }
+    return val;
+  }
+  get length() { return this.tail_idx - this.head_idx; }
 }
 </code></pre>
         </article>
