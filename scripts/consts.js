@@ -42,14 +42,29 @@ export const EMPTY_SYMBOL = 'ε';
 /** @constant {string} ARROW_SYMBOL - arrow symbol */
 export const ARROW_SYMBOL = '→';
 
-/** @constant {string} HIST_KEY - localstore key to the history stack */
-export const HIST_KEY = '%history';
+/** @constant {string} DEFAULT_MACHINE - choice from ['NFA', 'Pushdown', 'Turing'] */
+export const DEFAULT_MACHINE = 'NFA';
 
-/** @constant {string} HIST_TIP_KEY - localstore key to pointer to the top of the history stack */
-export const HIST_TIP_KEY = '%hist_tip';
+/** @constant {Object} HIST_KEYS - localstore key to the history stack */
+export const HIST_KEYS = {
+  'NFA': '%nfa_history',
+  'Pushdown': '%pushdown_history',
+  'Turing': '%turing_history'
+}
 
-/** @constant {string} HIST_PTR_KEY - localstore key to pointer to the currently displayed graph */
-export const HIST_PTR_KEY = '%hist_ptr';
+/** @constant {Object} HIST_TIP_KEYS - localstore key to pointer to the top of the history stack */
+export const HIST_TIP_KEYS = {
+  'NFA': '%nfa_hist_tip',
+  'Pushdown': '%pushdown_hist_tip',
+  'Turing': '%turing_hist_tip'
+}
+
+/** @constant {Object} HIST_PTR_KEYS - localstore key to pointer to the currently displayed graph */
+export const HIST_PTR_KEYS = {
+  'NFA': '%nfa_hist_ptr',
+  'Pushdown': '%pushdown_hist_ptr',
+  'Turing': '%turing_hist_ptr'
+}
 
 /** @constant {float} ZOOM_SPEED - final zoom is ZOOM_SPEED*scroll_wheel_ticks */
 export const ZOOM_SPEED = 0.001;

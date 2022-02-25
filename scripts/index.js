@@ -5,6 +5,7 @@ import * as consts from './consts.js';
 import * as hist from './history.js';
 import * as drawing from './drawing.js';
 import * as compute from './compute.js';
+import * as graph_ops from './graph_ops.js';
 
 document.addEventListener('DOMContentLoaded', init);
 window.addEventListener('resize', () => drawing.draw(graph));
@@ -51,11 +52,21 @@ function create_vertex(x, y, radius) {
  * @param {Object} e 
  * @returns {Array<float>} x and y position of the mouseclick wrt canvas
  */
-function get_position(e) {
+function event_position_on_canvas(e) {
   const rect = e.target.getBoundingClientRect();
   const x = (e.clientX - rect.left)*window.devicePixelRatio;
   const y = (e.clientY - rect.top)*window.devicePixelRatio;
   return [x, y];
+}
+
+/**
+ * get the position of the mouseclick event wrt canvas
+ * @param {Array<float>} canvas_pt - the [x, y] position wrt canvas 
+ * @returns {Array<float>} x and y position wrt window
+ */
+function canvas_px_to_window_px(canvas_pt) {
+  const rect = drawing.get_canvas().getBoundingClientRect();
+  return linalg.add([rect.left, rect.top], linalg.scale(1/window.devicePixelRatio, canvas_pt));
 }
 
 /**
@@ -87,7 +98,7 @@ function toggle_final(v) {
 function bind_double_click() {
   drawing.get_canvas().addEventListener('dblclick', e => {  // double click to create vertices
     if (e.movementX || e.movementY) {return;}  // shifted, don't create
-    const [x, y] = get_position(e);
+    const [x, y] = event_position_on_canvas(e);
     const v = drawing.in_any_vertex(graph, x, y);
     if (v) {toggle_final(v);}
     else {create_vertex(x, y, (Object.keys(graph).length) ? Object.values(graph)[0].r : consts.DEFAULT_VERTEX_RADIUS);}
@@ -120,7 +131,7 @@ function higher_order_drag_vertex(v) {
   }, { once:true });  // save once only
 
   return e => {
-    [vertex.x, vertex.y] = get_position(e);
+    [vertex.x, vertex.y] = event_position_on_canvas(e);
     drawing.draw(graph);
     moved = true;
   };
@@ -136,30 +147,17 @@ function higher_order_drag_vertex(v) {
  * @param {string} push_symbol - the symbol to push on top of the stack
  */
 function create_edge(u, v, angle1, angle2) {
-  const transition = prompt('Please input the transition', consts.EMPTY_TRANSITION);
-  let pop_symbol = prompt('Please input the pop symbol', consts.EMPTY_SYMBOL);
-  let push_symbol = prompt('Please input the push symbol', consts.EMPTY_SYMBOL);
-  if (!transition) {return;}  // can't have null transition
-  else if (!pop_symbol) {pop_symbol = null;}
-  else if (!push_symbol) {push_symbol = null;}
   const vertex = graph[u];
-  for (let existing_edge of vertex.out) {
-    if (existing_edge.to === v && existing_edge.transition === transition) {return;}  // already has it
-  }
   // now we add the edge to the graph and draw it
-  let edge;
-  if (u !== v) {  // easy case since start and end are different
-    const a1 = 0.5, a2 = 0;  // right in the center
-    edge = { transition: transition, from: u, to: v, a1: a1, a2: a2,
-      pop_symbol: pop_symbol, push_symbol: push_symbol };
-  } else {  // self loop
-    const a1 = 0.5, a2 = 1;
-    edge = { transition: transition, from: u, to: v, a1: a1, a2: a2, angle1: angle1, angle2: angle2,
-      pop_symbol: pop_symbol, push_symbol: push_symbol };
-  }
+  let a1 = 0.5, a2 = 0;
+  if (u == v) { a1 = 0.5, a2 = 1; }  // self loop
+  const edge = { transition: consts.EMPTY_TRANSITION, from: u, to: v, a1: a1, a2: a2, angle1: angle1, angle2: angle2,
+                 pop_symbol: consts.EMPTY_SYMBOL, push_symbol: consts.EMPTY_SYMBOL };
   vertex.out.push(edge);
   drawing.draw(graph);
   hist.push_history(graph);
+  const [_, __, mid] = drawing.compute_edge_geometry(graph, edge);
+  display_edge_menu(edge, ...canvas_px_to_window_px(mid));  // context menu to modify the edge right after
 }
 
 /**
@@ -181,7 +179,7 @@ function higher_order_edge_animation(v) {
   let angle1, angle2;
 
   canvas.addEventListener('mouseup', e => {  // additional event listener to restore canvas and snap to vertex
-    const [x, y] = get_position(e);
+    const [x, y] = event_position_on_canvas(e);
     const cur_v = drawing.in_any_vertex(graph, x, y);
     const cur_vertex = graph[cur_v];
     restore();
@@ -192,7 +190,7 @@ function higher_order_edge_animation(v) {
   }, { once:true });  // snap once only
 
   return e => {
-    const [x, y] = get_position(e);
+    const [x, y] = event_position_on_canvas(e);
     if (drawing.in_any_vertex(graph, x, y) === v) {return;}  // haven't left the vertex yet
     // now we are away from the vertex
     if (!has_left_before) {
@@ -218,7 +216,7 @@ function higher_order_drag_edge(edge) {
   }, { once:true });  // save once only
 
   return e => {
-    const mouse_pos = get_position(e);
+    const mouse_pos = event_position_on_canvas(e);
     const [start, end] = drawing.compute_edge_start_end(graph, edge);
     const mid = linalg.sub(mouse_pos, start);
     const v1 = linalg.sub(end, start);
@@ -241,7 +239,7 @@ function bind_drag() {
   canvas.addEventListener('mousedown', e => {
     if (mutex) {return;}  // something has already bind the mouse drag event
     mutex = true;  // lock
-    const [x, y] = get_position(e);
+    const [x, y] = event_position_on_canvas(e);
     const clicked_vertex = drawing.in_any_vertex(graph, x, y);
     const clicked_edge = drawing.in_edge_text(graph, x, y);
     if ((e.button === consts.RIGHT_BTN || e.ctrlKey) && clicked_vertex) {  // right create edge
@@ -274,6 +272,13 @@ function bind_drag() {
  */
 function delete_vertex(v) {
   remove_context_menu();
+  if (graph[v].is_start) {  // we will need a start replacement
+    for (let u of Object.keys(graph)) {
+      if (u === v) continue;
+      set_start(u);
+      break;
+    }
+  }
   delete graph[v];  // remove this vertex
   for (let vertex of Object.values(graph)) {
     for (let [i, edge] of vertex.out.entries()) {
@@ -364,10 +369,12 @@ function delete_edge(edge) {
  * rename the transition of an edge
  * @param {Object} edge the edge object of which we want to rename the transition
  * @param {string} new_transition - new transition symbol
+ * @param {string} new_pop - new pop symbol
+ * @param {string} new_push - new push symbol
  */
-function rename_edge(edge, new_transition) {
+function rename_edge(edge, new_transition, new_pop, new_push) {
   remove_context_menu();
-  edge.transition = new_transition;
+  [edge.transition, edge.push_symbol, edge.pop_symbol] = [new_transition, new_push, new_pop];
   drawing.draw(graph);
   hist.push_history(graph);
 }
@@ -387,13 +394,21 @@ function display_edge_menu(edge, x, y) {
   delete_div.addEventListener('click', () => delete_edge(edge));
   container.appendChild(rename_div);
   container.appendChild(delete_div);
-  const rename = document.createElement('input');
-  rename.value = edge.transition;  // prepopulate
-  rename.addEventListener('keyup', e => {
-    if (e.key === 'Enter') {rename_edge(edge, rename.value);}
-  });
-  rename_div.appendChild(rename);
+  const transition = document.createElement('input');
+  transition.value = edge.transition;
+  const pop = document.createElement('input');
+  pop.value = edge.pop_symbol;
+  const push = document.createElement('input');
+  push.value = edge.push_symbol;
+  rename_div.appendChild(transition);
+  if (graph_ops.is_Pushdown()) {
+    rename_div.appendChild(pop);
+    rename_div.appendChild(push);
+  }
   container.style = `position:absolute; left:${x}px; top:${y}px; color:blue`;
+  container.addEventListener('keyup', e => {
+    if (e.key === 'Enter') {rename_edge(edge, transition.value, pop.value, push.value);}
+  });
   document.querySelector('body').appendChild(container);
 }
 
@@ -411,20 +426,19 @@ function remove_context_menu() {
  */
 function bind_context_menu() {
   const canvas = drawing.get_canvas();
-  let last_time_mouse_press;
-  canvas.addEventListener('contextmenu', e => {
-    e.preventDefault();  // stop the context from showing
-    remove_context_menu();  // remove old
+  let last_time_mouse_press = 0;
+  canvas.addEventListener('contextmenu', e => e.preventDefault());  // stop contextmenu from showing
+  canvas.addEventListener('mousedown', e => {
+    remove_context_menu();  // remove old menu
+    if (e.button === consts.RIGHT_BTN) {last_time_mouse_press = e.timeStamp;}
+  });
+  canvas.addEventListener('mouseup', e => {
     if (e.timeStamp - last_time_mouse_press > consts.CLICK_HOLD_TIME) {return;}  // hack
-    const [x, y] = get_position(e);
+    const [x, y] = event_position_on_canvas(e);
     const v = drawing.in_any_vertex(graph, x, y);
     const edge = drawing.in_edge_text(graph, x, y);
     if (v) {display_vertex_menu(v, e.clientX, e.clientY);}
     else if (edge) {display_edge_menu(edge, e.clientX, e.clientY);}
-  });
-  canvas.addEventListener('mousedown', e => {
-    if (e.button === consts.LEFT_BTN) {remove_context_menu();}
-    else if (e.button === consts.RIGHT_BTN) {last_time_mouse_press = e.timeStamp;}
   });
 }
 
@@ -444,8 +458,9 @@ function bind_run_input() {
  * offers ctrl-z and ctrl-shift-z features
  */
 function bind_undo_redo() {
-  document.addEventListener('keypress', e => {
+  document.addEventListener('keydown', e => {
     if (e.code !== 'KeyZ' || e.metaKey || e.altKey) {return;}
+    e.preventDefault();  // prevent input undo
     if (e.ctrlKey && e.shiftKey) { graph = hist.redo(); }
     else if (e.ctrlKey) { graph = hist.undo(); }
     drawing.draw(graph);
@@ -458,7 +473,7 @@ function bind_undo_redo() {
 function bind_scroll() {
   drawing.get_canvas().addEventListener('wheel', e => {
     e.preventDefault();  // prevent browser scrolling or zooming
-    const [x, y] = get_position(e);
+    const [x, y] = event_position_on_canvas(e);
     const zoom_const = 1 - consts.ZOOM_SPEED*e.deltaY;
     for (let vertex of Object.values(graph)) {
       vertex.x = x + zoom_const*(vertex.x-x);
@@ -508,11 +523,20 @@ function init_graph() {
   drawing.draw(graph);
 }
 
+function bind_switch_machine() {
+  const select = document.getElementById('select_machine');
+  select.addEventListener('change', e => {
+    hist.set_history_keys(e.target.value);
+    init_graph();  // switching graph
+  });
+}
+
 /**
  * run after all the contents are loaded
  */
 function init() {
   init_graph();
+  bind_switch_machine();
   bind_double_click();
   bind_drag();
   bind_context_menu();

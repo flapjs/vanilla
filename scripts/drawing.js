@@ -2,6 +2,7 @@
 
 import * as linalg from './linalg.js';
 import * as consts from './consts.js';
+import * as graph_ops from './graph_ops.js';
 
 /**
  * get the machine drawing canvas
@@ -209,7 +210,7 @@ export function draw_edge(graph, edge, text_size) {
   let {transition, pop_symbol, push_symbol} = edge;
   const [start, end, mid] = compute_edge_geometry(graph, edge);
   draw_arrow(start, end, mid);
-  if (pop_symbol || push_symbol) {transition += ','+pop_symbol+consts.ARROW_SYMBOL+push_symbol;}
+  if (graph_ops.is_Pushdown()) {transition += ','+pop_symbol+consts.ARROW_SYMBOL+push_symbol;}
   draw_text(transition, mid, text_size);
 }
 
