@@ -1,7 +1,7 @@
 /** @module compute */
 
 import * as consts from './consts.js';
-import * as graph_ops from './graph_ops.js';
+import * as menus from './menus.js';
 import { Queue } from './util.js';
 
 /**
@@ -136,12 +136,9 @@ function run_input_Pushdown(graph, input) {
  * @param {string} input - input string
  * @returns {boolean} true iff the input is accepted by the machine
  */
-function run_input_Turing(graph, input) {
-  const v = find_start(graph);
-  const stack = [];  // empty
-  const remaining_input = input.split('').reverse();
-  return BFS_step(graph, v, stack, remaining_input);
-}
+// function run_input_Turing(graph, input) {
+
+// }
 
 /**
  * determines whether the machine is Pushdown or normal NFA and checks if the input is accepted
@@ -151,12 +148,11 @@ function run_input_Turing(graph, input) {
  * @returns {boolean} true iff the input is accepted by the machine
  */
 export function run_input(graph, input) {
-  if (!Object.keys(graph).length) {
+  if (!Object.keys(graph).length) {  // empty graph
     return false;
-  }  // empty graph
-  else if (graph_ops.is_NFA()) {
+  } else if (menus.is_NFA()) {
     return run_input_NFA(graph, input);
-  } else if (graph_ops.is_Pushdown()) {
+  } else if (menus.is_Pushdown()) {
     return run_input_Pushdown(graph, input);
   }
   // else if (machine_type === 'Turing') {return run_input_Turing(graph, input);}

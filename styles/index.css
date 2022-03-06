@@ -9,6 +9,8 @@
 
 .context_menu {
   z-index: 99;
+  position: absolute;
+  color: rgb(0, 140, 255);
 }
 
 .machine_toggle {

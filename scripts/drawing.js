@@ -1,8 +1,8 @@
 /** @module drawing */
 
-import * as linalg from './linalg.js';
 import * as consts from './consts.js';
-import * as graph_ops from './graph_ops.js';
+import * as linalg from './linalg.js';
+import * as menus from './menus.js';
 
 /**
  * get the machine drawing canvas
@@ -10,6 +10,28 @@ import * as graph_ops from './graph_ops.js';
  */
 export function get_canvas() {
   return document.getElementById('machine_drawing');
+}
+
+/**
+ * get the position of the mouseclick event wrt canvas
+ * @param {Object} e 
+ * @returns {Array<float>} x and y position of the mouseclick wrt canvas
+ */
+export function event_position_on_canvas(e) {
+  const rect = get_canvas().getBoundingClientRect();
+  const x = (e.clientX - rect.left)*window.devicePixelRatio;
+  const y = (e.clientY - rect.top)*window.devicePixelRatio;
+  return [x, y];
+}
+
+/**
+ * get the position of the mouseclick event wrt canvas
+ * @param {Array<float>} canvas_pt - the [x, y] position wrt canvas 
+ * @returns {Array<float>} x and y position wrt window
+ */
+export function canvas_px_to_window_px(canvas_pt) {
+  const rect = get_canvas().getBoundingClientRect();
+  return linalg.add([rect.left, rect.top], linalg.scale(1/window.devicePixelRatio, canvas_pt));
 }
 
 /**
@@ -218,7 +240,7 @@ export function draw_edge(graph, edge, text_size) {
   let {transition, pop_symbol, push_symbol} = edge;
   const [start, end, mid] = compute_edge_geometry(graph, edge);
   draw_arrow(start, end, mid);
-  if (graph_ops.is_Pushdown()) {
+  if (menus.is_Pushdown()) {
     transition += ','+pop_symbol+consts.ARROW_SYMBOL+push_symbol;
   }
   draw_text(transition, mid, text_size);
