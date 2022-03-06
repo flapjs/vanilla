@@ -35,6 +35,11 @@
             "warn",
             "all"
         ],
+        "brace-style": [
+            "warn",
+            "1tbs",
+            { "allowSingleLine": false }
+        ],
         "eqeqeq": [
             "warn",
             "smart"

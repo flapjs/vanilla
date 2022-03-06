@@ -64,7 +64,9 @@ export function draw_vertex(vertex) {
       tip3 = linalg.sub(tip1, linalg.scale(consts.START_TRIANGLE_SCALE, [vertex.r, -vertex.r]));
     draw_triangle(tip1, tip2, tip3);
   }
-  if (vertex.is_final) {draw_final_circle(vertex);}
+  if (vertex.is_final) {
+    draw_final_circle(vertex);
+  }
 }
 
 /**
@@ -89,7 +91,9 @@ export function draw_triangle(tip1, tip2, tip3) {
  * @param {Array<float>} mid - control point for quadratic bezier curve
  */
 export function draw_arrow(start, end, mid) {
-  if (!mid) {mid = linalg.scale(1/2, linalg.add(start, end));}  // find mid if DNE
+  if (!mid) {
+    mid = linalg.scale(1/2, linalg.add(start, end));
+  }  // find mid if DNE
   const start_to_mid = linalg.sub(mid, start), mid_to_end = linalg.sub(end, mid), start_to_end = linalg.sub(end, start);
   const v1_on_v2 = linalg.proj(start_to_mid, start_to_end);
   const ortho_comp = linalg.scale(consts.EDGE_CURVATURE, linalg.sub(start_to_mid, v1_on_v2));
@@ -130,7 +134,9 @@ export function in_vertex(graph, x, y, v) {
  */
 export function in_any_vertex(graph, x, y) {
   for (let v of Object.keys(graph)) {
-    if (in_vertex(graph, x, y, v)) {return v;}
+    if (in_vertex(graph, x, y, v)) {
+      return v;
+    }
   }
   return null;
 }
@@ -147,7 +153,9 @@ export function in_edge_text(graph, x, y) {
     for (let edge of vertex.out) {
       const [, , mid] = compute_edge_geometry(graph, edge);
       const diff = [x-mid[0], y-mid[1]];
-      if (linalg.vec_len(diff) < vertex.r/2) {return edge;}
+      if (linalg.vec_len(diff) < vertex.r/2) {
+        return edge;
+      }
     }
   }
   return null;
@@ -210,7 +218,9 @@ export function draw_edge(graph, edge, text_size) {
   let {transition, pop_symbol, push_symbol} = edge;
   const [start, end, mid] = compute_edge_geometry(graph, edge);
   draw_arrow(start, end, mid);
-  if (graph_ops.is_Pushdown()) {transition += ','+pop_symbol+consts.ARROW_SYMBOL+push_symbol;}
+  if (graph_ops.is_Pushdown()) {
+    transition += ','+pop_symbol+consts.ARROW_SYMBOL+push_symbol;
+  }
   draw_text(transition, mid, text_size);
 }
 
@@ -224,6 +234,8 @@ export function draw(graph) {
   canvas.height = window.innerHeight*window.devicePixelRatio;
   for (let vertex of Object.values(graph)) {
     draw_vertex(vertex);
-    for (let edge of vertex.out) {draw_edge(graph, edge, vertex.r);}
+    for (let edge of vertex.out) {
+      draw_edge(graph, edge, vertex.r);
+    }
   }
 }

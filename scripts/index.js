@@ -20,7 +20,9 @@ function find_unused_name() {
   const prefix = 'q';  // using standard notation
   let i;
   for (i = 0; i <= Object.keys(graph).length; i++) {  // we don't need to look further than how many elements in the set
-    if (!(prefix+`${i}` in graph)) {break;}
+    if (!(prefix+`${i}` in graph)) {
+      break;
+    }
   }
   return prefix+`${i}`;
 }
@@ -74,7 +76,9 @@ function canvas_px_to_window_px(canvas_pt) {
  * @param {string} v - name of the vertex
  */
 function set_start(v) {
-  for (let vertex of Object.values(graph)) {vertex.is_start = false;}
+  for (let vertex of Object.values(graph)) {
+    vertex.is_start = false;
+  }
   graph[v].is_start = true;
   drawing.draw(graph);
   hist.push_history(graph);
@@ -87,8 +91,11 @@ function set_start(v) {
 function toggle_final(v) {
   const vertex = graph[v];
   vertex.is_final = !vertex.is_final;
-  if (vertex.is_final) {drawing.draw_final_circle(vertex);}  // adding a circle
-  else {drawing.draw(graph);}  // removing the circle, requires drawing
+  if (vertex.is_final) {  // adding a circle
+    drawing.draw_final_circle(vertex);
+  } else {  // removing the circle, requires drawing
+    drawing.draw(graph);
+  }
   hist.push_history(graph);
 }
 
@@ -97,11 +104,16 @@ function toggle_final(v) {
  */
 function bind_double_click() {
   drawing.get_canvas().addEventListener('dblclick', e => {  // double click to create vertices
-    if (e.movementX || e.movementY) {return;}  // shifted, don't create
+    if (e.movementX || e.movementY) {
+      return;
+    }  // shifted, don't create
     const [x, y] = event_position_on_canvas(e);
     const v = drawing.in_any_vertex(graph, x, y);
-    if (v) {toggle_final(v);}
-    else {create_vertex(x, y, (Object.keys(graph).length) ? Object.values(graph)[0].r : consts.DEFAULT_VERTEX_RADIUS);}
+    if (v) {
+      toggle_final(v);
+    } else {
+      create_vertex(x, y, (Object.keys(graph).length) ? Object.values(graph)[0].r : consts.DEFAULT_VERTEX_RADIUS);
+    }
   });
 }
 
@@ -127,7 +139,9 @@ function higher_order_drag_vertex(v) {
   const vertex = graph[v];
   let moved = false;
   drawing.get_canvas().addEventListener('mouseup', () => {  // additional event listener to hist.push_history
-    if (moved) {hist.push_history(graph);}
+    if (moved) {
+      hist.push_history(graph);
+    }
   }, { once:true });  // save once only
 
   return e => {
@@ -150,7 +164,9 @@ function create_edge(u, v, angle1, angle2) {
   const vertex = graph[u];
   // now we add the edge to the graph and draw it
   let a1 = 0.5, a2 = 0;
-  if (u === v) { a1 = 0.5, a2 = 1; }  // self loop
+  if (u === v) {
+    a1 = 0.5, a2 = 1; 
+  }  // self loop
   const edge = { transition: consts.EMPTY_TRANSITION, from: u, to: v, a1: a1, a2: a2, angle1: angle1, angle2: angle2,
     pop_symbol: consts.EMPTY_SYMBOL, push_symbol: consts.EMPTY_SYMBOL };
   vertex.out.push(edge);
@@ -191,7 +207,9 @@ function higher_order_edge_animation(v) {
 
   return e => {
     const [x, y] = event_position_on_canvas(e);
-    if (drawing.in_any_vertex(graph, x, y) === v) {return;}  // haven't left the vertex yet
+    if (drawing.in_any_vertex(graph, x, y) === v) {
+      return;
+    }  // haven't left the vertex yet
     // now we are away from the vertex
     if (!has_left_before) {
       has_left_before = true;
@@ -212,7 +230,9 @@ function higher_order_drag_edge(edge) {
   const s = graph[edge.from];
   let moved = false;
   drawing.get_canvas().addEventListener('mouseup', () => {  // additional event listener to hist.push_history
-    if (moved) {hist.push_history(graph);}
+    if (moved) {
+      hist.push_history(graph);
+    }
   }, { once:true });  // save once only
 
   return e => {
@@ -237,7 +257,9 @@ function bind_drag() {
   let edge_animation = consts.EMPTY_FUNCTION, drag_edge = consts.EMPTY_FUNCTION, drag_vertex = consts.EMPTY_FUNCTION;
   const canvas = drawing.get_canvas();
   canvas.addEventListener('mousedown', e => {
-    if (mutex) {return;}  // something has already bind the mouse drag event
+    if (mutex) {
+      return;
+    }  // something has already bind the mouse drag event
     mutex = true;  // lock
     const [x, y] = event_position_on_canvas(e);
     const clicked_vertex = drawing.in_any_vertex(graph, x, y);
@@ -274,7 +296,9 @@ function delete_vertex(v) {
   remove_context_menu();
   if (graph[v].is_start) {  // we will need a start replacement
     for (let u of Object.keys(graph)) {
-      if (u === v) {continue;}
+      if (u === v) {
+        continue;
+      }
       set_start(u);
       break;
     }
@@ -282,7 +306,9 @@ function delete_vertex(v) {
   delete graph[v];  // remove this vertex
   for (let vertex of Object.values(graph)) {
     for (let [i, edge] of vertex.out.entries()) {
-      if (edge.to === v) {vertex.out.splice(i, 1);}  // remove all edges leading to it
+      if (edge.to === v) {
+        vertex.out.splice(i, 1);
+      }  // remove all edges leading to it
     }
   }
   drawing.draw(graph);
@@ -296,15 +322,22 @@ function delete_vertex(v) {
  */
 function rename_vertex(v, new_name) {
   remove_context_menu();
-  if (v === new_name) {return;}  // nothing to do
-  else if (new_name in graph) {alert(new_name + ' already exists');}
-  else {
+  if (v === new_name) {
+    return;
+  }  // nothing to do
+  else if (new_name in graph) {
+    alert(new_name + ' already exists');
+  } else {
     graph[new_name] = graph[v];  // duplicate
     delete graph[v];  // remove old
     for (let vertex of Object.values(graph)) {
       for (let edge of vertex.out) {
-        if (edge.from === v) {edge.from = new_name;}
-        if (edge.to === v) {edge.to = new_name;}
+        if (edge.from === v) {
+          edge.from = new_name;
+        }
+        if (edge.to === v) {
+          edge.to = new_name;
+        }
       }
     }
   }
@@ -332,7 +365,9 @@ function display_vertex_menu(v, x, y) {
   const rename = document.createElement('input');
   rename.value = v;  // prepopulate vertex name
   rename.addEventListener('keyup', e => {
-    if (e.key === 'Enter') {rename_vertex(v, rename.value);}
+    if (e.key === 'Enter') {
+      rename_vertex(v, rename.value);
+    }
   });
   rename_div.appendChild(rename);
   const start_btn = document.createElement('button');
@@ -407,7 +442,9 @@ function display_edge_menu(edge, x, y) {
   }
   container.style = `position:absolute; left:${x}px; top:${y}px; color:blue`;
   container.addEventListener('keyup', e => {
-    if (e.key === 'Enter') {rename_edge(edge, transition.value, pop.value, push.value);}
+    if (e.key === 'Enter') {
+      rename_edge(edge, transition.value, pop.value, push.value);
+    }
   });
   document.querySelector('body').appendChild(container);
 }
@@ -431,15 +468,22 @@ function bind_context_menu() {
   canvas.addEventListener('contextmenu', e => e.preventDefault());  // stop contextmenu from showing
   canvas.addEventListener('mousedown', e => {
     remove_context_menu();  // remove old menu
-    if (e.button === consts.RIGHT_BTN) {last_time_mouse_press = e.timeStamp;}
+    if (e.button === consts.RIGHT_BTN) {
+      last_time_mouse_press = e.timeStamp;
+    }
   });
   canvas.addEventListener('mouseup', e => {
-    if (e.timeStamp - last_time_mouse_press > consts.CLICK_HOLD_TIME) {return;}  // hack
+    if (e.timeStamp - last_time_mouse_press > consts.CLICK_HOLD_TIME) {
+      return;
+    }  // hack
     const [x, y] = event_position_on_canvas(e);
     const v = drawing.in_any_vertex(graph, x, y);
     const edge = drawing.in_edge_text(graph, x, y);
-    if (v) {display_vertex_menu(v, e.clientX, e.clientY);}
-    else if (edge) {display_edge_menu(edge, e.clientX, e.clientY);}
+    if (v) {
+      display_vertex_menu(v, e.clientX, e.clientY);
+    } else if (edge) {
+      display_edge_menu(edge, e.clientX, e.clientY);
+    }
   });
 }
 
@@ -460,10 +504,15 @@ function bind_run_input() {
  */
 function bind_undo_redo() {
   document.addEventListener('keydown', e => {
-    if (e.code !== 'KeyZ' || e.metaKey || e.altKey) {return;}
+    if (e.code !== 'KeyZ' || e.metaKey || e.altKey) {
+      return;
+    }
     e.preventDefault();  // prevent input undo
-    if (e.ctrlKey && e.shiftKey) { graph = hist.redo(); }
-    else if (e.ctrlKey) { graph = hist.undo(); }
+    if (e.ctrlKey && e.shiftKey) {
+      graph = hist.redo(); 
+    } else if (e.ctrlKey) {
+      graph = hist.undo(); 
+    }
     drawing.draw(graph);
   });
 }
@@ -509,7 +558,9 @@ function on_double_press(key, callback) {
  */
 function bind_dd() {
   on_double_press('KeyD', () => {
-    if (!Object.keys(graph).length) {return;}  // nothing to delete
+    if (!Object.keys(graph).length) {
+      return;
+    }  // nothing to delete
     graph = consts.EMPTY_GRAPH;
     drawing.draw(graph);
     hist.push_history(graph);

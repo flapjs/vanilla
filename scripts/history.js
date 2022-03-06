@@ -48,7 +48,9 @@ export function retrieve_latest_graph() {
  * @param {Array<Object>} history - array of graphs, force rewrite
  */
 export function push_history(graph, history = null) {
-  if (!history) { history = get_history(); }
+  if (!history) {
+    history = get_history(); 
+  }
   history[++hist_ptr] = graph;
   hist_tip = hist_ptr;  // we just pushed, so that is the new tip
   const hist_str = JSON.stringify(history);
@@ -63,7 +65,9 @@ export function push_history(graph, history = null) {
  */
 export function undo() {
   const history = get_history();
-  if (hist_ptr <= 0) { return history[hist_ptr]; }  // can't go backward
+  if (hist_ptr <= 0) {
+    return history[hist_ptr]; 
+  }  // can't go backward
   const graph = history[--hist_ptr];
   localStorage.setItem(hist_ptr_key, hist_ptr);
   return graph;
@@ -75,7 +79,9 @@ export function undo() {
  */
 export function redo() {
   const history = get_history();
-  if (hist_ptr === hist_tip) { return history[hist_ptr]; }  // can't go forward
+  if (hist_ptr === hist_tip) {
+    return history[hist_ptr]; 
+  }  // can't go forward
   const graph = history[++hist_ptr];
   localStorage.setItem(hist_ptr_key, hist_ptr);
   return graph;

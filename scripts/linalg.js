@@ -49,7 +49,9 @@ export function normal_vec(vec, clockwise=false) {
 export function normalize(vec, final_length=1) {
   const adjusted_vec = [];
   const length_adj = vec_len(vec)/final_length;
-  for (let component of vec) {adjusted_vec.push(component/length_adj);}
+  for (let component of vec) {
+    adjusted_vec.push(component/length_adj);
+  }
   return adjusted_vec;
 }
 
