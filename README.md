@@ -1,4 +1,4 @@
-# Welcome to [`flap.js`](https://flapjs.github.io/vanilla/)
+# Welcome to [`flap.js`](https://flapjs.web.app/)
 This is a vanilla js rewrite of the [`flap.js`](https://github.com/flapjs/webapp) project. Alternatively, you can consider this a minimal [JFLAP](https://www.jflap.org/) clone in javscript so people only need their browser.
 
 # Repo Setup
