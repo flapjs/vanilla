@@ -149,8 +149,13 @@ export function create_edge(graph, u, v, angle1, angle2) {
   if (u === v) {
     a1 = 0.5, a2 = 1; 
   }  // self loop
-  const edge = { transition: consts.EMPTY_TRANSITION, from: u, to: v, a1: a1, a2: a2, angle1: angle1, angle2: angle2,
-    pop_symbol: consts.EMPTY_SYMBOL, push_symbol: consts.EMPTY_SYMBOL };
+  const edge = {
+    transition: consts.EMPTY_TRANSITION,
+    from: u, to: v,
+    a1: a1, a2: a2,
+    angle1: angle1, angle2: angle2,
+    pop_symbol: consts.EMPTY_SYMBOL, push_symbol: consts.EMPTY_SYMBOL
+  };
   vertex.out.push(edge);
   drawing.draw(graph);
   hist.push_history(graph);
