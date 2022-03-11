@@ -33,9 +33,6 @@ export const ARROW_LENGTH = 15;
 /** @constant {int} ARROW_WIDTH - [px] total width of the edge arrow */
 export const ARROW_WIDTH = 10;
 
-/** @constant {string} EMPTY_TRANSITION - default transition too */
-export const EMPTY_TRANSITION = 'ε';
-
 /** @constant {string} EMPTY_SYMBOL - no operation stack symbol */
 export const EMPTY_SYMBOL = 'ε';
 
@@ -74,3 +71,9 @@ export const EDGE_CURVATURE = 0.5;
 
 /** @constant {float} FINAL_CIRCLE_SIZE - fraction of the radius of the outer circle */
 export const FINAL_CIRCLE_SIZE = 0.8;
+
+/** @constant {string} LEFT - symbol for move tape left */
+export const LEFT = 'L';
+
+/** @constant {string} RIGHT - symbol for move tape right */
+export const RIGHT = 'R';

@@ -42,7 +42,7 @@ export function find_start(graph) {
 export function closure(graph, cur_states) {
   for (let v of cur_states) {  // sets are interated in insertion order, so is BFS by default
     for (let edge of graph[v].out) {
-      if (edge.transition === consts.EMPTY_TRANSITION) {
+      if (edge.transition === consts.EMPTY_SYMBOL) {
         cur_states.add(edge.to);
       }
     }
@@ -90,6 +90,15 @@ function run_input_NFA(graph, input) {
   return contains_final(graph, cur_states);
 }
 
+/**
+ * step through the the computation of PDA with BFS
+ * @param {Object} graph - machine graph
+ * @param {string} v - starting vertex
+ * @param {Array<string>} remaining_input - input string split into char array
+ * @param {int} allowed_steps - the computation will halt and return false if the step limit is reached
+ * @returns {boolean} true iff the input is accepted by the machine
+ * @returns 
+ */
 function BFS_step(graph, v, stack, remaining_input, allowed_steps=512) {
   const q = new Queue();
   q.enqueue([v, stack, remaining_input]);
@@ -101,7 +110,7 @@ function BFS_step(graph, v, stack, remaining_input, allowed_steps=512) {
     for (let edge of graph[v].out) {  // otherwise add all valid neighbors to queue and keep searching
       const {transition, to, pop_symbol, push_symbol} = edge;
       const stack_copy = [...stack], input_copy = [...remaining_input];  // deep clone the input and stack for enqueuing
-      if (transition !== consts.EMPTY_TRANSITION && transition !== input_copy.pop()) {
+      if (transition !== consts.EMPTY_SYMBOL && transition !== input_copy.pop()) {
         continue;
       }  // input mismatch
       if (pop_symbol !== consts.EMPTY_SYMBOL && pop_symbol !== stack_copy.pop()) {
@@ -134,11 +143,35 @@ function run_input_Pushdown(graph, input) {
  * check if the input is accepted
  * @param {Object} graph - machine graph
  * @param {string} input - input string
+ * @param {int} allowed_steps - the computation will halt and return false if the step limit is reached
  * @returns {boolean} true iff the input is accepted by the machine
  */
-// function run_input_Turing(graph, input) {
-
-// }
+function run_input_Turing(graph, input, allowed_steps=512) {
+  const tape = {};  // we use an object instead of array to have negative index
+  for (let i = 0; i < input.length; i++) {
+    tape[i] = input[i];  // copy all input over
+  }
+  let tape_idx = 0;  // starting tape index
+  let cur_state = find_start(graph);
+  let stuck = false;  // whether we are out of legal transitions
+  while (!stuck && !graph[cur_state].is_final && allowed_steps --> 0) {
+    stuck = true;  // assume we are stuck and change to not stuck in the loop
+    for (let edge of graph[cur_state].out) {
+      if (!tape[tape_idx]) {  // fill in empty if tape null/undefined
+        tape[tape_idx] = consts.EMPTY_SYMBOL;
+      }
+      if (edge.transition !== tape[tape_idx]) {  // cannot take this transition
+        continue;
+      }
+      cur_state = edge.to;  // go to next state
+      tape[tape_idx] = edge.push_symbol;  // write to tape
+      tape_idx += (edge.move === consts.LEFT) ? -1 : 1;  // move tape needle
+      stuck = false;  // we just moved, so not stuck
+      break;  // determinism, so can't multi-branch
+    }
+  }
+  return graph[cur_state].is_final;
+}
 
 /**
  * determines whether the machine is Pushdown or normal NFA and checks if the input is accepted
@@ -154,6 +187,7 @@ export function run_input(graph, input) {
     return run_input_NFA(graph, input);
   } else if (menus.is_Pushdown()) {
     return run_input_Pushdown(graph, input);
+  } else if (menus.is_Turing()) {
+    return run_input_Turing(graph, input);
   }
-  // else if (machine_type === 'Turing') {return run_input_Turing(graph, input);}
 }

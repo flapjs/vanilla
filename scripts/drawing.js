@@ -175,7 +175,7 @@ export function in_edge_text(graph, x, y) {
     for (let edge of vertex.out) {
       const [, , mid] = compute_edge_geometry(graph, edge);
       const diff = [x-mid[0], y-mid[1]];
-      if (linalg.vec_len(diff) < vertex.r/2) {
+      if (linalg.vec_len(diff) < vertex.r) {  // we are using the radius of the vertex as tolerance
         return edge;
       }
     }
@@ -237,13 +237,16 @@ export function compute_edge_geometry(graph, edge) {
  * @param {float} text_size - the font size of the transition label
  */
 export function draw_edge(graph, edge, text_size) {
-  let {transition, pop_symbol, push_symbol} = edge;
+  let {transition, pop_symbol, push_symbol, move} = edge;
   const [start, end, mid] = compute_edge_geometry(graph, edge);
   draw_arrow(start, end, mid);
-  if (menus.is_Pushdown()) {
-    transition += ','+pop_symbol+consts.ARROW_SYMBOL+push_symbol;
+  let edge_text = transition;  // vanilla NFA only uses transition
+  if (menus.is_Pushdown()) {  // append pop and push if we have PDA
+    edge_text += ','+pop_symbol+consts.ARROW_SYMBOL+push_symbol;
+  } else if (menus.is_Turing()) {  // append push and left/right if we have turing
+    edge_text += consts.ARROW_SYMBOL+push_symbol+','+move;
   }
-  draw_text(transition, mid, text_size);
+  draw_text(edge_text, mid, text_size);
 }
 
 /**

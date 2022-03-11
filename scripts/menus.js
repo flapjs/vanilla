@@ -1,5 +1,6 @@
 /** @module menus */
 
+import * as consts from './consts.js';
 import * as graph_ops from './graph_ops.js';
 
 /**
@@ -16,6 +17,14 @@ export function is_NFA() {
  */
 export function is_Pushdown() {
   return document.getElementById('select_machine').value === 'Pushdown';
+}
+
+/**
+ * reports the type of machine the user is working on
+ * @returns {boolean} true or false 
+ */
+export function is_Turing() {
+  return document.getElementById('select_machine').value === 'Turing';
 }
 
 /**
@@ -78,15 +87,24 @@ export function display_edge_menu(graph, edge, x, y) {
   pop.value = edge.pop_symbol;
   const push = document.createElement('input');
   push.value = edge.push_symbol;
+  const left_right_choice = document.createElement('input');
+  left_right_choice.type = 'checkbox';
+  left_right_choice.className = 'L_R_toggle';
+  left_right_choice.checked = edge.move === consts.LEFT;
   rename_div.appendChild(transition);
   if (is_Pushdown()) {
     rename_div.appendChild(pop);
     rename_div.appendChild(push);
+  } else if (is_Turing()) {
+    rename_div.appendChild(push);
+    rename_div.appendChild(left_right_choice);
   }
   container.style = `left:${x}px; top:${y}px`;
   container.addEventListener('keyup', e => {
     if (e.key === 'Enter') {
-      graph_ops.rename_edge(graph, edge, transition.value, pop.value, push.value);
+      graph_ops.rename_edge(graph, edge,
+        transition.value, pop.value, push.value,
+        left_right_choice.checked ? consts.LEFT : consts.RIGHT);
     }
   });
   document.querySelector('body').appendChild(container);
