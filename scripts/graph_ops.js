@@ -154,7 +154,8 @@ export function create_edge(graph, u, v, angle1, angle2) {
     from: u, to: v,
     a1: a1, a2: a2,
     angle1: angle1, angle2: angle2,
-    pop_symbol: consts.EMPTY_SYMBOL, push_symbol: consts.EMPTY_SYMBOL
+    pop_symbol: consts.EMPTY_SYMBOL, push_symbol: consts.EMPTY_SYMBOL,
+    move: consts.RIGHT
   };
   vertex.out.push(edge);
   drawing.draw(graph);
@@ -190,15 +191,17 @@ export function delete_edge(graph, edge) {
  * @param {string} new_transition - new transition symbol
  * @param {string} new_pop - new pop symbol
  * @param {string} new_push - new push symbol
+ * @param {string} new_left_right - new move (left or right)
  */
-export function rename_edge(graph, edge, new_transition, new_pop, new_push) {
+export function rename_edge(graph, edge, new_transition, new_pop, new_push, new_left_right) {
   menus.remove_context_menu();
   if (new_transition === edge.transition &&
       new_push === edge.push_symbol &&
-      new_pop === edge.pop_symbol) {
+      new_pop === edge.pop_symbol &&
+      new_left_right === edge.move) {
     return;  // nothing changed, so nothing to do
   }
-  [edge.transition, edge.push_symbol, edge.pop_symbol] = [new_transition, new_push, new_pop];
+  [edge.transition, edge.push_symbol, edge.pop_symbol, edge.move] = [new_transition, new_push, new_pop, new_left_right];
   drawing.draw(graph);
   hist.push_history(graph);
 }

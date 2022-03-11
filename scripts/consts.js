@@ -74,3 +74,9 @@ export const EDGE_CURVATURE = 0.5;
 
 /** @constant {float} FINAL_CIRCLE_SIZE - fraction of the radius of the outer circle */
 export const FINAL_CIRCLE_SIZE = 0.8;
+
+/** @constant {string} LEFT - symbol for move tape left */
+export const LEFT = 'L';
+
+/** @constant {string} RIGHT - symbol for move tape right */
+export const RIGHT = 'R';
