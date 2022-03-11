@@ -23,7 +23,7 @@ export function is_Pushdown() {
  * reports the type of machine the user is working on
  * @returns {boolean} true or false 
  */
- export function is_Turing() {
+export function is_Turing() {
   return document.getElementById('select_machine').value === 'Turing';
 }
 

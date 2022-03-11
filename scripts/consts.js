@@ -33,9 +33,6 @@ export const ARROW_LENGTH = 15;
 /** @constant {int} ARROW_WIDTH - [px] total width of the edge arrow */
 export const ARROW_WIDTH = 10;
 
-/** @constant {string} EMPTY_TRANSITION - default transition too */
-export const EMPTY_TRANSITION = 'ε';
-
 /** @constant {string} EMPTY_SYMBOL - no operation stack symbol */
 export const EMPTY_SYMBOL = 'ε';
 

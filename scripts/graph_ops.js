@@ -150,7 +150,7 @@ export function create_edge(graph, u, v, angle1, angle2) {
     a1 = 0.5, a2 = 1; 
   }  // self loop
   const edge = {
-    transition: consts.EMPTY_TRANSITION,
+    transition: consts.EMPTY_SYMBOL,
     from: u, to: v,
     a1: a1, a2: a2,
     angle1: angle1, angle2: angle2,
