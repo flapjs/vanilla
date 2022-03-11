@@ -97,9 +97,9 @@ function run_input_NFA(graph, input) {
  * @param {Array<string>} remaining_input - input string split into char array
  * @param {int} allowed_steps - the computation will halt and return false if the step limit is reached
  * @returns {boolean} true iff the input is accepted by the machine
- * @returns 
  */
-function BFS_step(graph, v, stack, remaining_input, allowed_steps=512) {
+function BFS_step(graph, v, remaining_input, allowed_steps=512) {
+  const stack = [];  // the computational stack
   const q = new Queue();
   q.enqueue([v, stack, remaining_input]);
   while (q.length && allowed_steps --> 0) {
@@ -134,9 +134,8 @@ function BFS_step(graph, v, stack, remaining_input, allowed_steps=512) {
  */
 function run_input_Pushdown(graph, input) {
   const v = find_start(graph);
-  const stack = [];  // empty
   const remaining_input = input.split('').reverse();
-  return BFS_step(graph, v, stack, remaining_input);
+  return BFS_step(graph, v, remaining_input);
 }
 
 /**
