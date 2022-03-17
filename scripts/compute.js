@@ -99,7 +99,7 @@ function run_input_NFA(graph, input) {
  * @returns {boolean} true iff the input is accepted by the machine
  */
 function BFS_step(graph, v, remaining_input, allowed_steps=512) {
-  const stack = [];  // the computational stack
+  let stack = [];  // the computational stack
   const q = new Queue();
   q.enqueue([v, stack, remaining_input]);
   while (q.length && allowed_steps --> 0) {

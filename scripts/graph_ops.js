@@ -1,9 +1,9 @@
 /** @module graph_ops */
 
-import * as consts from './consts.js';
 import * as hist from './history.js';
 import * as drawing from './drawing.js';
 import * as menus from './menus.js';  // I know this is a circular dep, but it makes more sense this way
+import * as graph_components from './graph_components.js';
 
 /**
  * go through the list of used names for a vertex and find the smallest unused
@@ -30,16 +30,8 @@ export function find_unused_name(graph) {
  */
 export function create_vertex(graph, x, y, radius) {
   const name = find_unused_name(graph);
-  const vertex = {
-    name: name,
-    x: x,
-    y: y,
-    r: radius,
-    is_start: Object.keys(graph).length === 0,
-    is_final: false,
-    out: [],
-  };
-  graph[name] = vertex;  // add to the list
+  const vertex = graph_components.make_vertex(name, x, y, radius, !Object.keys(graph).length);
+  graph[name] = vertex;
   drawing.draw(graph);
   hist.push_history(graph);
 }
@@ -149,14 +141,7 @@ export function create_edge(graph, u, v, angle1, angle2) {
   if (u === v) {
     a1 = 0.5, a2 = 1; 
   }  // self loop
-  const edge = {
-    transition: consts.EMPTY_SYMBOL,
-    from: u, to: v,
-    a1: a1, a2: a2,
-    angle1: angle1, angle2: angle2,
-    pop_symbol: consts.EMPTY_SYMBOL, push_symbol: consts.EMPTY_SYMBOL,
-    move: consts.RIGHT
-  };
+  const edge = graph_components.make_edge(u, v, a1, a2, angle1, angle2);  // make empty edge to be modified by user
   vertex.out.push(edge);
   drawing.draw(graph);
   hist.push_history(graph);
