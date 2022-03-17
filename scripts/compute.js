@@ -11,8 +11,8 @@ import { Queue } from './util.js';
  */
 export function compute_alphabet(graph) {
   const alphabet = new Set();
-  for (let vertex of Object.values(graph)) {
-    for (let edge of vertex.out) {
+  for (const vertex of Object.values(graph)) {
+    for (const edge of vertex.out) {
       alphabet.add(edge.transition);
     }
   }
@@ -25,7 +25,7 @@ export function compute_alphabet(graph) {
  * @returns {string} the start of the graph, null of graph empty
  */
 export function find_start(graph) {
-  for (let [v, vertex] of Object.entries(graph)) {
+  for (const [v, vertex] of Object.entries(graph)) {
     if (vertex.is_start) {
       return v;
     }
@@ -40,8 +40,8 @@ export function find_start(graph) {
  * @returns {Set<string>} the closure of cur_states
  */
 export function closure(graph, cur_states) {
-  for (let v of cur_states) {  // sets are interated in insertion order, so is BFS by default
-    for (let edge of graph[v].out) {
+  for (const v of cur_states) {  // sets are interated in insertion order, so is BFS by default
+    for (const edge of graph[v].out) {
       if (edge.transition === consts.EMPTY_SYMBOL) {
         cur_states.add(edge.to);
       }
@@ -57,7 +57,7 @@ export function closure(graph, cur_states) {
  * @returns {boolean} true iff some state in cur_states is a final state
  */
 export function contains_final(graph, cur_states) {
-  for (let v of cur_states) {
+  for (const v of cur_states) {
     if (graph[v].is_final) {
       return true;
     }
@@ -73,10 +73,10 @@ export function contains_final(graph, cur_states) {
  */
 function run_input_NFA(graph, input) {
   let cur_states = closure(graph, new Set([find_start(graph)]));  // find closure of start
-  for (let c of input) {
+  for (const c of input) {
     const new_states = new Set();
-    for (let v of cur_states) {
-      for (let edge of graph[v].out) {
+    for (const v of cur_states) {
+      for (const edge of graph[v].out) {
         if (edge.transition === c) {
           new_states.add(edge.to);
         }
@@ -107,7 +107,7 @@ function BFS_step(graph, v, remaining_input, allowed_steps=512) {
     if (graph[v].is_final && !remaining_input.length) {
       return true;
     }  // found a path to accept
-    for (let edge of graph[v].out) {  // otherwise add all valid neighbors to queue and keep searching
+    for (const edge of graph[v].out) {  // otherwise add all valid neighbors to queue and keep searching
       const {transition, to, pop_symbol, push_symbol} = edge;
       const stack_copy = [...stack], input_copy = [...remaining_input];  // deep clone the input and stack for enqueuing
       if (transition !== consts.EMPTY_SYMBOL && transition !== input_copy.pop()) {
@@ -147,7 +147,7 @@ function run_input_Pushdown(graph, input) {
  */
 function run_input_Turing(graph, input, allowed_steps=512) {
   const tape = {};  // we use an object instead of array to have negative index
-  for (let i = 0; i < input.length; i++) {
+  for (const i = 0; i < input.length; i++) {
     tape[i] = input[i];  // copy all input over
   }
   let tape_idx = 0;  // starting tape index
@@ -155,7 +155,7 @@ function run_input_Turing(graph, input, allowed_steps=512) {
   let stuck = false;  // whether we are out of legal transitions
   while (!stuck && !graph[cur_state].is_final && allowed_steps --> 0) {
     stuck = true;  // assume we are stuck and change to not stuck in the loop
-    for (let edge of graph[cur_state].out) {
+    for (const edge of graph[cur_state].out) {
       if (!tape[tape_idx]) {  // fill in empty if tape null/undefined
         tape[tape_idx] = consts.EMPTY_SYMBOL;
       }

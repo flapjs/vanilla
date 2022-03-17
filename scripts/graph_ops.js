@@ -2,6 +2,10 @@
 
 import * as hist from './history.js';
 import * as drawing from './drawing.js';
+import * as consts from './consts.js';
+import * as compute from './compute.js';
+import * as linalg from './linalg.js';
+import { Queue } from './util.js';
 import * as menus from './menus.js';  // I know this is a circular dep, but it makes more sense this way
 import * as graph_components from './graph_components.js';
 
@@ -44,7 +48,7 @@ export function create_vertex(graph, x, y, radius) {
 export function delete_vertex(graph, v) {
   menus.remove_context_menu();
   if (graph[v].is_start) {  // we will need a start replacement
-    for (let u of Object.keys(graph)) {
+    for (const u of Object.keys(graph)) {
       if (u === v) {
         continue;
       }
@@ -53,8 +57,8 @@ export function delete_vertex(graph, v) {
     }
   }
   delete graph[v];  // remove this vertex
-  for (let vertex of Object.values(graph)) {
-    for (let [i, edge] of vertex.out.entries()) {
+  for (const vertex of Object.values(graph)) {
+    for (const [i, edge] of vertex.out.entries()) {
       if (edge.to === v) {
         vertex.out.splice(i, 1);
       }  // remove all edges leading to it
@@ -79,8 +83,8 @@ export function rename_vertex(graph, v, new_name) {
   } else {
     graph[new_name] = graph[v];  // duplicate
     delete graph[v];  // remove old
-    for (let vertex of Object.values(graph)) {
-      for (let edge of vertex.out) {
+    for (const vertex of Object.values(graph)) {
+      for (const edge of vertex.out) {
         if (edge.from === v) {
           edge.from = new_name;
         }
@@ -100,7 +104,7 @@ export function rename_vertex(graph, v, new_name) {
  * @param {string} v - name of the vertex
  */
 export function set_start(graph, v) {
-  for (let vertex of Object.values(graph)) {
+  for (const vertex of Object.values(graph)) {
     vertex.is_start = false;
   }
   graph[v].is_start = true;
@@ -157,8 +161,8 @@ export function create_edge(graph, u, v, angle1, angle2) {
  */
 export function delete_edge(graph, edge) {
   menus.remove_context_menu();
-  for (let vertex of Object.values(graph)) {
-    for (let [i, e] of vertex.out.entries()) {
+  for (const vertex of Object.values(graph)) {
+    for (const [i, e] of vertex.out.entries()) {
       if (e.from === edge.from && e.to === edge.to && e.transition === edge.transition) {
         vertex.out.splice(i, 1);
         break;
@@ -189,4 +193,112 @@ export function rename_edge(graph, edge, new_transition, new_pop, new_push, new_
   [edge.transition, edge.push_symbol, edge.pop_symbol, edge.move] = [new_transition, new_push, new_pop, new_left_right];
   drawing.draw(graph);
   hist.push_history(graph);
+}
+
+/**
+ * 
+ * @param {Array<string>} states - a list of state labels that are to be combined
+ * @returns {string} [q3, q0, q5] -> '{q0,q3,q5}'
+ */
+function combine_state_labels(states) {
+  states = [...states];  // convert to array
+  states.sort((u, v) => {
+    // u, v of the form qn, qm where n, m integers
+    if (u.substr(0, 1) === v.substr(0, 1) && !isNaN(u.substr(1)) && !isNaN(v.substr(1))) {
+      return parseInt(u.substr(1)) < parseInt(v.substr(1));  // return the numeric comparison
+    } else {
+      return u < v;  // use the string comparisn
+    }
+  });  // sort it so eaiser to read
+  return '{'+ states.join(',') +'}'
+}
+
+export function NFA_to_DFA(NFA) {
+  // if (is already an DFA) return;
+  const DFA = {};  // new graph to populate
+  const alphabet = compute.compute_alphabet(NFA); // these will be all transitions symbols
+  const send_to_trap = new Map();  // (state, transition) pairs that results in the trapped state
+  
+  let NFA_states = compute.closure(NFA, new Set([compute.find_start(NFA)]));  // find the start states
+  let DFA_state = combine_state_labels(NFA_states);  // merge them
+  let vertex_position = [100, 100];  // initial position of a new state
+  DFA[DFA_state] = graph_components.make_vertex(
+    DFA_state, ...vertex_position, consts.DEFAULT_VERTEX_RADIUS, true, compute.contains_final(NFA_states));
+  linalg.add(consts.DEFAULT_VERTEX_RADIUS, vertex_position);  // increment vertex position
+
+  const q = new Queue();
+  q.enqueue([NFA_states]);
+  while (q.length) {  // while still something to explore
+    NFA_states = q.dequeue();
+    DFA_state = combine_state_labels(NFA_states);
+    for (const letter of alphabet) // for each letter
+    {
+        const newStatesSet = new Set();
+        for (const state of states) // for each state do transition
+        {
+            nfa.doTransition(state, letter).forEach(newState => 
+            {
+                newStatesSet.add(newState);
+            });
+        }
+
+        for (const newState of newStatesSet) // do closure on each new state
+        {
+            nfa.doClosureTransition(newState).forEach(epsilonState => 
+            {
+                newStatesSet.add(epsilonState);
+            });
+        }
+
+        const newStates = Array.from(newStatesSet);
+        if (newStates.length == 0) // send that transition to trap
+        { 
+            sendToTrap.push([dfaState, letter]); // this combo results in trapped state
+            continue;
+        }
+        
+        newStates.sort((a, b) => a.getStateLabel() < b.getStateLabel() ? -1 : 1);
+
+        // now we have the set of new reachable states
+        let newStatesLabel = newStates.map(state => state.getStateLabel()).toString();
+        let newDFAState;
+
+        // if seen before
+        if (seen.has(newStatesLabel))
+        {
+            newDFAState = seen.get(newStatesLabel);
+            dst.addTransition(dfaState, newDFAState, letter); // simply add transition
+        }
+        else 
+        {
+            newDFAState = getDFAStateFromNFAStates(newStates); // create
+            dst.addState(newDFAState); // add state
+            dst.addTransition(dfaState, newDFAState, letter);
+
+            for (const newState of newStates) // check for end
+            {
+                if (nfa.isFinalState(newState))
+                {
+                    dst.setFinalState(newDFAState);
+                }
+            }
+            
+            seen.set(newStatesLabel, newDFAState); // seen
+            q.push(newStates); // add to explore queue
+        }
+    }
+  }
+  // now we are done building the regular transitions, we finish all the trap states
+  if (sendToTrap.length == 0) return;
+
+  const trapState = new State('{}');
+  dst.addState(trapState);
+  for (const letter of alphabet)
+  {
+      sendToTrap.push([trapState, letter]);
+  }
+  for (const transition of sendToTrap) 
+  {
+      dst.addTransition(transition[0], trapState, transition[1]);
+  }
 }

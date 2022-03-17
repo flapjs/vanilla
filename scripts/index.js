@@ -39,7 +39,7 @@ function bind_double_click() {
  */
 function drag_scene(e) {
   const dx = e.movementX, dy = e.movementY;
-  for (let vertex of Object.values(graph)) {
+  for (const vertex of Object.values(graph)) {
     vertex.x += dx;
     vertex.y += dy;
   }
@@ -245,7 +245,7 @@ function bind_scroll() {
     e.preventDefault();  // prevent browser scrolling or zooming
     const [x, y] = drawing.event_position_on_canvas(e);
     const zoom_const = 1 - consts.ZOOM_SPEED*e.deltaY;
-    for (let vertex of Object.values(graph)) {
+    for (const vertex of Object.values(graph)) {
       vertex.x = x + zoom_const*(vertex.x-x);
       vertex.y = y + zoom_const*(vertex.y-y);
       vertex.r *= zoom_const;

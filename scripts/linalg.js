@@ -49,7 +49,7 @@ export function normal_vec(vec, clockwise=false) {
 export function normalize(vec, final_length=1) {
   const adjusted_vec = [];
   const length_adj = vec_len(vec)/final_length;
-  for (let component of vec) {
+  for (const component of vec) {
     adjusted_vec.push(component/length_adj);
   }
   return adjusted_vec;
@@ -67,11 +67,12 @@ export function scale(a, v) {
 
 /**
  * 2d vector addition
- * @param {Array<float>} v1 
+ * @param {float|Array<float>} v1 
  * @param {Array<float>} v2 
  * @returns v1+v2
  */
 export function add(v1, v2) {
+  if (!isNaN(v1)) v1 = [parseFloat(v1), parseFloat(v1)];  // incase someone passes in a scalar
   return [v1[0]+v2[0], v1[1]+v2[1]];
 }
 

@@ -115,7 +115,7 @@ export function display_edge_menu(graph, edge, x, y) {
  */
 export function remove_context_menu() {
   const menus = document.querySelectorAll('.context_menu');
-  for (let menu of menus) {
+  for (const menu of menus) {
     document.querySelector('body').removeChild(menu);
   }
 }
