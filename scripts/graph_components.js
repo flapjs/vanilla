@@ -11,7 +11,7 @@ import * as consts from './consts.js';
  * @param {boolean} is_start - is the vertex a start state?
  * @param {boolean} is_final - is the vertex an accept state?
  * @param {Array<Object>} out - neighbors, more specifically array of edges to neighbors
- * @returns 
+ * @returns {Object} the vertex as a json object
  */
 export function make_vertex(name, x, y, r, is_start, is_final, out) {
   return {
@@ -37,7 +37,7 @@ export function make_vertex(name, x, y, r, is_start, is_final, out) {
  * @param {string} pop_symbol - the read symbol
  * @param {string} push_symbol - the write symbol
  * @param {string} move - whether move left of right
- * @returns 
+ * @returns {Object} the edge as a json object
  */
 export function make_edge(from, to, a1, a2, angle1, angle2, transition, pop_symbol, push_symbol, move) {
   return {
