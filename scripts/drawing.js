@@ -155,7 +155,7 @@ export function in_vertex(graph, x, y, v) {
  * @returns {string} returns the first vertex in the graph that contains (x, y), null otherwise
  */
 export function in_any_vertex(graph, x, y) {
-  for (let v of Object.keys(graph)) {
+  for (const v of Object.keys(graph)) {
     if (in_vertex(graph, x, y, v)) {
       return v;
     }
@@ -171,8 +171,8 @@ export function in_any_vertex(graph, x, y) {
  * @returns {Object} returns the first edge in the graph that contains (x, y), null otherwise
  */
 export function in_edge_text(graph, x, y) {
-  for (let vertex of Object.values(graph)) {
-    for (let edge of vertex.out) {
+  for (const vertex of Object.values(graph)) {
+    for (const edge of vertex.out) {
       const [, , mid] = compute_edge_geometry(graph, edge);
       const diff = [x-mid[0], y-mid[1]];
       if (linalg.vec_len(diff) < vertex.r) {  // we are using the radius of the vertex as tolerance
@@ -257,9 +257,9 @@ export function draw(graph) {
   const canvas = get_canvas();
   canvas.width = window.innerWidth*window.devicePixelRatio;
   canvas.height = window.innerHeight*window.devicePixelRatio;
-  for (let vertex of Object.values(graph)) {
+  for (const vertex of Object.values(graph)) {
     draw_vertex(vertex);
-    for (let edge of vertex.out) {
+    for (const edge of vertex.out) {
       draw_edge(graph, edge, vertex.r);
     }
   }

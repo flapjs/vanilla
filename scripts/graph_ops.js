@@ -2,6 +2,10 @@
 
 import * as hist from './history.js';
 import * as drawing from './drawing.js';
+import * as consts from './consts.js';
+import * as compute from './compute.js';
+import * as linalg from './linalg.js';
+import { Queue, deep_equal } from './util.js';
 import * as menus from './menus.js';  // I know this is a circular dep, but it makes more sense this way
 import * as graph_components from './graph_components.js';
 
@@ -44,7 +48,7 @@ export function create_vertex(graph, x, y, radius) {
 export function delete_vertex(graph, v) {
   menus.remove_context_menu();
   if (graph[v].is_start) {  // we will need a start replacement
-    for (let u of Object.keys(graph)) {
+    for (const u of Object.keys(graph)) {
       if (u === v) {
         continue;
       }
@@ -53,12 +57,8 @@ export function delete_vertex(graph, v) {
     }
   }
   delete graph[v];  // remove this vertex
-  for (let vertex of Object.values(graph)) {
-    for (let [i, edge] of vertex.out.entries()) {
-      if (edge.to === v) {
-        vertex.out.splice(i, 1);
-      }  // remove all edges leading to it
-    }
+  for (const vertex of Object.values(graph)) {
+    vertex.out = vertex.out.filter(edge => edge.to !== v);
   }
   drawing.draw(graph);
   hist.push_history(graph);
@@ -79,8 +79,8 @@ export function rename_vertex(graph, v, new_name) {
   } else {
     graph[new_name] = graph[v];  // duplicate
     delete graph[v];  // remove old
-    for (let vertex of Object.values(graph)) {
-      for (let edge of vertex.out) {
+    for (const vertex of Object.values(graph)) {
+      for (const edge of vertex.out) {
         if (edge.from === v) {
           edge.from = new_name;
         }
@@ -100,7 +100,7 @@ export function rename_vertex(graph, v, new_name) {
  * @param {string} v - name of the vertex
  */
 export function set_start(graph, v) {
-  for (let vertex of Object.values(graph)) {
+  for (const vertex of Object.values(graph)) {
     vertex.is_start = false;
   }
   graph[v].is_start = true;
@@ -138,10 +138,11 @@ export function create_edge(graph, u, v, angle1, angle2) {
   const vertex = graph[u];
   // now we add the edge to the graph and draw it
   let a1 = 0.5, a2 = 0;
-  if (u === v) {
+  if (u === v) {  // self loop
     a1 = 0.5, a2 = 1; 
-  }  // self loop
-  const edge = graph_components.make_edge(u, v, a1, a2, angle1, angle2);  // make empty edge to be modified by user
+  }
+  // make empty edge to be modified by user
+  const edge = graph_components.make_edge(u, v, consts.EMPTY_SYMBOL, a1, a2, angle1, angle2);
   vertex.out.push(edge);
   drawing.draw(graph);
   hist.push_history(graph);
@@ -157,13 +158,8 @@ export function create_edge(graph, u, v, angle1, angle2) {
  */
 export function delete_edge(graph, edge) {
   menus.remove_context_menu();
-  for (let vertex of Object.values(graph)) {
-    for (let [i, e] of vertex.out.entries()) {
-      if (e.from === edge.from && e.to === edge.to && e.transition === edge.transition) {
-        vertex.out.splice(i, 1);
-        break;
-      }
-    }
+  for (const vertex of Object.values(graph)) {
+    vertex.out = vertex.out.filter(e => !deep_equal(e, edge));
   }
   drawing.draw(graph);
   hist.push_history(graph);
@@ -189,4 +185,74 @@ export function rename_edge(graph, edge, new_transition, new_pop, new_push, new_
   [edge.transition, edge.push_symbol, edge.pop_symbol, edge.move] = [new_transition, new_push, new_pop, new_left_right];
   drawing.draw(graph);
   hist.push_history(graph);
+}
+
+/**
+ * 
+ * @param {Array<string>} states - a list of state labels that are to be combined
+ * @returns {string} [q3, q0, q5] -> '{q0,q3,q5}'
+ */
+function combine_state_labels(states) {
+  // convert to array and sort
+  states = [...states].sort((u, v) => {
+    // u, v of the form qn, qm where n, m integers
+    if (u.substr(0, 1) === v.substr(0, 1) && !isNaN(u.substr(1)) && !isNaN(v.substr(1))) {
+      return parseInt(u.substr(1)) - parseInt(v.substr(1));  // return the numeric comparison
+    } else {
+      return u < v;  // use the string comparisn
+    }
+  });
+  return '{'+ states.join(',') +'}';
+}
+
+export function NFA_to_DFA(NFA) {
+  //TODO if (is already an DFA) return;
+  // initialize graph and make trap state
+  const alphabet = compute.compute_alphabet(NFA); // these will be all transitions symbols
+  let vertex_position = [200, 200];  // initial position of a new state
+  const DFA = {};  // new graph to populate
+  DFA[consts.TRAP_STATE] = graph_components.make_vertex(
+    consts.TRAP_STATE, ...vertex_position, consts.DEFAULT_VERTEX_RADIUS);  // add a trap state
+  vertex_position = linalg.add(3*consts.DEFAULT_VERTEX_RADIUS, vertex_position);  // increment vertex position
+  let trap_state_used = false;  // assume we haven't used the trap state yet
+  for (const letter of alphabet) {
+    DFA[consts.TRAP_STATE].out.push(graph_components.make_edge(consts.TRAP_STATE, consts.TRAP_STATE, letter));
+  }
+
+  // make start state
+  let NFA_states = compute.closure(NFA, new Set([compute.find_start(NFA)]));  // find the start states
+  let DFA_state = combine_state_labels(NFA_states);  // merge them
+  DFA[DFA_state] = graph_components.make_vertex(
+    DFA_state, ...vertex_position, consts.DEFAULT_VERTEX_RADIUS, true, compute.contains_final(NFA, NFA_states));
+  vertex_position = linalg.add(3*consts.DEFAULT_VERTEX_RADIUS, vertex_position);  // increment vertex position
+
+  // start BFS searching
+  const q = new Queue();
+  q.enqueue(NFA_states);
+  while (q.length) {  // while still something to explore
+    NFA_states = q.dequeue();
+    DFA_state = combine_state_labels(NFA_states);
+    for (const letter of alphabet) {  // for each letter, we add an edge
+      const new_NFA_states = compute.NFA_step(NFA, NFA_states, letter);  // new states
+      if (!new_NFA_states.size) {  // send to trap
+        DFA[DFA_state].out.push(graph_components.make_edge(DFA_state, consts.TRAP_STATE, letter));
+        trap_state_used = true;  // mark it used so we don't delete the trap state later
+        continue;  // done
+      }
+      const new_DFA_state = combine_state_labels(new_NFA_states);
+      if (!(new_DFA_state in DFA)) {  // if we don't have that state yet, create one
+        DFA[new_DFA_state] = graph_components.make_vertex(new_DFA_state,
+          ...vertex_position, consts.DEFAULT_VERTEX_RADIUS, false, compute.contains_final(NFA, new_NFA_states));
+        vertex_position = linalg.add(3*consts.DEFAULT_VERTEX_RADIUS, vertex_position);  // increment vertex position
+        q.enqueue(new_NFA_states);  // add this to be explored
+      }
+      DFA[DFA_state].out.push(graph_components.make_edge(DFA_state, new_DFA_state, letter));  // make edge
+    }
+  }
+  
+  // clean up
+  if (!trap_state_used) {
+    delete_vertex(DFA, consts.TRAP_STATE);
+  }
+  return DFA;
 }

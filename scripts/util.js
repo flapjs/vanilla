@@ -23,3 +23,26 @@ export class Queue {
     return this.tail_idx - this.head_idx; 
   }
 }
+
+/**
+ * compare the equality of the two objects
+ * @param {string|number|Object} obj1 - object 1
+ * @param {string|number|Object} obj2 - object 2
+ * @returns {boolean} true iff equal
+ */
+export function deep_equal(obj1, obj2) {
+  if (!obj1 || !obj2 || typeof obj1 !== 'object' || typeof obj2 !== 'object') {
+    return obj1 === obj2;
+  }
+
+  const keys1 = Object.keys(obj1), keys2 = Object.keys(obj2);
+  if (keys1.length !== keys2.length) {  // key length doesn't match
+    return false;
+  }
+  for (const key of keys1) {
+    if (!deep_equal(obj1[key], obj2[key])) {
+      return false;
+    }
+  }
+  return true;
+}

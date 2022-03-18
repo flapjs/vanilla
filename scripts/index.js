@@ -39,7 +39,7 @@ function bind_double_click() {
  */
 function drag_scene(e) {
   const dx = e.movementX, dy = e.movementY;
-  for (let vertex of Object.values(graph)) {
+  for (const vertex of Object.values(graph)) {
     vertex.x += dx;
     vertex.y += dy;
   }
@@ -245,7 +245,7 @@ function bind_scroll() {
     e.preventDefault();  // prevent browser scrolling or zooming
     const [x, y] = drawing.event_position_on_canvas(e);
     const zoom_const = 1 - consts.ZOOM_SPEED*e.deltaY;
-    for (let vertex of Object.values(graph)) {
+    for (const vertex of Object.values(graph)) {
       vertex.x = x + zoom_const*(vertex.x-x);
       vertex.y = y + zoom_const*(vertex.y-y);
       vertex.r *= zoom_const;
@@ -306,6 +306,17 @@ function bind_switch_machine() {
   });
 }
 
+function bind_machine_transform() {
+  const transform_btns = document.querySelector('.machine_transform').children;
+  for (const btn of transform_btns) {
+    btn.addEventListener('click', () => {
+      graph = graph_ops.NFA_to_DFA(graph);
+      drawing.draw(graph);
+      hist.push_history(graph);
+    });
+  }
+}
+
 /**
  * run after all the contents are loaded
  */
@@ -316,6 +327,7 @@ function init() {
   bind_drag();
   bind_context_menu();
   bind_run_input();
+  bind_machine_transform();
   bind_undo_redo();
   bind_scroll();
   bind_dd();
