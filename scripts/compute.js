@@ -159,7 +159,7 @@ function run_input_Pushdown(graph, input) {
  */
 function run_input_Turing(graph, input, allowed_steps=512) {
   const tape = {};  // we use an object instead of array to have negative index
-  for (const i = 0; i < input.length; i++) {
+  for (let i = 0; i < input.length; i++) {
     tape[i] = input[i];  // copy all input over
   }
   let tape_idx = 0;  // starting tape index

@@ -72,7 +72,9 @@ export function scale(a, v) {
  * @returns v1+v2
  */
 export function add(v1, v2) {
-  if (!isNaN(v1)) v1 = [parseFloat(v1), parseFloat(v1)];  // incase someone passes in a scalar
+  if (!isNaN(v1)) {
+    v1 = [parseFloat(v1), parseFloat(v1)];
+  }  // incase someone passes in a scalar
   return [v1[0]+v2[0], v1[1]+v2[1]];
 }
 

@@ -202,7 +202,7 @@ function combine_state_labels(states) {
       return u < v;  // use the string comparisn
     }
   });
-  return '{'+ states.join(',') +'}'
+  return '{'+ states.join(',') +'}';
 }
 
 export function NFA_to_DFA(NFA) {
