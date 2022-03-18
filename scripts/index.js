@@ -306,6 +306,17 @@ function bind_switch_machine() {
   });
 }
 
+function bind_machine_transform() {
+  const transform_btns = document.querySelector('.machine_transform').children;
+  for (const btn of transform_btns) {
+    btn.addEventListener('click', () => {
+      graph = graph_ops.NFA_to_DFA(graph);
+      drawing.draw(graph);
+      hist.push_history(graph);
+    });
+  }
+}
+
 /**
  * run after all the contents are loaded
  */
@@ -316,6 +327,7 @@ function init() {
   bind_drag();
   bind_context_menu();
   bind_run_input();
+  bind_machine_transform();
   bind_undo_redo();
   bind_scroll();
   bind_dd();

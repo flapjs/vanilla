@@ -20,6 +20,13 @@
   top: 5%;
 }
 
+.machine_transform {
+  z-index: 999;
+  position: absolute;
+  left: 20%;
+  top: 5%;
+}
+
 .machine_inputs {
   z-index: 999;
   position: absolute;

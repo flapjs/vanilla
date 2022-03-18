@@ -77,3 +77,6 @@ export const LEFT = 'L';
 
 /** @constant {string} RIGHT - symbol for move tape right */
 export const RIGHT = 'R';
+
+/** @constant {string} TRAP_STATE - name of the trap state for a DFA */
+export const TRAP_STATE = 'q_trap';

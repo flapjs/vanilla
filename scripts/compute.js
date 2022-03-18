@@ -16,6 +16,7 @@ export function compute_alphabet(graph) {
       alphabet.add(edge.transition);
     }
   }
+  alphabet.delete(consts.EMPTY_SYMBOL);  // exclude epsilon
   return alphabet;
 }
 
@@ -66,6 +67,25 @@ export function contains_final(graph, cur_states) {
 }
 
 /**
+ * a single step of the NFA running algorithm
+ * @param {Object} graph - the NFA of interest
+ * @param {Set<string>} cur_states - all possible states the machine is in
+ * @param {string} symbol - the transition symbol
+ * @returns {Set<string>} a new set of states after the transition
+ */
+export function NFA_step(graph, cur_states, symbol) {
+  const new_states = new Set();
+  for (const v of cur_states) {
+    for (const edge of graph[v].out) {
+      if (edge.transition === symbol) {
+        new_states.add(edge.to);
+      }
+    }
+  }
+  return closure(graph, new_states);
+}
+
+/**
  * check if the input is accepted
  * @param {Object} graph - machine graph
  * @param {string} input - input string
@@ -74,15 +94,7 @@ export function contains_final(graph, cur_states) {
 function run_input_NFA(graph, input) {
   let cur_states = closure(graph, new Set([find_start(graph)]));  // find closure of start
   for (const c of input) {
-    const new_states = new Set();
-    for (const v of cur_states) {
-      for (const edge of graph[v].out) {
-        if (edge.transition === c) {
-          new_states.add(edge.to);
-        }
-      }
-    }
-    cur_states = closure(graph, new_states);
+    cur_states = NFA_step(graph, cur_states, c);
     if (!cur_states.size) {
       return false;
     }  // can't go anywhere
