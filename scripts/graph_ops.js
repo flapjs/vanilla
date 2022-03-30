@@ -78,6 +78,7 @@ export function rename_vertex(graph, v, new_name) {
     alert(new_name + ' already exists');
   } else {
     graph[new_name] = graph[v];  // duplicate
+    graph[new_name].name = new_name;
     delete graph[v];  // remove old
     for (const vertex of Object.values(graph)) {
       for (const edge of vertex.out) {
@@ -196,8 +197,8 @@ function combine_state_labels(states) {
   // convert to array and sort
   states = [...states].sort((u, v) => {
     // u, v of the form qn, qm where n, m integers
-    if (u.substr(0, 1) === v.substr(0, 1) && !isNaN(u.substr(1)) && !isNaN(v.substr(1))) {
-      return parseInt(u.substr(1)) - parseInt(v.substr(1));  // return the numeric comparison
+    if (u.substring(0, 1) === v.substring(0, 1) && !isNaN(u.substring(1)) && !isNaN(v.substring(1))) {
+      return parseInt(u.substring(1)) - parseInt(v.substring(1));  // return the numeric comparison
     } else {
       return u < v;  // use the string comparisn
     }

@@ -7,6 +7,10 @@
   list-style-position:inside
 }
 
+*:focus {
+  outline:0;
+}
+
 .context_menu {
   z-index: 99;
   position: absolute;
