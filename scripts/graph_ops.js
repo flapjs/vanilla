@@ -5,7 +5,7 @@ import * as drawing from './drawing.js';
 import * as consts from './consts.js';
 import * as compute from './compute.js';
 import * as linalg from './linalg.js';
-import { Queue, deep_equal } from './util.js';
+import { Queue } from './util.js';
 import * as menus from './menus.js';  // I know this is a circular dep, but it makes more sense this way
 import * as graph_components from './graph_components.js';
 
@@ -126,6 +126,28 @@ export function toggle_final(graph, v) {
 }
 
 /**
+ * check if edge has proper name and is not already in the graph
+ * @param {Object} graph - the graph to check the edge against
+ * @param {Object} edge - the edge to validate
+ * @returns {boolean} true iff edge valid
+ */
+export function validate_edge(graph, edge) {
+  edge.transition = (edge.transition === '') ? consts.EMPTY_SYMBOL : edge.transition;
+  edge.pop_symbol = (edge.pop_symbol === '') ? edge.pop_symbol : consts.EMPTY_SYMBOL;
+  edge.push_symbol = (edge.push_symbol === '') ? edge.push_symbol : consts.EMPTY_SYMBOL;
+  edge.move = (edge.move === '') ? edge.move : consts.RIGHT;  // fill in default if user erased the input
+  for (const vertex of Object.values(graph)) {
+    for (const e of vertex.out) {
+      if (graph_components.edge_equal(edge, e)) {
+        alert('the edge you are creating already exists');
+        return false;  // same edge is already in graph
+      }
+    }
+  }
+  return true;
+}
+
+/**
  * creates an edge between two vertices and draw it on the screen
  * @param {Object} graph - the graph in which we are creating a new edge
  * @param {string} u - from vertex
@@ -137,19 +159,20 @@ export function toggle_final(graph, v) {
  */
 export function create_edge(graph, u, v, angle1, angle2) {
   const vertex = graph[u];
-  // now we add the edge to the graph and draw it
-  let a1 = 0.5, a2 = 0;
-  if (u === v) {  // self loop
-    a1 = 0.5, a2 = 1; 
-  }
+  const a1 = 0.5, a2 = (u === v) ? 1 : 0;  // determine if self loop, then put the text somewhere else
   // make empty edge to be modified by user
   const edge = graph_components.make_edge(u, v, consts.EMPTY_SYMBOL, a1, a2, angle1, angle2);
-  vertex.out.push(edge);
-  drawing.draw(graph);
-  hist.push_history(graph);
   const [, , mid] = drawing.compute_edge_geometry(graph, edge);
   // context menu to modify the edge right after
   menus.display_edge_menu(graph, edge, ...drawing.canvas_px_to_window_px(mid));
+  /***** NOTE: only create the edge when enter key is pressed *****/
+  document.querySelector('.context_menu').addEventListener('keyup', e => {
+    if (validate_edge(graph, edge) && e.key === 'Enter') {  // if user creates a legal edge and presses enter
+      vertex.out.push(edge);
+      drawing.draw(graph);
+      hist.push_history(graph);
+    }
+  }, { once:true });
 }
 
 /**
@@ -160,7 +183,7 @@ export function create_edge(graph, u, v, angle1, angle2) {
 export function delete_edge(graph, edge) {
   menus.remove_context_menu();
   for (const vertex of Object.values(graph)) {
-    vertex.out = vertex.out.filter(e => !deep_equal(e, edge));
+    vertex.out = vertex.out.filter(e => !graph_components.edge_equal(e, edge));
   }
   drawing.draw(graph);
   hist.push_history(graph);

@@ -202,3 +202,10 @@ export function run_input(graph, input) {
     return run_input_Turing(graph, input);
   }
 }
+
+/**
+ * given an NFA, check if it is in fact deterministic
+ */
+export function is_DFA(NFA) {
+
+}
