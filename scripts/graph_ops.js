@@ -158,21 +158,13 @@ export function validate_edge(graph, edge) {
  * @param {string} push_symbol - the symbol to push on top of the stack
  */
 export function create_edge(graph, u, v, angle1, angle2) {
-  const vertex = graph[u];
   const a1 = 0.5, a2 = (u === v) ? 1 : 0;  // determine if self loop, then put the text somewhere else
   // make empty edge to be modified by user
   const edge = graph_components.make_edge(u, v, consts.EMPTY_SYMBOL, a1, a2, angle1, angle2);
   const [, , mid] = drawing.compute_edge_geometry(graph, edge);
   // context menu to modify the edge right after
   menus.display_edge_menu(graph, edge, ...drawing.canvas_px_to_window_px(mid));
-  /***** NOTE: only create the edge when enter key is pressed *****/
-  document.querySelector('.context_menu').addEventListener('keyup', e => {
-    if (validate_edge(graph, edge) && e.key === 'Enter') {  // if user creates a legal edge and presses enter
-      vertex.out.push(edge);
-      drawing.draw(graph);
-      hist.push_history(graph);
-    }
-  }, { once:true });
+  // Note: the edge is not added right away; instead it will be added after the user press enter to rename the edge
 }
 
 /**
@@ -200,13 +192,16 @@ export function delete_edge(graph, edge) {
  */
 export function rename_edge(graph, edge, new_transition, new_pop, new_push, new_left_right) {
   menus.remove_context_menu();
-  if (new_transition === edge.transition &&
-      new_push === edge.push_symbol &&
-      new_pop === edge.pop_symbol &&
-      new_left_right === edge.move) {
-    return;  // nothing changed, so nothing to do
+  const new_edge = {...edge,
+    transition: new_transition, pop_symbol: new_pop, push_symbol: new_push, move: new_left_right};
+  if (compute.edge_has_equiv_edge_in_graph(graph, new_edge)) {  // new edge clashes with old
+    alert('an equivalent edge already exists');
+    return;
   }
-  [edge.transition, edge.push_symbol, edge.pop_symbol, edge.move] = [new_transition, new_push, new_pop, new_left_right];
+  Object.assign(edge, new_edge);  // change in place
+  if (!compute.edge_in_graph(graph, edge)) {  // edge was not part of the graph
+    graph[edge.to].out.push(edge);
+  }
   drawing.draw(graph);
   hist.push_history(graph);
 }
