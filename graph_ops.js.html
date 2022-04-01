@@ -33,7 +33,7 @@ import * as drawing from './drawing.js';
 import * as consts from './consts.js';
 import * as compute from './compute.js';
 import * as linalg from './linalg.js';
-import { Queue, deep_equal } from './util.js';
+import { Queue } from './util.js';
 import * as menus from './menus.js';  // I know this is a circular dep, but it makes more sense this way
 import * as graph_components from './graph_components.js';
 
@@ -106,6 +106,7 @@ export function rename_vertex(graph, v, new_name) {
     alert(new_name + ' already exists');
   } else {
     graph[new_name] = graph[v];  // duplicate
+    graph[new_name].name = new_name;
     delete graph[v];  // remove old
     for (const vertex of Object.values(graph)) {
       for (const edge of vertex.out) {
@@ -153,6 +154,28 @@ export function toggle_final(graph, v) {
 }
 
 /**
+ * check if edge has proper name and is not already in the graph
+ * @param {Object} graph - the graph to check the edge against
+ * @param {Object} edge - the edge to validate
+ * @returns {boolean} true iff edge valid
+ */
+export function validate_edge(graph, edge) {
+  edge.transition = (edge.transition === '') ? consts.EMPTY_SYMBOL : edge.transition;
+  edge.pop_symbol = (edge.pop_symbol === '') ? edge.pop_symbol : consts.EMPTY_SYMBOL;
+  edge.push_symbol = (edge.push_symbol === '') ? edge.push_symbol : consts.EMPTY_SYMBOL;
+  edge.move = (edge.move === '') ? edge.move : consts.RIGHT;  // fill in default if user erased the input
+  for (const vertex of Object.values(graph)) {
+    for (const e of vertex.out) {
+      if (graph_components.edge_equal(edge, e)) {
+        alert('the edge you are creating already exists');
+        return false;  // same edge is already in graph
+      }
+    }
+  }
+  return true;
+}
+
+/**
  * creates an edge between two vertices and draw it on the screen
  * @param {Object} graph - the graph in which we are creating a new edge
  * @param {string} u - from vertex
@@ -163,20 +186,13 @@ export function toggle_final(graph, v) {
  * @param {string} push_symbol - the symbol to push on top of the stack
  */
 export function create_edge(graph, u, v, angle1, angle2) {
-  const vertex = graph[u];
-  // now we add the edge to the graph and draw it
-  let a1 = 0.5, a2 = 0;
-  if (u === v) {  // self loop
-    a1 = 0.5, a2 = 1; 
-  }
+  const a1 = 0.5, a2 = (u === v) ? 1 : 0;  // determine if self loop, then put the text somewhere else
   // make empty edge to be modified by user
   const edge = graph_components.make_edge(u, v, consts.EMPTY_SYMBOL, a1, a2, angle1, angle2);
-  vertex.out.push(edge);
-  drawing.draw(graph);
-  hist.push_history(graph);
   const [, , mid] = drawing.compute_edge_geometry(graph, edge);
   // context menu to modify the edge right after
   menus.display_edge_menu(graph, edge, ...drawing.canvas_px_to_window_px(mid));
+  // Note: the edge is not added right away; instead it will be added after the user press enter to rename the edge
 }
 
 /**
@@ -187,7 +203,7 @@ export function create_edge(graph, u, v, angle1, angle2) {
 export function delete_edge(graph, edge) {
   menus.remove_context_menu();
   for (const vertex of Object.values(graph)) {
-    vertex.out = vertex.out.filter(e => !deep_equal(e, edge));
+    vertex.out = vertex.out.filter(e => !graph_components.edge_equal(e, edge));
   }
   drawing.draw(graph);
   hist.push_history(graph);
@@ -204,13 +220,16 @@ export function delete_edge(graph, edge) {
  */
 export function rename_edge(graph, edge, new_transition, new_pop, new_push, new_left_right) {
   menus.remove_context_menu();
-  if (new_transition === edge.transition &amp;&amp;
-      new_push === edge.push_symbol &amp;&amp;
-      new_pop === edge.pop_symbol &amp;&amp;
-      new_left_right === edge.move) {
-    return;  // nothing changed, so nothing to do
+  const new_edge = {...edge,
+    transition: new_transition, pop_symbol: new_pop, push_symbol: new_push, move: new_left_right};
+  if (compute.edge_has_equiv_edge_in_graph(graph, new_edge)) {  // new edge clashes with old
+    alert('an equivalent edge already exists');
+    return;
   }
-  [edge.transition, edge.push_symbol, edge.pop_symbol, edge.move] = [new_transition, new_push, new_pop, new_left_right];
+  Object.assign(edge, new_edge);  // change in place
+  if (!compute.edge_in_graph(graph, edge)) {  // edge was not part of the graph
+    graph[edge.to].out.push(edge);
+  }
   drawing.draw(graph);
   hist.push_history(graph);
 }
@@ -224,8 +243,8 @@ function combine_state_labels(states) {
   // convert to array and sort
   states = [...states].sort((u, v) => {
     // u, v of the form qn, qm where n, m integers
-    if (u.substr(0, 1) === v.substr(0, 1) &amp;&amp; !isNaN(u.substr(1)) &amp;&amp; !isNaN(v.substr(1))) {
-      return parseInt(u.substr(1)) - parseInt(v.substr(1));  // return the numeric comparison
+    if (u.substring(0, 1) === v.substring(0, 1) &amp;&amp; !isNaN(u.substring(1)) &amp;&amp; !isNaN(v.substring(1))) {
+      return parseInt(u.substring(1)) - parseInt(v.substring(1));  // return the numeric comparison
     } else {
       return u &lt; v;  // use the string comparisn
     }
@@ -300,7 +319,7 @@ export function NFA_to_DFA(NFA) {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Fri Mar 18 2022 00:44:35 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Fri Apr 01 2022 04:44:49 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>
