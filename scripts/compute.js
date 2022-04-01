@@ -3,6 +3,7 @@
 import * as consts from './consts.js';
 import * as menus from './menus.js';
 import { Queue } from './util.js';
+import { edge_equal } from './graph_components.js';
 
 /**
  * finds all letters used in the transitions
@@ -201,4 +202,45 @@ export function run_input(graph, input) {
   } else if (menus.is_Turing()) {
     return run_input_Turing(graph, input);
   }
+}
+
+/**
+ * given an NFA, check if it is in fact deterministic
+ */
+export function is_DFA(NFA) {
+
+}
+
+/**
+ * computes if the edge is the same as another one already in graph up to graphical representation
+ * @param {Object} graph 
+ * @param {Object} edge 
+ * @returns {boolean} true iff edge \in graph
+ */
+export function edge_has_equiv_edge_in_graph(graph, edge) {
+  for (const vertex of Object.values(graph)) {
+    for (const e of vertex.out) {
+      if (edge_equal(e, edge)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * computes if the edge IS already in graph
+ * @param {Object} graph 
+ * @param {Object} edge 
+ * @returns {boolean} true iff edge \in graph
+ */
+export function edge_in_graph(graph, edge) {
+  for (const vertex of Object.values(graph)) {
+    for (const e of vertex.out) {
+      if (edge === e) {
+        return true;
+      }
+    }
+  }
+  return false;
 }

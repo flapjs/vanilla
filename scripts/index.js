@@ -300,9 +300,11 @@ function init_graph() {
  */
 function bind_switch_machine() {
   const select = document.getElementById('select_machine');
+  select.value = consts.DEFAULT_MACHINE;  // set to default machine here too
   select.addEventListener('change', e => {
     hist.set_history_keys(e.target.value);
     init_graph();  // switching graph
+    menus.display_UI_for(e.target.value);
   });
 }
 

@@ -58,3 +58,18 @@ export function make_edge(from, to, transition, a1, a2, angle1, angle2, pop_symb
     move: move ? move : consts.RIGHT
   };
 }
+
+/**
+ * check if the two edges are equal up to graphical representation
+ * @param {Object} e1 - edge 1
+ * @param {Object} e2 - edge 2
+ * @returns {boolean} true iff equal
+ */
+export function edge_equal(e1, e2) {
+  return e1.from === e2.from &&
+         e1.to === e2.to &&
+         e1.transition === e2.transition &&
+         e1.pop_symbol === e2.pop_symbol &&
+         e1.push_symbol === e2.push_symbol &&
+         e1.move === e2.move;
+}

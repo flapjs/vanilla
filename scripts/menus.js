@@ -8,7 +8,7 @@ import * as graph_ops from './graph_ops.js';
  * @returns {boolean} true or false 
  */
 export function is_NFA() {
-  return document.getElementById('select_machine').value === 'NFA';
+  return document.getElementById('select_machine').value === consts.NFA;
 }
 
 /**
@@ -16,7 +16,7 @@ export function is_NFA() {
  * @returns {boolean} true or false 
  */
 export function is_Pushdown() {
-  return document.getElementById('select_machine').value === 'Pushdown';
+  return document.getElementById('select_machine').value === consts.Pushdown;
 }
 
 /**
@@ -24,7 +24,7 @@ export function is_Pushdown() {
  * @returns {boolean} true or false 
  */
 export function is_Turing() {
-  return document.getElementById('select_machine').value === 'Turing';
+  return document.getElementById('select_machine').value === consts.Turing;
 }
 
 /**
@@ -47,11 +47,6 @@ export function display_vertex_menu(graph, v, x, y) {
   container.appendChild(delete_div);
   const rename = document.createElement('input');
   rename.value = v;  // prepopulate vertex name
-  rename.addEventListener('keyup', e => {
-    if (e.key === 'Enter') {
-      graph_ops.rename_vertex(graph, v, rename.value);
-    }
-  });
   rename_div.appendChild(rename);
   const start_btn = document.createElement('button');
   start_btn.innerText = 'make start';
@@ -62,7 +57,14 @@ export function display_vertex_menu(graph, v, x, y) {
   buttons_div.appendChild(start_btn);
   buttons_div.appendChild(final_btn);
   container.style = `left:${x}px; top:${y}px`;
+  container.addEventListener('keyup', e => {
+    if (e.key === 'Enter') {
+      graph_ops.rename_vertex(graph, v, rename.value);
+    }
+  });
   document.querySelector('body').appendChild(container);
+  rename.focus();  // focus on the first text box
+  rename.select();  // select all text
 }
 
 /**
@@ -108,6 +110,8 @@ export function display_edge_menu(graph, edge, x, y) {
     }
   });
   document.querySelector('body').appendChild(container);
+  transition.focus();  // focus on the first text box
+  transition.select();  // select all text
 }
 
 /**
@@ -117,5 +121,35 @@ export function remove_context_menu() {
   const menus = document.querySelectorAll('.context_menu');
   for (const menu of menus) {
     document.querySelector('body').removeChild(menu);
+  }
+}
+
+
+/**
+ * show/hide UI specific for a machine
+ */
+export function set_UI_visibility(machine, visible) {
+  const UIs = document.getElementsByClassName(machine+'_specific');
+  for (let i = 0; i < UIs.length; i++) {
+    UIs[i].hidden = !visible;
+  }
+}
+
+/**
+ * displays exactly those UI elements specific to the machine from {NFA, Pushdown, Turing}
+ */
+export function display_UI_for(machine) {
+  if (machine === consts.NFA) {
+    set_UI_visibility(consts.NFA, true);
+    set_UI_visibility(consts.Pushdown, false);
+    set_UI_visibility(consts.Turing, false);
+  } else if (machine === consts.Pushdown) {
+    set_UI_visibility(consts.NFA, false);
+    set_UI_visibility(consts.Pushdown, true);
+    set_UI_visibility(consts.Turing, false);
+  } else if (machine === consts.Turing) {
+    set_UI_visibility(consts.NFA, false);
+    set_UI_visibility(consts.Pushdown, false);
+    set_UI_visibility(consts.Turing, true);
   }
 }
