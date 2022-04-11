@@ -200,7 +200,7 @@ export function rename_edge(graph, edge, new_transition, new_pop, new_push, new_
   }
   Object.assign(edge, new_edge);  // change in place
   if (!compute.edge_in_graph(graph, edge)) {  // edge was not part of the graph
-    graph[edge.to].out.push(edge);
+    graph[edge.from].out.push(edge);
   }
   drawing.draw(graph);
   hist.push_history(graph);
