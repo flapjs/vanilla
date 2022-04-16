@@ -35,6 +35,18 @@ export function canvas_px_to_window_px(canvas_pt) {
 }
 
 /**
+ * computes an appropriate text size to display the label
+ * @param {int} textbox_width - width of textbox in pxiels
+ * @param {string} text - the text message to display 
+ * @returns {int} fontsize in pixels
+ */
+function text_size_huristic(textbox_width, text) {
+  const default_size = consts.TEXT_SIZING_CONSTS.b+
+                       Math.exp(consts.TEXT_SIZING_CONSTS.k*text.length+consts.TEXT_SIZING_CONSTS.a);
+  return textbox_width/consts.DEFAULT_VERTEX_RADIUS*default_size;
+}
+
+/**
  * draw text on the canvas
  * @param {string} text - the text you want to draw on the screen
  * @param {Array<float>} pos - the position wrt canvas
@@ -78,8 +90,8 @@ export function draw_final_circle(vertex) {
 export function draw_vertex(vertex) {
   // draw the circle
   draw_cricle(vertex.x, vertex.y, vertex.r);
-  // draw the text inside
-  draw_text(vertex.name, [vertex.x, vertex.y], vertex.r);
+  // find an appropriate text size and draw the text inside the vertex
+  draw_text(vertex.name, [vertex.x, vertex.y], text_size_huristic(vertex.r, vertex.name));
   if (vertex.is_start) {  // it is the starting vertex
     const tip1 = [vertex.x-vertex.r, vertex.y],
       tip2 = linalg.sub(tip1, linalg.scale(consts.START_TRIANGLE_SCALE, [vertex.r, vertex.r])),
@@ -175,7 +187,7 @@ export function in_edge_text(graph, x, y) {
     for (const edge of vertex.out) {
       const [, , mid] = compute_edge_geometry(graph, edge);
       const diff = [x-mid[0], y-mid[1]];
-      if (linalg.vec_len(diff) < vertex.r) {  // we are using the radius of the vertex as tolerance
+      if (linalg.vec_len(diff) < consts.EDGE_TEXT_SACALING*vertex.r) {  // click within a certain radius
         return edge;
       }
     }
@@ -260,7 +272,7 @@ export function draw(graph) {
   for (const vertex of Object.values(graph)) {
     draw_vertex(vertex);
     for (const edge of vertex.out) {
-      draw_edge(graph, edge, vertex.r);
+      draw_edge(graph, edge, consts.EDGE_TEXT_SACALING*vertex.r);
     }
   }
 }

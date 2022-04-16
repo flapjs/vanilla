@@ -278,9 +278,9 @@ function on_double_press(key, callback) {
  */
 function bind_dd() {
   on_double_press('KeyD', () => {
-    if (!Object.keys(graph).length) {
+    if (!Object.keys(graph).length) {  // nothing to delete
       return;
-    }  // nothing to delete
+    }
     graph = consts.EMPTY_GRAPH;
     drawing.draw(graph);
     hist.push_history(graph);

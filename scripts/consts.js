@@ -24,6 +24,9 @@ export const DOUBLE_PRESS_TIME = 240;
 /** @constant {int} DEFAULT_VERTEX_RADIUS - [px] it is not a constant since we might zoom in and out */
 export const DEFAULT_VERTEX_RADIUS = 40;
 
+/** @constant {int} EDGE_TEXT_SACALING - a fraction that multiplies the vertex radius to get the transition text size */
+export const EDGE_TEXT_SACALING = 0.5;
+
 /** @constant {float} START_TRIANGLE_SCALE - wrt vertex radius */
 export const START_TRIANGLE_SCALE = 0.6;
 
@@ -89,3 +92,10 @@ export const RIGHT = 'R';
 
 /** @constant {string} TRAP_STATE - name of the trap state for a DFA */
 export const TRAP_STATE = 'q_trap';
+
+/** @constant {Object} TEXT_SIZING_CONSTS - a list of function params to correctly size texts */
+export const TEXT_SIZING_CONSTS = {
+  k: -0.208097,
+  a: 3.96831,
+  b: 6.36873  // note the accompanying function is e^(kx+a)+b
+};
