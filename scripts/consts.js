@@ -24,8 +24,11 @@ export const DOUBLE_PRESS_TIME = 240;
 /** @constant {int} DEFAULT_VERTEX_RADIUS - [px] it is not a constant since we might zoom in and out */
 export const DEFAULT_VERTEX_RADIUS = 40;
 
-/** @constant {int} EDGE_TEXT_SACALING - a fraction that multiplies the vertex radius to get the transition text size */
+/** @constant {float} EDGE_TEXT_SACALING - a fraction of vertex radius to as the transition text size */
 export const EDGE_TEXT_SACALING = 0.5;
+
+/** @constant {float} PIXEL_PER_SIZE_1_LETTER - pixel per letter for font size 1 text. approximate */
+export const PIXEL_PER_SIZE_1_LETTER = 0.275;
 
 /** @constant {float} START_TRIANGLE_SCALE - wrt vertex radius */
 export const START_TRIANGLE_SCALE = 0.6;

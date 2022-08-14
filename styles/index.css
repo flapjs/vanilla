@@ -27,7 +27,14 @@
 .machine_transform {
   z-index: 999;
   position: absolute;
-  left: 20%;
+  left: 10%;
+  top: 5%;
+}
+
+.save_machine_drawing {
+  z-index: 999;
+  position: absolute;
+  left: 18%;
   top: 5%;
 }
 
