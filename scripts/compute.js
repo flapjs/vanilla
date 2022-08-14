@@ -145,7 +145,7 @@ function BFS_step(graph, v, remaining_input, allowed_steps=512) {
  * @param {string} input - input string
  * @returns {boolean} true iff the input is accepted by the machine
  */
-function run_input_Pushdown(graph, input) {
+function run_input_PDA(graph, input) {
   const v = find_start(graph);
   const remaining_input = input.split('').reverse();
   return BFS_step(graph, v, remaining_input);
@@ -186,7 +186,7 @@ function run_input_Turing(graph, input, allowed_steps=512) {
 }
 
 /**
- * determines whether the machine is Pushdown or normal NFA and checks if the input is accepted
+ * determines whether the machine is PDA or normal NFA and checks if the input is accepted
  * @param {Object} graph - machine graph
  * @param {string} machine_type - type of machine the graph represents
  * @param {string} input - input string
@@ -197,8 +197,8 @@ export function run_input(graph, input) {
     return false;
   } else if (menus.is_NFA()) {
     return run_input_NFA(graph, input);
-  } else if (menus.is_Pushdown()) {
-    return run_input_Pushdown(graph, input);
+  } else if (menus.is_PDA()) {
+    return run_input_PDA(graph, input);
   } else if (menus.is_Turing()) {
     return run_input_Turing(graph, input);
   }

@@ -253,7 +253,7 @@ export function draw_edge(graph, edge, text_size) {
   const [start, end, mid] = compute_edge_geometry(graph, edge);
   draw_arrow(start, end, mid);
   let edge_text = transition;  // vanilla NFA only uses transition
-  if (menus.is_Pushdown()) {  // append pop and push if we have PDA
+  if (menus.is_PDA()) {  // append pop and push if we have PDA
     edge_text += ','+pop_symbol+consts.ARROW_SYMBOL+push_symbol;
   } else if (menus.is_Turing()) {  // append push and left/right if we have turing
     edge_text += consts.ARROW_SYMBOL+push_symbol+','+move;

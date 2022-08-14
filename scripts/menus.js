@@ -8,15 +8,15 @@ import * as graph_ops from './graph_ops.js';
  * @returns {boolean} true or false 
  */
 export function is_NFA() {
-  return document.getElementById('select_machine').value === consts.NFA;
+  return document.getElementById('select_machine').value === consts.MACHINE_TYPES.NFA;
 }
 
 /**
  * reports the type of machine the user is working on
  * @returns {boolean} true or false 
  */
-export function is_Pushdown() {
-  return document.getElementById('select_machine').value === consts.Pushdown;
+export function is_PDA() {
+  return document.getElementById('select_machine').value === consts.MACHINE_TYPES.PDA;
 }
 
 /**
@@ -24,7 +24,7 @@ export function is_Pushdown() {
  * @returns {boolean} true or false 
  */
 export function is_Turing() {
-  return document.getElementById('select_machine').value === consts.Turing;
+  return document.getElementById('select_machine').value === consts.MACHINE_TYPES.Turing;
 }
 
 /**
@@ -94,7 +94,7 @@ export function display_edge_menu(graph, edge, x, y) {
   left_right_choice.className = 'L_R_toggle';
   left_right_choice.checked = edge.move === consts.LEFT;
   rename_div.appendChild(transition);
-  if (is_Pushdown()) {
+  if (is_PDA()) {
     rename_div.appendChild(pop);
     rename_div.appendChild(push);
   } else if (is_Turing()) {
@@ -136,20 +136,11 @@ export function set_UI_visibility(machine, visible) {
 }
 
 /**
- * displays exactly those UI elements specific to the machine from {NFA, Pushdown, Turing}
+ * displays exactly those UI elements specific to the machine from {NFA, PDA, Turing}
  */
 export function display_UI_for(machine) {
-  if (machine === consts.NFA) {
-    set_UI_visibility(consts.NFA, true);
-    set_UI_visibility(consts.Pushdown, false);
-    set_UI_visibility(consts.Turing, false);
-  } else if (machine === consts.Pushdown) {
-    set_UI_visibility(consts.NFA, false);
-    set_UI_visibility(consts.Pushdown, true);
-    set_UI_visibility(consts.Turing, false);
-  } else if (machine === consts.Turing) {
-    set_UI_visibility(consts.NFA, false);
-    set_UI_visibility(consts.Pushdown, false);
-    set_UI_visibility(consts.Turing, true);
+  for (const machine_type of Object.values(consts.MACHINE_TYPES)) {
+    set_UI_visibility(machine_type, false);  // hide all UI elements
   }
+  set_UI_visibility(machine, true);  // show only the UI elements for the specified machine
 }

@@ -11,7 +11,7 @@ let hist_ptr = -1, hist_tip = -1;
 /**
  * sets the localstore key for history retrival and writing
  * MUST be used before get_history, push_history, etc.
- * @param {String} machine - type of machine from ['NFA', 'Pushdown', 'Turing']
+ * @param {String} machine - type of machine from ['NFA', 'PDA', 'Turing']
  */
 export function set_history_keys(machine) {
   hist_key = consts.HIST_KEYS[machine];
