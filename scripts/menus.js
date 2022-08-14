@@ -114,9 +114,7 @@ export function display_edge_menu(graph, edge, x, y) {
   transition.select();  // select all text
 }
 
-/**
- * wipes the context menu; does nothing if none exists
- */
+/** wipes the context menu; does nothing if none exists */
 export function remove_context_menu() {
   const menus = document.querySelectorAll('.context_menu');
   for (const menu of menus) {
@@ -125,9 +123,7 @@ export function remove_context_menu() {
 }
 
 
-/**
- * show/hide UI specific for a machine
- */
+/** show/hide UI specific for a machine */
 export function set_UI_visibility(machine, visible) {
   const UIs = document.getElementsByClassName(machine+'_specific');
   for (let i = 0; i < UIs.length; i++) {
@@ -135,9 +131,7 @@ export function set_UI_visibility(machine, visible) {
   }
 }
 
-/**
- * displays exactly those UI elements specific to the machine from {NFA, PDA, Turing}
- */
+/** displays exactly those UI elements specific to the machine from {NFA, PDA, Turing} */
 export function display_UI_for(machine) {
   for (const machine_type of Object.values(consts.MACHINE_TYPES)) {
     set_UI_visibility(machine_type, false);  // hide all UI elements

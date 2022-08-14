@@ -224,6 +224,11 @@ function combine_state_labels(states) {
   return '{'+ states.join(',') +'}';
 }
 
+/**
+ * Converts a graph of an NFA to a DFA
+ * @param {Object} NFA - graph of an NFA to be converted to DFA
+ * @returns {Object} - graph of a DFA equivalent to the NFA
+ */
 export function NFA_to_DFA(NFA) {
   //TODO if (is already an DFA) return;
   // initialize graph and make trap state

@@ -204,9 +204,7 @@ export function run_input(graph, input) {
   }
 }
 
-/**
- * given an NFA, check if it is in fact deterministic
- */
+/** given an NFA, check if it is in fact deterministic */
 export function is_DFA(NFA) {
 
 }

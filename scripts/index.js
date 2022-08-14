@@ -13,9 +13,7 @@ window.addEventListener('resize', () => drawing.draw(graph));
 
 let graph = consts.EMPTY_GRAPH;  // global graph
 
-/**
- * binds double click behavior
- */
+/** handles double click */
 function bind_double_click() {
   drawing.get_canvas().addEventListener('dblclick', e => {  // double click to create vertices
     if (e.movementX || e.movementY) {
@@ -139,9 +137,7 @@ function higher_order_drag_edge(edge) {
   };
 }
 
-/**
- * binds callback functions to the mouse dragging behavior
- */
+/** binds callback functions to the mouse dragging behavior */
 function bind_drag() {
   let mutex = false;  // drag lock not activiated
   // declare the callbacks as empty function so that intellisense recognizes them as function
@@ -179,9 +175,7 @@ function bind_drag() {
   });
 }
 
-/**
- * replaces the default context menu
- */
+/** replaces the default context menu */
 function bind_context_menu() {
   const canvas = drawing.get_canvas();
   let last_time_mouse_press = 0;
@@ -207,9 +201,7 @@ function bind_context_menu() {
   });
 }
 
-/**
- * binds each machine input to the run_input function
- */
+/** binds each machine input to the run_input function */
 function bind_run_input() {
   const input_divs = document.getElementsByClassName('machine_input');
   for (let i = 0; i < input_divs.length; i++) {
@@ -219,9 +211,7 @@ function bind_run_input() {
   }
 }
 
-/**
- * offers ctrl-z and ctrl-shift-z features
- */
+/** offers ctrl-z and ctrl-shift-z features */
 function bind_undo_redo() {
   document.addEventListener('keydown', e => {
     if (e.code !== 'KeyZ' || e.metaKey || e.altKey) {
@@ -237,9 +227,7 @@ function bind_undo_redo() {
   });
 }
 
-/**
- * zooming in and out
- */
+/** zooming in and out */
 function bind_scroll() {
   drawing.get_canvas().addEventListener('wheel', e => {
     e.preventDefault();  // prevent browser scrolling or zooming
@@ -273,9 +261,7 @@ function on_double_press(key, callback) {
   });
 }
 
-/**
- * press dd does delete
- */
+/** press dd does delete */
 function bind_dd() {
   on_double_press('KeyD', () => {
     if (!Object.keys(graph).length) {  // nothing to delete
@@ -287,17 +273,13 @@ function bind_dd() {
   });
 }
 
-/**
- * get the lastest graph from localstore and display
- */
+/** get the lastest graph from localstore and display */
 function init_graph() {
   graph = hist.retrieve_latest_graph();
   drawing.draw(graph);
 }
 
-/**
- * handle switching machine type event
- */
+/** handle switching machine type event */
 function bind_switch_machine() {
   const select = document.getElementById('select_machine');
   select.value = consts.DEFAULT_MACHINE;  // set to default machine here too
@@ -308,6 +290,7 @@ function bind_switch_machine() {
   });
 }
 
+/** handles the NFA to DFA button */
 function bind_machine_transform() {
   const transform_btns = document.querySelector('.machine_transform').children;
   for (const btn of transform_btns) {
@@ -319,9 +302,7 @@ function bind_machine_transform() {
   }
 }
 
-/**
- * run after all the contents are loaded
- */
+/** run after all the contents are loaded to hook up callbacks */
 function init() {
   init_graph();
   bind_switch_machine();
