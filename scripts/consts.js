@@ -25,7 +25,7 @@ export const DOUBLE_PRESS_TIME = 240;
 export const DEFAULT_VERTEX_RADIUS = 40;
 
 /** @constant {float} EDGE_TEXT_SACALING - a fraction of vertex radius to as the transition text size */
-export const EDGE_TEXT_SACALING = 0.5;
+export const EDGE_TEXT_SACALING = 0.7;
 
 /** @constant {float} PIXEL_PER_SIZE_1_LETTER - pixel per letter for font size 1 text. approximate */
 export const PIXEL_PER_SIZE_1_LETTER = 0.275;
@@ -41,6 +41,9 @@ export const ARROW_WIDTH = 10;
 
 /** @constant {string} EMPTY_SYMBOL - no operation stack symbol */
 export const EMPTY_SYMBOL = 'ε';
+
+/** @constant {string} EMPTY_TYPE - symbol for an empty cell of a Turing Machine */
+export const EMPTY_TAPE = '☐'
 
 /** @constant {string} ARROW_SYMBOL - arrow symbol */
 export const ARROW_SYMBOL = '→';
@@ -83,7 +86,7 @@ export const ZOOM_SPEED = 0.001;
 export const EDGE_CURVATURE = 0.5;
 
 /** @constant {float} FINAL_CIRCLE_SIZE - fraction of the radius of the outer circle */
-export const FINAL_CIRCLE_SIZE = 0.8;
+export const FINAL_CIRCLE_SIZE = 0.85;
 
 /** @constant {string} LEFT - symbol for move tape left */
 export const LEFT = 'L';

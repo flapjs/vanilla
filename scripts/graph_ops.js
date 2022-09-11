@@ -159,8 +159,8 @@ export function validate_edge(graph, edge) {
  */
 export function create_edge(graph, u, v, angle1, angle2) {
   const a1 = 0.5, a2 = (u === v) ? 1 : 0;  // determine if self loop, then put the text somewhere else
-  // make empty edge to be modified by user
-  const edge = graph_components.make_edge(u, v, consts.EMPTY_SYMBOL, a1, a2, angle1, angle2);
+  // make edge with undefined transition to be modified by user
+  const edge = graph_components.make_edge(u, v, undefined, a1, a2, angle1, angle2);
   const [, , mid] = drawing.compute_edge_geometry(graph, edge);
   // context menu to modify the edge right after
   menus.display_edge_menu(graph, edge, ...drawing.canvas_px_to_window_px(mid));
