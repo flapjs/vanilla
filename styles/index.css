@@ -1,48 +1,17 @@
 * {
-  margin: 0px;
-  padding: 0px;
-  font-family: sans-serif;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border: 0;
+  outline:0;
+  
   overflow: hidden;
   user-select: none;
-  list-style-position:inside
-}
-
-*:focus {
-  outline:0;
-}
-
-.context_menu {
-  z-index: 99;
-  position: absolute;
-  color: rgb(0, 140, 255);
-}
-
-.machine_toggle {
-  z-index: 999;
-  position: absolute;
-  left: 3%;
-  top: 5%;
-}
-
-.machine_transform {
-  z-index: 999;
-  position: absolute;
-  left: 10%;
-  top: 5%;
-}
-
-.save_machine_drawing {
-  z-index: 999;
-  position: absolute;
-  left: 18%;
-  top: 5%;
-}
-
-.machine_inputs {
-  z-index: 999;
-  position: absolute;
-  left: 3%;
-  top: 10%;
+  list-style-position:inside;
+  
+  font-family: sans-serif;
+  font-size: 16px;
 }
 
 canvas {
@@ -50,13 +19,61 @@ canvas {
   height: 100%;
 }
 
-.tutorials {
-  z-index: 999;
-  position: absolute;
-  left: 3%;
-  top: 15%;
+/* all input textboxes */
+input {
+  text-align: left;
+  width: 32px;
+  border-radius: 10px;
+  border: 1px solid rgb(128, 128, 16);
 }
 
-input {
-  width: 30px;
+/* all buttons */
+button {
+  background-color: Transparent;
+  color: rgb(0, 144, 255);
+}
+
+.topnav {
+  overflow: hidden;
+  background-color: rgba(192, 192, 32, 0.3);
+}
+
+.topnav > * {
+  float: left;
+  color: brown;
+  text-align: center;
+  margin: 0 3px;
+  padding: 3px;
+}
+
+.topnav > *:hover {
+  background-color: rgba(32, 128, 16, 0.3);
+  color: lightyellow;
+}
+
+.topnav > select:hover {
+  background-color: white;
+  color: brown;
+}
+
+.context_menu {
+  z-index: 99;
+  position: absolute;
+  border-radius: 10px;
+  border: 2px solid rgb(32, 128, 16);
+  text-align: center;
+  background-color: rgba(240, 245, 255, 0.5);
+}
+
+.delete {
+  color: red;
+}
+
+.machine_input > input {
+  width: 64px;
+}
+
+#tutorial-content {
+  font-size: 12px;
+  padding-top: 8px;
 }

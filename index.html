@@ -8,40 +8,46 @@
   <title>flap.js</title>
 </head>
 <body>
-  <canvas id='machine_drawing'>Your browser does not support canvas</canvas>
-  <section class="machine_inputs">
-    <div class="machine_input" id="input1">
-      <input type="text">
-      <button>run</button>
-    </div>
-  </section>
-  <section class="machine_toggle">
+
+  <!-- top bar -->
+  <section class="topnav">
+
     <select id="select_machine">
       <option value="NFA">NFA</option>
       <option value="PDA">PDA</option>
       <option value="Turing">Turing</option>
     </select>
-  </section>
-  <section class="machine_transform">
-    <button id="NFA_2_DFA">NFA to DFA</button>
-  </section>
-  <section class="save_machine_drawing">
+
+    <button class="NFA_specific" id="NFA_2_DFA">NFA to DFA</button>
+    
     <button id="save_machine">Save as png</button>
-  </section>
-  <section class="tutorials">
-    <button onclick="document.getElementById('tutorial-content').hidden = !document.getElementById('tutorial-content').hidden">
+    
+    <button onclick=
+      "document.getElementById('tutorial-content').hidden = !document.getElementById('tutorial-content').hidden">
       Toggle Tutorial
     </button>
-    <ul hidden id="tutorial-content">
-      <li>double click to create vertices, additional double clicks to toggle final</li>
-      <li>right click on vertices (or ctrl) drag to create edges</li>
-      <li>right click on vertices or edge texts to inspect</li>
-      <li>left click drag on vertices or edge texts to drag</li>
-      <li>left click drag on empty space to pan, use scroll wheel to zoom</li>
-      <li>ctrl+z to undo, ctrl+shift+z to redo</li>
-      <li>dd to delete</li>
-    </ul>
+  
+    <div class="machine_input" id="input1">
+      <input type="text">
+      <button>run</button>
+    </div>
+
   </section>
+
+  <!-- user guide content -->
+  <section hidden id="tutorial-content">
+    <div>double click to create vertices, additional double clicks to toggle final</div>
+    <div>right click on vertices (or ctrl) drag to create edges</div>
+    <div>right click on vertices or edge texts to inspect</div>
+    <div>left click drag on vertices or edge texts to drag</div>
+    <div>left click drag on empty space to pan, use scroll wheel to zoom</div>
+    <div>ctrl+z to undo, ctrl+shift+z to redo</div>
+    <div>dd to delete</li>
+  </section>
+
+  <!-- the big canvas that we draw on -->
+  <canvas id='machine_drawing'>Your browser does not support canvas</canvas>
+
 </body>
 <script src="scripts/index.js" type="module"></script>
 </html>

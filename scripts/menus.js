@@ -41,6 +41,7 @@ export function display_vertex_menu(graph, v, x, y) {
   const buttons_div = document.createElement('div');
   const delete_div = document.createElement('div');
   delete_div.innerText = 'delete';
+  delete_div.className = 'delete';
   delete_div.addEventListener('click', () => graph_ops.delete_vertex(graph, v));
   container.appendChild(rename_div);
   container.appendChild(buttons_div);
@@ -80,6 +81,7 @@ export function display_edge_menu(graph, edge, x, y) {
   const rename_div = document.createElement('div');
   const delete_div = document.createElement('div');
   delete_div.innerText = 'delete';
+  delete_div.className = 'delete';
   delete_div.addEventListener('click', () => graph_ops.delete_edge(graph, edge));
   container.appendChild(rename_div);
   container.appendChild(delete_div);
