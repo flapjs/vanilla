@@ -323,6 +323,7 @@ export function save_as_png(graph) {
   new_ctx.drawImage(get_canvas(), top_left[0], top_left[1], width, height, 0, 0, width, height);
   const link = document.createElement('a');
   link.href = new_canvas.toDataURL('image/png');
-  link.download = 'machine.png';
+  // GB date for sortability
+  link.download = (new Date()).toLocaleString('en-GB').replace(' ', '')+'_machine.png';
   link.click();
 }
