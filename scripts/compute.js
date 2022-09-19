@@ -2,6 +2,7 @@
 
 import * as consts from './consts.js';
 import * as menus from './menus.js';
+import * as drawing from './drawing.js';
 import { Queue } from './util.js';
 import { edge_equal } from './graph_components.js';
 
@@ -68,6 +69,21 @@ export function contains_final(graph, cur_states) {
 }
 
 /**
+ * remove old highlited vertexes and mark current vertexes as highlited
+ * @param {Object} graph 
+ * @param {Array<string>} cur_states - vertex names
+ */
+function highlight_cur_states(graph, cur_states) {
+  for (const vertex of Object.values(graph)) {  // eliminate all highlights
+    vertex.highlighted = false;
+  }
+  for (const v of cur_states) {  // highlight only those we want to highlight
+    graph[v].highlighted = true;
+  }
+  drawing.draw(graph);
+}
+
+/**
  * a single step of the NFA running algorithm
  * @param {Object} graph - the NFA of interest
  * @param {Set<string>} cur_states - all possible states the machine is in
@@ -90,15 +106,26 @@ export function NFA_step(graph, cur_states, symbol) {
  * check if the input is accepted
  * @param {Object} graph - machine graph
  * @param {string} input - input string
- * @returns {boolean} true iff the input is accepted by the machine
+ * @returns {Iterable} a generator that evaluates to true iff the input is accepted by the machine
  */
-function run_input_NFA(graph, input) {
+function* run_input_NFA(graph, input, interactive=false) {
   let cur_states = closure(graph, new Set([find_start(graph)]));  // find closure of start
+  if (interactive) {
+    highlight_cur_states(graph, cur_states);
+    yield;
+  }
   for (const c of input) {
     cur_states = NFA_step(graph, cur_states, c);
+    if (interactive) {
+      highlight_cur_states(graph, cur_states);
+      yield;
+    }
     if (!cur_states.size) {
-      return false;
+      break;
     }  // can't go anywhere
+  }
+  if (interactive) {
+    highlight_cur_states(graph, []);  // clear all highlights
   }
   return contains_final(graph, cur_states);
 }
@@ -190,17 +217,20 @@ function run_input_Turing(graph, input, allowed_steps=512) {
  * @param {Object} graph - machine graph
  * @param {string} machine_type - type of machine the graph represents
  * @param {string} input - input string
- * @returns {boolean} true iff the input is accepted by the machine
+ * @param {boolean} interactive - whether to step through and highlight the computation
+ * @returns {Iterable} return a generator that
+ *                     if noninteractive, evaluates to immediately in one step
+ *                     if interactive, evaluates step by step with highlight
  */
-export function run_input(graph, input) {
+export function run_input(graph, input, interactive=false) {
   if (!Object.keys(graph).length) {  // empty graph
     return false;
   } else if (menus.is_NFA()) {
-    return run_input_NFA(graph, input);
+    return run_input_NFA(graph, input, interactive);
   } else if (menus.is_PDA()) {
-    return run_input_PDA(graph, input);
+    return run_input_PDA(graph, input, interactive);
   } else if (menus.is_Turing()) {
-    return run_input_Turing(graph, input);
+    return run_input_Turing(graph, input, interactive);
   }
 }
 

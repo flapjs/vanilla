@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/*.test.js",
-    "lint": "node_modules/.bin/eslint --fix scripts --ext .js",
-    "doc": "node_modules/.bin/jsdoc -d docs scripts/*.js README.md"
+    "lint": "node_modules/.bin/eslint --fix scripts --ext .js"
   },
   "repository": {
     "type": "git",

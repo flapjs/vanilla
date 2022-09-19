@@ -124,7 +124,6 @@ export function remove_context_menu() {
   }
 }
 
-
 /** show/hide UI specific for a machine */
 export function set_UI_visibility(machine, visible) {
   const UIs = document.getElementsByClassName(machine+'_specific');

@@ -65,14 +65,20 @@ export function draw_text(text, pos, size) {
  * @param {int} x - x position from left wrt canvas
  * @param {int} y - y position from top wrt canvas
  * @param {int} r - radius of the circle
+ * @param {boolean} highlighted - if true, fill the circle with color
  * @param {float} thickness - line width
  */
-export function draw_cricle(x, y, r, thickness=1) {
+export function draw_cricle(x, y, r, highlighted=false, thickness=1) {
   const ctx = get_canvas().getContext('2d');
   ctx.beginPath();
   ctx.arc(x, y, r, 0, 2*Math.PI);
   ctx.lineWidth = Math.round(thickness);
   ctx.stroke();
+  if (highlighted) {
+    ctx.fillStyle = consts.HIGHLIGHTED_VERTEX_COLOR;
+    ctx.fill();
+    ctx.fillStyle = 'black';  // reset to default for text and other drawings
+  }
 }
 
 /**
@@ -89,7 +95,7 @@ export function draw_final_circle(vertex) {
  */
 export function draw_vertex(vertex) {
   // draw the circle
-  draw_cricle(vertex.x, vertex.y, vertex.r);
+  draw_cricle(vertex.x, vertex.y, vertex.r, vertex.highlighted);
   // find an appropriate text size and draw the text inside the vertex
   draw_text(vertex.name, [vertex.x, vertex.y], text_size_huristic(vertex.r, vertex.name));
   if (vertex.is_start) {  // it is the starting vertex

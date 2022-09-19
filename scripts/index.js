@@ -206,8 +206,27 @@ function bind_run_input() {
   const input_divs = document.getElementsByClassName('machine_input');
   for (let i = 0; i < input_divs.length; i++) {
     const textbox = input_divs[i].querySelector('input');
-    const run_btn = input_divs[i].querySelector('button');
-    run_btn.addEventListener('click', () => alert(compute.run_input(graph, textbox.value)));
+    let computation;  // generator of the computation
+    
+    const run_btn = input_divs[i].querySelector('.run_btn');
+    run_btn.addEventListener('click', () => {
+      computation = compute.run_input(graph, textbox.value);  // noninteractive computation
+      const { value, _ } = computation.next();  // second value is always true since it is noninteractive
+      alert(value);
+      computation = undefined;
+    });
+    
+    const step_btn = input_divs[i].querySelector('.step_btn');
+    step_btn.addEventListener('click', () => {
+      if (!computation) {
+        computation = compute.run_input(graph, textbox.value, true);  // true for interactive
+      }
+      const { value, done } = computation.next();
+      if (done) {
+        alert(value);  // whether true or false
+        computation = undefined;
+      }
+    });
   }
 }
 
