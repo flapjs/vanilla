@@ -114,14 +114,19 @@ function* run_input_NFA(graph, input, interactive=false) {
     highlight_cur_states(graph, cur_states);
     yield;
   }
-  for (const c of input) {
-    cur_states = NFA_step(graph, cur_states, c);
+  for (let i = 0; i < input.length; ++i) {
+    cur_states = NFA_step(graph, cur_states, input.charAt(i));
     if (!cur_states.size) {  // can't go anywhere
       break;
     }
+    
     if (interactive) {
       highlight_cur_states(graph, cur_states);
-      yield;
+      if (i === input.length-1) {  // last step
+        break;
+      } else {
+        yield;
+      }
     }
   }
   return contains_final(graph, cur_states);
@@ -206,21 +211,27 @@ function* BFS_step(graph, v, remaining_input, interactive=false, allowed_depth=6
           stack_copy.push(push_symbol);
         }
         if (graph[to].is_final && !input_copy.length) {  // final state + exhausted input
-          const cur_vertices = config_to_vertices(cur_configs);
-          cur_vertices.add(to);
-          highlight_cur_states(graph, cur_vertices);
+          if (interactive) {
+            const cur_vertices = config_to_vertices(cur_configs);
+            cur_vertices.add(to);
+            highlight_cur_states(graph, cur_vertices);
+          }
           return true;
         }
         nxt_configs.set(JSON.stringify([to, stack_copy, input_copy]), [to, stack_copy, input_copy]);
       }
     }
     PDA_closure(graph, nxt_configs);
+    if (interactive) {
+      if (nxt_configs.size) {  // not the last step
+        highlight_cur_states(graph, config_to_vertices(nxt_configs));
+        yield;
+      } else {
+        return false;
+      }
+    }
     cur_configs = nxt_configs;
     nxt_configs = new Map();  // swap the buffers
-    if (interactive) {
-      highlight_cur_states(graph, config_to_vertices(cur_configs));
-      yield;
-    }
   }
   return false;  // either stuck or exhausted step limit
 }
@@ -243,15 +254,20 @@ function run_input_PDA(graph, input, interactive) {
  * @param {Object} graph - machine graph
  * @param {string} input - input string
  * @param {int} allowed_steps - the computation will halt and return false if the step limit is reached
- * @returns {boolean} true iff the input is accepted by the machine
+ * @returns {Iterable} a generator that evaluates to true iff the input is accepted by the machine
  */
-function run_input_Turing(graph, input, allowed_steps=512) {
+function* run_input_Turing(graph, input, interactive=false, allowed_steps=512) {
   const tape = {};  // we use an object instead of array to have negative index
   for (let i = 0; i < input.length; i++) {
     tape[i] = input[i];  // copy all input over
   }
   let tape_idx = 0;  // starting tape index
   let cur_state = find_start(graph);
+  if (interactive) {
+    highlight_cur_states(graph, [cur_state]);
+    yield;
+  }
+
   let stuck = false;  // whether we are out of legal transitions
   while (!stuck && !graph[cur_state].is_final && allowed_steps --> 0) {
     stuck = true;  // assume we are stuck and change to not stuck in the loop
@@ -267,6 +283,16 @@ function run_input_Turing(graph, input, allowed_steps=512) {
       tape_idx += (edge.move === consts.LEFT) ? -1 : 1;  // move tape needle
       stuck = false;  // we just moved, so not stuck
       break;  // determinism, so can't multi-branch
+    }
+    if (interactive) {
+      highlight_cur_states(graph, [cur_state]);
+      if (cur_state.is_final) {
+        return true;
+      } else if (stuck) {
+        return false;
+      } else {
+        yield;
+      }
     }
   }
   return graph[cur_state].is_final;
