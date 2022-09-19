@@ -43,6 +43,19 @@ export function retrieve_latest_graph() {
 }
 
 /**
+ * Some information of the graph should not be saved to the history. Remove them here.
+ * @param {Object} graph 
+ * @returns {Object} the graph without the unnecessary information
+ */
+function remove_ignores(graph) {
+  const copy = structuredClone(graph);
+  for (const vertex of Object.values(copy)) {
+    vertex.highlighted = false;  // remove highlight
+  }
+  return copy;
+}
+
+/**
  * push the current state of the graph onto history
  * @param {Object} graph - the graph you want to add to history
  * @param {Array<Object>} history - array of graphs, force rewrite
@@ -51,7 +64,7 @@ export function push_history(graph, history = null) {
   if (!history) {
     history = get_history(); 
   }
-  history[++hist_ptr] = graph;
+  history[++hist_ptr] = remove_ignores(graph);
   hist_tip = hist_ptr;  // we just pushed, so that is the new tip
   const hist_str = JSON.stringify(history);
   localStorage.setItem(hist_key, hist_str);
