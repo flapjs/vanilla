@@ -223,7 +223,8 @@ function bind_run_input() {
       }
       const { value, done } = computation.next();
       if (done) {
-        alert(value);  // whether true or false
+        // whether true or false. We wrap this in timeout to execute after the vertex coloring is done
+        setTimeout(() => alert(value));
         computation = undefined;
       }
     });

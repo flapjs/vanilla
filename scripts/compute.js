@@ -71,7 +71,7 @@ export function contains_final(graph, cur_states) {
 /**
  * remove old highlited vertexes and mark current vertexes as highlited
  * @param {Object} graph 
- * @param {Array<string>} cur_states - vertex names
+ * @param {Iterable<string>} cur_states - vertex names
  */
 function highlight_cur_states(graph, cur_states) {
   for (const vertex of Object.values(graph)) {  // eliminate all highlights
@@ -116,18 +116,59 @@ function* run_input_NFA(graph, input, interactive=false) {
   }
   for (const c of input) {
     cur_states = NFA_step(graph, cur_states, c);
+    if (!cur_states.size) {  // can't go anywhere
+      break;
+    }
     if (interactive) {
       highlight_cur_states(graph, cur_states);
       yield;
     }
-    if (!cur_states.size) {
-      break;
-    }  // can't go anywhere
-  }
-  if (interactive) {
-    highlight_cur_states(graph, []);  // clear all highlights
   }
   return contains_final(graph, cur_states);
+}
+
+/**
+ * Compute the (almost) closure of PDA states stored inside the queue q and add them to the queue
+ * Note that we only evaluate all the epsilon transitions once to speed up computation
+ * @param {Object} graph 
+ * @param {Map<string, Array>} cur_configs - an array of configurations [vertex_name, stack, remaining_input]
+ *                                           we package it in a set to deduplicate
+ */
+function PDA_closure(graph, cur_configs) {
+  let original_len = cur_configs.size;
+  for (const [v, stack, remaining_input] of cur_configs.values()) {
+    for (const edge of graph[v].out) {
+      const {transition, to, pop_symbol, push_symbol} = edge;
+      const stack_copy = [...stack], input_copy = [...remaining_input];  // deep clone the input and stack
+      if (transition !== consts.EMPTY_SYMBOL) {  // not spontaneous transition
+        continue;
+      }
+      if (pop_symbol !== consts.EMPTY_SYMBOL && pop_symbol !== stack_copy.pop()) {  // stack mismatch
+        continue;
+      }
+      if (push_symbol !== consts.EMPTY_SYMBOL) {  // add to the stack
+        stack_copy.push(push_symbol);
+      }
+      cur_configs.set(JSON.stringify([to, stack_copy, input_copy]), [to, stack_copy, input_copy]);
+    }
+    --original_len;
+    if (!original_len) {  // we have evaluated all the original configurations
+      break;              // break to prevent infinite loop after adding new configurations
+    }
+  }
+}
+
+/**
+ * Extract a list of vertices from a map of configurations
+ * @param {Map<string, Array>} cur_configs - a map of whose values are [vertex_name, stack, remaining_input]
+ * @returns Set<string> a set of vertex names
+ */
+function config_to_vertices(cur_configs) {
+  const cur_vertices = new Set();
+  for (const [v, _, __] of cur_configs.values()) {
+    cur_vertices.add(v);
+  }
+  return cur_vertices;
 }
 
 /**
@@ -135,32 +176,50 @@ function* run_input_NFA(graph, input, interactive=false) {
  * @param {Object} graph - machine graph
  * @param {string} v - starting vertex
  * @param {Array<string>} remaining_input - input string split into char array
- * @param {int} allowed_steps - the computation will halt and return false if the step limit is reached
- * @returns {boolean} true iff the input is accepted by the machine
+ * @param {int} allowed_depth - the computation will halt and return false if the BFS tree is deeper than this
+ * @returns {Iterable} a generator that evaluates to true iff the input is accepted by the machine
  */
-function BFS_step(graph, v, remaining_input, allowed_steps=512) {
+function* BFS_step(graph, v, remaining_input, interactive=false, allowed_depth=64) {
   let stack = [];  // the computational stack
-  const q = new Queue();
-  q.enqueue([v, stack, remaining_input]);
-  while (q.length && allowed_steps --> 0) {
-    [v, stack, remaining_input] = q.dequeue();
-    if (graph[v].is_final && !remaining_input.length) {
-      return true;
-    }  // found a path to accept
-    for (const edge of graph[v].out) {  // otherwise add all valid neighbors to queue and keep searching
-      const {transition, to, pop_symbol, push_symbol} = edge;
-      const stack_copy = [...stack], input_copy = [...remaining_input];  // deep clone the input and stack for enqueuing
-      if (transition !== consts.EMPTY_SYMBOL && transition !== input_copy.pop()) {
-        continue;
-      }  // input mismatch
-      if (pop_symbol !== consts.EMPTY_SYMBOL && pop_symbol !== stack_copy.pop()) {
-        continue;
-      }  // stack mismatch
-      // now we can go since both transition and stack match
-      if (push_symbol !== consts.EMPTY_SYMBOL) {
-        stack_copy.push(push_symbol);
-      }  // add to the stack
-      q.enqueue([to, stack_copy, input_copy]);
+  let cur_configs = new Map(), nxt_configs = new Map();  // the current configurations [vertex, stack, remaining_input]
+  cur_configs.set(JSON.stringify([v, stack, remaining_input]), [v, stack, remaining_input]);
+  PDA_closure(graph, cur_configs);
+  if (interactive) {
+    highlight_cur_states(graph, config_to_vertices(cur_configs));
+    yield;
+  }
+  
+  while (cur_configs.size && allowed_depth --> 0) {
+    // process all configurations on a single depth of the BFS tree
+    for (const [v, stack, remaining_input] of cur_configs.values()) {
+      for (const edge of graph[v].out) {
+        const {transition, to, pop_symbol, push_symbol} = edge;
+        const stack_copy = [...stack], input_copy = [...remaining_input];  // deep clone the input and stack
+        if (transition !== consts.EMPTY_SYMBOL && transition !== input_copy.pop()) {
+          continue;  // input mismatch
+        }
+        if (pop_symbol !== consts.EMPTY_SYMBOL && pop_symbol !== stack_copy.pop()) {
+          continue;  // stack mismatch
+        }
+        // now we can go since both transition and stack match
+        if (push_symbol !== consts.EMPTY_SYMBOL) {  // add to the stack
+          stack_copy.push(push_symbol);
+        }
+        if (graph[to].is_final && !input_copy.length) {  // final state + exhausted input
+          const cur_vertices = config_to_vertices(cur_configs);
+          cur_vertices.add(to);
+          highlight_cur_states(graph, cur_vertices);
+          return true;
+        }
+        nxt_configs.set(JSON.stringify([to, stack_copy, input_copy]), [to, stack_copy, input_copy]);
+      }
+    }
+    PDA_closure(graph, nxt_configs);
+    cur_configs = nxt_configs;
+    nxt_configs = new Map();  // swap the buffers
+    if (interactive) {
+      highlight_cur_states(graph, config_to_vertices(cur_configs));
+      yield;
     }
   }
   return false;  // either stuck or exhausted step limit
@@ -170,12 +229,13 @@ function BFS_step(graph, v, remaining_input, allowed_steps=512) {
  * check if the input is accepted
  * @param {Object} graph - machine graph
  * @param {string} input - input string
- * @returns {boolean} true iff the input is accepted by the machine
+ * @param {boolean} interactive - whether to show the computation step by step
+ * @returns {Iterable} a generator that evaluates to true iff the input is accepted by the machine
  */
-function run_input_PDA(graph, input) {
+function run_input_PDA(graph, input, interactive) {
   const v = find_start(graph);
   const remaining_input = input.split('').reverse();
-  return BFS_step(graph, v, remaining_input);
+  return BFS_step(graph, v, remaining_input, interactive);
 }
 
 /**
@@ -223,6 +283,10 @@ function run_input_Turing(graph, input, allowed_steps=512) {
  *                     if interactive, evaluates step by step with highlight
  */
 export function run_input(graph, input, interactive=false) {
+  if (interactive) {
+    highlight_cur_states(graph, []);  // clear all highlights
+  }
+
   if (!Object.keys(graph).length) {  // empty graph
     return false;
   } else if (menus.is_NFA()) {
@@ -243,7 +307,7 @@ export function is_DFA(NFA) {
  * computes if the edge is the same as another one already in graph up to graphical representation
  * @param {Object} graph 
  * @param {Object} edge 
- * @returns {boolean} true iff edge \in graph
+ * @returns {boolean} true iff edge in graph
  */
 export function edge_has_equiv_edge_in_graph(graph, edge) {
   for (const vertex of Object.values(graph)) {
@@ -260,7 +324,7 @@ export function edge_has_equiv_edge_in_graph(graph, edge) {
  * computes if the edge IS already in graph
  * @param {Object} graph 
  * @param {Object} edge 
- * @returns {boolean} true iff edge \in graph
+ * @returns {boolean} true iff edge in graph
  */
 export function edge_in_graph(graph, edge) {
   for (const vertex of Object.values(graph)) {
