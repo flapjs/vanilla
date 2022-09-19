@@ -204,31 +204,33 @@ function bind_context_menu() {
 /** binds each machine input to the run_input function */
 function bind_run_input() {
   const input_divs = document.getElementsByClassName('machine_input');
+  const computations = Array(input_divs.length);  // stores generators of the computation half evaluated
   for (let i = 0; i < input_divs.length; i++) {
     const textbox = input_divs[i].querySelector('input');
-    let computation;  // generator of the computation
     
     const run_btn = input_divs[i].querySelector('.run_btn');
     run_btn.addEventListener('click', () => {
-      computation = compute.run_input(graph, textbox.value);  // noninteractive computation
-      const { value, _ } = computation.next();  // second value is always true since it is noninteractive
+      computations[i] = compute.run_input(graph, textbox.value);  // noninteractive computation
+      const { value, _ } = computations[i].next();  // second value is always true since it is noninteractive
       alert(value);
-      computation = undefined;
+      computations[i] = undefined;
     });
     
     const step_btn = input_divs[i].querySelector('.step_btn');
     step_btn.addEventListener('click', () => {
-      if (!computation) {
-        computation = compute.run_input(graph, textbox.value, true);  // true for interactive
+      if (!computations[i]) {
+        computations[i] = compute.run_input(graph, textbox.value, true);  // true for interactive
       }
-      const { value, done } = computation.next();
+      const { value, done } = computations[i].next();
       if (done) {
         // whether true or false. We wrap this in timeout to execute after the vertex coloring is done
         setTimeout(() => alert(value));
-        computation = undefined;
+        computations[i] = undefined;
       }
     });
   }
+  // clear the partial computations when user switches machines
+  document.getElementById('select_machine').addEventListener('change', () => computations.fill(undefined));
 }
 
 /** offers ctrl-z and ctrl-shift-z features */
