@@ -2,6 +2,7 @@
 
 import * as consts from './consts.js';
 import * as graph_ops from './graph_ops.js';
+import { bind_elongate_textbox } from './index.js';
 
 /**
  * reports the type of machine the user is working on
@@ -47,6 +48,7 @@ export function display_vertex_menu(graph, v, x, y) {
   container.appendChild(buttons_div);
   container.appendChild(delete_div);
   const rename = document.createElement('input');
+  rename.type = 'text';
   rename.value = v;  // prepopulate vertex name
   rename_div.appendChild(rename);
   const start_btn = document.createElement('button');
@@ -66,6 +68,7 @@ export function display_vertex_menu(graph, v, x, y) {
   document.querySelector('body').appendChild(container);
   rename.focus();  // focus on the first text box
   rename.select();  // select all text
+  bind_elongate_textbox();
 }
 
 /**
@@ -86,10 +89,13 @@ export function display_edge_menu(graph, edge, x, y) {
   container.appendChild(rename_div);
   container.appendChild(delete_div);
   const transition = document.createElement('input');
+  transition.type = 'text';
   transition.value = edge.transition;
   const pop = document.createElement('input');
+  pop.type = 'text';
   pop.value = edge.pop_symbol;
   const push = document.createElement('input');
+  push.type = 'text';
   push.value = edge.push_symbol;
   const left_right_choice = document.createElement('input');
   left_right_choice.type = 'checkbox';
@@ -114,6 +120,7 @@ export function display_edge_menu(graph, edge, x, y) {
   document.querySelector('body').appendChild(container);
   transition.focus();  // focus on the first text box
   transition.select();  // select all text
+  bind_elongate_textbox();
 }
 
 /** wipes the context menu; does nothing if none exists */
