@@ -76,6 +76,8 @@ export function rename_vertex(graph, v, new_name) {
     return;
   } else if (new_name in graph) {
     alert(new_name + ' already exists');
+  } else if (new_name === '') {
+    alert('vertex name cannot be empty')
   } else {
     graph[new_name] = graph[v];  // duplicate
     graph[new_name].name = new_name;
@@ -90,9 +92,9 @@ export function rename_vertex(graph, v, new_name) {
         }
       }
     }
+    drawing.draw(graph);
+    hist.push_history(graph);
   }
-  drawing.draw(graph);
-  hist.push_history(graph);
 }
 
 /**
@@ -193,7 +195,10 @@ export function delete_edge(graph, edge) {
 export function rename_edge(graph, edge, new_transition, new_pop, new_push, new_left_right) {
   menus.remove_context_menu();
   const new_edge = {...edge,
-    transition: new_transition, pop_symbol: new_pop, push_symbol: new_push, move: new_left_right};
+    transition: new_transition ? new_transition : graph_components.get_empty_symbol(),
+    pop_symbol: new_pop ? new_pop : graph_components.get_empty_symbol(),
+    push_symbol: new_push ? new_push : graph_components.get_empty_symbol(),
+    move: new_left_right};
   if (compute.edge_has_equiv_edge_in_graph(graph, new_edge)) {  // new edge clashes with old
     alert('an equivalent edge already exists');
     return;

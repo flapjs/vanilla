@@ -31,7 +31,7 @@ export function make_vertex(name, x, y, r, is_start, is_final, out) {
  * Check which user interface we are on and return the appropriate empty symbol
  * @returns {string} ☐ if dealing with Turing machine and ε otherwise
  */
-function get_empty_symbol() {
+export function get_empty_symbol() {
   return is_Turing() ? consts.EMPTY_TAPE : consts.EMPTY_SYMBOL;
 }
 
