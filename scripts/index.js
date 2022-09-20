@@ -204,11 +204,33 @@ function bind_context_menu() {
 /** binds each machine input to the run_input function */
 function bind_run_input() {
   const input_divs = document.getElementsByClassName('machine_input');
+  const computations = Array(input_divs.length);  // stores generators of the computation half evaluated
   for (let i = 0; i < input_divs.length; i++) {
     const textbox = input_divs[i].querySelector('input');
-    const run_btn = input_divs[i].querySelector('button');
-    run_btn.addEventListener('click', () => alert(compute.run_input(graph, textbox.value)));
+    
+    const run_btn = input_divs[i].querySelector('.run_btn');
+    run_btn.addEventListener('click', () => {
+      computations[i] = compute.run_input(graph, textbox.value);  // noninteractive computation
+      const { value, _ } = computations[i].next();  // second value is always true since it is noninteractive
+      alert(value);
+      computations[i] = undefined;
+    });
+    
+    const step_btn = input_divs[i].querySelector('.step_btn');
+    step_btn.addEventListener('click', () => {
+      if (!computations[i]) {
+        computations[i] = compute.run_input(graph, textbox.value, true);  // true for interactive
+      }
+      const { value, done } = computations[i].next();
+      if (done) {
+        // whether true or false. We wrap this in timeout to execute after the vertex coloring is done
+        setTimeout(() => alert(value));
+        computations[i] = undefined;
+      }
+    });
   }
+  // clear the partial computations when user switches machines
+  document.getElementById('select_machine').addEventListener('change', () => computations.fill(undefined));
 }
 
 /** offers ctrl-z and ctrl-shift-z features */
@@ -306,6 +328,16 @@ function bind_save_drawing() {
   save_btn.addEventListener('click', () => drawing.save_as_png(graph));
 }
 
+/** dynamically change the length of textboxes */
+export function bind_elongate_textbox() {
+  const change_width_func = e => {  // minimum width of 4ch
+    e.target.style.width = `${Math.max(4, e.target.value.length)}ch`;
+  }
+  document.querySelectorAll('input[type=text]').forEach(textbox => {
+    textbox.addEventListener('input', change_width_func);
+  });
+}
+
 /** run after all the contents are loaded to hook up callbacks */
 function init() {
   init_graph();
@@ -319,4 +351,5 @@ function init() {
   bind_undo_redo();
   bind_scroll();
   bind_dd();
+  bind_elongate_textbox();
 }

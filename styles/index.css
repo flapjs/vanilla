@@ -22,7 +22,8 @@ canvas {
 /* all input textboxes */
 input {
   text-align: left;
-  width: 32px;
+  padding: 0 5px 0 5px;
+  width: 4ch;
   border-radius: 10px;
   border: 1px solid rgb(128, 128, 16);
 }
@@ -62,15 +63,11 @@ button {
   border-radius: 10px;
   border: 2px solid rgb(32, 128, 16);
   text-align: center;
-  background-color: rgba(240, 245, 255, 0.5);
+  background-color: rgba(240, 245, 255, 0.7);
 }
 
 .delete {
   color: red;
-}
-
-.machine_input > input {
-  width: 64px;
 }
 
 #tutorial-content {

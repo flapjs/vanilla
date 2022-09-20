@@ -19,6 +19,9 @@ export class Queue {
     }
     return val;
   }
+  get entire_queue() {
+    return this.arr.slice(this.head_idx, this.tail_idx-this.head_idx);
+  }
   get length() {
     return this.tail_idx - this.head_idx; 
   }

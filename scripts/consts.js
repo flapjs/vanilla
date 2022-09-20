@@ -24,6 +24,9 @@ export const DOUBLE_PRESS_TIME = 240;
 /** @constant {int} DEFAULT_VERTEX_RADIUS - [px] it is not a constant since we might zoom in and out */
 export const DEFAULT_VERTEX_RADIUS = 40;
 
+/** @constant {string} HIGH_LIGHTED_VERTEX_COLOR - color of the highlighted vertex */
+export const HIGHLIGHTED_VERTEX_COLOR = 'rgba(96, 192, 128, 0.3)';
+
 /** @constant {float} EDGE_TEXT_SACALING - a fraction of vertex radius to as the transition text size */
 export const EDGE_TEXT_SACALING = 0.7;
 
