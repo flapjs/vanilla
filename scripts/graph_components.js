@@ -11,7 +11,7 @@ import { is_Turing } from './menus.js';
  * @param {float} r - radius in pixels
  * @param {boolean} is_start - is the vertex a start state?
  * @param {boolean} is_final - is the vertex an accept state?
- * @param {Array<Object>} out - neighbors, more specifically array of edges to neighbors
+ * @param {[Object]} out - neighbors, more specifically array of edges to neighbors
  * @returns {Object} the vertex as a json object
  */
 export function make_vertex(name, x, y, r, is_start, is_final, out) {

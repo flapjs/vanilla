@@ -15,7 +15,7 @@ export function get_canvas() {
 /**
  * get the position of the mouseclick event wrt canvas
  * @param {Object} e 
- * @returns {Array<float>} x and y position of the mouseclick wrt canvas
+ * @returns {[float]} x and y position of the mouseclick wrt canvas
  */
 export function event_position_on_canvas(e) {
   const rect = get_canvas().getBoundingClientRect();
@@ -26,8 +26,8 @@ export function event_position_on_canvas(e) {
 
 /**
  * get the position of the mouseclick event wrt canvas
- * @param {Array<float>} canvas_pt - the [x, y] position wrt canvas 
- * @returns {Array<float>} x and y position wrt window
+ * @param {[float]} canvas_pt - the [x, y] position wrt canvas 
+ * @returns {[float]} x and y position wrt window
  */
 export function canvas_px_to_window_px(canvas_pt) {
   const rect = get_canvas().getBoundingClientRect();
@@ -49,7 +49,7 @@ function text_size_huristic(textbox_width, text) {
 /**
  * draw text on the canvas
  * @param {string} text - the text you want to draw on the screen
- * @param {Array<float>} pos - the position wrt canvas
+ * @param {[float]} pos - the position wrt canvas
  * @param {float} size - font size
  */
 export function draw_text(text, pos, size) {
@@ -111,9 +111,9 @@ export function draw_vertex(vertex) {
 
 /**
  * draw a triangle with three tips provided
- * @param {Array<float>} tip1 
- * @param {Array<float>} tip2 
- * @param {Array<float>} tip3 
+ * @param {[float]} tip1 
+ * @param {[float]} tip2 
+ * @param {[float]} tip3 
  */
 export function draw_triangle(tip1, tip2, tip3) {
   const ctx = get_canvas().getContext('2d');
@@ -126,9 +126,9 @@ export function draw_triangle(tip1, tip2, tip3) {
 
 /**
  * draw an curved array with start, end and a mid
- * @param {Array<float>} start - where to begin
- * @param {Array<float>} end - where to end
- * @param {Array<float>} mid - control point for quadratic bezier curve
+ * @param {[float]} start - where to begin
+ * @param {[float]} end - where to end
+ * @param {[float]} mid - control point for quadratic bezier curve
  */
 export function draw_arrow(start, end, mid) {
   if (!mid) {
@@ -205,7 +205,7 @@ export function in_edge_text(graph, x, y) {
  * computes the geometric start and end of the edge wrt canvas
  * @param {Object} graph - the graph containing the edge
  * @param {Object} edge - the edge we want to compute the start and end of
- * @returns {Array<Object>} [start, end], both 2d vectors
+ * @returns {[Object]} [start, end], both 2d vectors
  */
 export function compute_edge_start_end(graph, edge) {
   const {from, to} = edge;
@@ -228,7 +228,7 @@ export function compute_edge_start_end(graph, edge) {
  * computes the geometric start, end, and quadratic bezier curve control
  * @param {Object} graph - the graph containing the edge
  * @param {Object} edge - the edge we want to compute the start and end and mid of
- * @returns {Array<Object>} [start, end, mid], all 2d vectors
+ * @returns {[Object]} [start, end, mid], all 2d vectors
  */
 export function compute_edge_geometry(graph, edge) {
   const {from, to, a1, a2} = edge;
@@ -286,7 +286,7 @@ export function draw(graph) {
 /**
  * Computes the total size taken by the graph drawing on the canvas
  * @param {Object} graph - target graph
- * @returns {Array<Array<float>>} - [[xmin, ymin], [xmax, ymax]] enclosing the graph
+ * @returns {Array<[float]>} - [[xmin, ymin], [xmax, ymax]] enclosing the graph
  */
 function compute_machine_drawing_size(graph) {
   const canvas = get_canvas();

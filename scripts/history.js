@@ -21,7 +21,7 @@ export function set_history_keys(machine) {
 
 /**
  * get history array from localstore and parse
- * @returns {Array<Object>} an array of graphs
+ * @returns {[Object]} an array of graphs
  */
 export function get_history() {
   if (!localStorage.getItem(hist_key)) {
@@ -58,7 +58,7 @@ function remove_ignores(graph) {
 /**
  * push the current state of the graph onto history
  * @param {Object} graph - the graph you want to add to history
- * @param {Array<Object>} history - array of graphs, force rewrite
+ * @param {[Object]} history - array of graphs, force rewrite
  */
 export function push_history(graph, history = null) {
   if (!history) {

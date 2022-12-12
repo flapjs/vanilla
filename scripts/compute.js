@@ -180,7 +180,7 @@ function config_to_vertices(cur_configs) {
  * step through the the computation of PDA with BFS
  * @param {Object} graph - machine graph
  * @param {string} v - starting vertex
- * @param {Array<string>} remaining_input - input string split into char array
+ * @param {[string]} remaining_input - input string split into char array
  * @param {int} allowed_depth - the computation will halt and return false if the BFS tree is deeper than this
  * @returns {Iterable} a generator that evaluates to true iff the input is accepted by the machine
  */

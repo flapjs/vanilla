@@ -213,7 +213,7 @@ export function rename_edge(graph, edge, new_transition, new_pop, new_push, new_
 
 /**
  * 
- * @param {Array<string>} states - a list of state labels that are to be combined
+ * @param {[string]} states - a list of state labels that are to be combined
  * @returns {string} [q3, q0, q5] -> '{q0,q3,q5}'
  */
 function combine_state_labels(states) {

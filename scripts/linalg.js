@@ -2,7 +2,7 @@
 
 /**
  * compute the length of a 2d vector
- * @param {Array<float>} vec - a vector whose length we want to compute
+ * @param {[float]} vec - a vector whose length we want to compute
  * @returns {float} the length of the vector
  */
 export function vec_len(vec) {
@@ -11,8 +11,8 @@ export function vec_len(vec) {
 
 /**
  * computes the 2d dot product
- * @param {Array<float>} u - first vector
- * @param {Array<float>} v - second vector
+ * @param {[float]} u - first vector
+ * @param {[float]} v - second vector
  * @returns {float} <u, v> (u dot v)
  */
 export function dot(u, v) {
@@ -21,9 +21,9 @@ export function dot(u, v) {
 
 /**
  * projection of the 2d vector u on to v
- * @param {Array<float>} u - first vector
- * @param {Array<float>} v - second vector (onto which to project the first)
- * @returns {Array<float>} the component of the first vector in the direction of the second
+ * @param {[float]} u - first vector
+ * @param {[float]} v - second vector (onto which to project the first)
+ * @returns {[float]} the component of the first vector in the direction of the second
  */
 export function proj(u, v) {
   const unit_v = normalize(v);
@@ -33,8 +33,8 @@ export function proj(u, v) {
 
 /**
  * computes a orthogonal vector
- * @param {Array<float>} vec - a vector on which to calculate the orthogonal vector
- * @returns {Array<float>} a vector orthogonal of the original vector
+ * @param {[float]} vec - a vector on which to calculate the orthogonal vector
+ * @returns {[float]} a vector orthogonal of the original vector
  */
 export function normal_vec(vec, clockwise=false) {
   return clockwise ? [vec[1], -vec[0]] : [-vec[1], vec[0]];
@@ -42,9 +42,9 @@ export function normal_vec(vec, clockwise=false) {
 
 /**
  * normalizes a vector to a specific length
- * @param {Array<float>} vec - the vector you want to scale
+ * @param {[float]} vec - the vector you want to scale
  * @param {float} final_length - the length you want the final vector to end up
- * @returns {Array<float>} the normalized vector
+ * @returns {[float]} the normalized vector
  */
 export function normalize(vec, final_length=1) {
   const adjusted_vec = [];
@@ -58,8 +58,8 @@ export function normalize(vec, final_length=1) {
 /**
  * scale the 2d vector v by a scalar a
  * @param {float} a - the scalar
- * @param {Array<float>} v - the vector
- * @returns {Array<float>} av
+ * @param {[float]} v - the vector
+ * @returns {[float]} av
  */
 export function scale(a, v) {
   return [a*v[0], a*v[1]];
@@ -67,8 +67,8 @@ export function scale(a, v) {
 
 /**
  * 2d vector addition
- * @param {float|Array<float>} v1 
- * @param {Array<float>} v2 
+ * @param {float|[float]} v1 
+ * @param {[float]} v2 
  * @returns v1+v2
  */
 export function add(v1, v2) {
@@ -80,8 +80,8 @@ export function add(v1, v2) {
 
 /**
  * 2d vector subtraction
- * @param {Array<float>} v1
- * @param {Array<float>} v2
+ * @param {[float]} v1
+ * @param {[float]} v2
  * @returns v1-v2
  */
 export function sub(v1, v2) {
@@ -90,11 +90,11 @@ export function sub(v1, v2) {
 
 /**
  * calculate the linear combination of a1*v1+a2*v2, also known as the matrix vector product
- * @param {Array<float>} v1 - vector1
- * @param {Array<float>} v2 - vector2
+ * @param {[float]} v1 - vector1
+ * @param {[float]} v2 - vector2
  * @param {float} a1 - scalar1
  * @param {float} a2 - scalar2
- * @returns {Array<float>} the result of a1*v1+a2*v2
+ * @returns {[float]} the result of a1*v1+a2*v2
  */
 export function linear_comb(v1, v2, a1=1, a2=1) {
   return add(scale(a1, v1), scale(a2, v2));
@@ -102,8 +102,8 @@ export function linear_comb(v1, v2, a1=1, a2=1) {
 
 /**
  * determinant of a column major 2x2 matrix
- * @param {Array<float>} v1 - first column
- * @param {Array<float>} v2 - second column
+ * @param {[float]} v1 - first column
+ * @param {[float]} v2 - second column
  * @returns {float} det([v1, v2])
  */
 export function det(v1, v2) {
@@ -112,9 +112,9 @@ export function det(v1, v2) {
 
 /**
  * computes the inverse of a column major 2x2 matrix
- * @param {Array<float>} v1 - first column
- * @param {Array<float>} v2 - second column
- * @returns {Array<Array<float>>} the inverse matrix
+ * @param {[float]} v1 - first column
+ * @param {[float]} v2 - second column
+ * @returns {Array<[float]>} the inverse matrix
  */
 export function inv(v1, v2) {
   const inv_det = 1/det(v1, v2);
