@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: history</title>
+    <title>JSDoc: Module: permalink</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: history</h1>
+    <h1 class="page-title">Module: permalink</h1>
 
     
 
@@ -64,7 +64,7 @@
     
 
     
-    <h4 class="name" id=".get_history"><span class="type-signature">(static) </span>get_history<span class="signature">()</span><span class="type-signature"> &rarr; {Array.&lt;Object>}</span></h4>
+    <h4 class="name" id=".deserialize"><span class="type-signature">(static) </span>deserialize<span class="signature">(graph_str)</span><span class="type-signature"> &rarr; {Array.&lt;(string|Object)>}</span></h4>
     
 
     
@@ -72,117 +72,7 @@
 
 
 <div class="description">
-    get history array from localstore and parse
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="history.js.html">history.js</a>, <a href="history.js.html#line26">line 26</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    an array of graphs
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Array.&lt;Object></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".push_history"><span class="type-signature">(static) </span>push_history<span class="signature">(graph, history)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    push the current state of the graph onto history
+    basically the "fromString" method for the graph
 </div>
 
 
@@ -218,13 +108,13 @@
 
         <tr>
             
-                <td class="name"><code>graph</code></td>
+                <td class="name"><code>graph_str</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">string</span>
 
 
             
@@ -234,30 +124,7 @@
 
             
 
-            <td class="description last">the graph you want to add to history</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>history</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;Object></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">array of graphs, force rewrite</td>
+            <td class="description last">the string representation of the graph</td>
         </tr>
 
     
@@ -298,95 +165,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="history.js.html">history.js</a>, <a href="history.js.html#line63">line 63</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".redo"><span class="type-signature">(static) </span>redo<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    redo the last undo
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="history.js.html">history.js</a>, <a href="history.js.html#line93">line 93</a>
+        <a href="permalink.js.html">permalink.js</a>, <a href="permalink.js.html#line93">line 93</a>
     </li></ul></dd>
     
 
@@ -415,7 +194,7 @@
 
         
 <div class="param-desc">
-    the next graph
+    type of the graph in {"NFA", "PDA", "Turing"} and the graph
 </div>
 
 
@@ -426,7 +205,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Object</span>
+<span class="param-type">Array.&lt;(string|Object)></span>
 
 
     </dd>
@@ -444,7 +223,7 @@
     
 
     
-    <h4 class="name" id=".retrieve_latest_graph"><span class="type-signature">(static) </span>retrieve_latest_graph<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    <h4 class="name" id=".serialize"><span class="type-signature">(static) </span>serialize<span class="signature">(type, graph)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
 
     
@@ -452,118 +231,7 @@
 
 
 <div class="description">
-    get the latest graph object from localstore
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="history.js.html">history.js</a>, <a href="history.js.html#line41">line 41</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    the latest graph object
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".set_history_keys"><span class="type-signature">(static) </span>set_history_keys<span class="signature">(machine)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    sets the localstore key for history retrival and writing
-MUST be used before get_history, push_history, etc.
+    basically the "toString" method for the graph
 </div>
 
 
@@ -599,13 +267,13 @@ MUST be used before get_history, push_history, etc.
 
         <tr>
             
-                <td class="name"><code>machine</code></td>
+                <td class="name"><code>type</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">string</span>
 
 
             
@@ -615,7 +283,30 @@ MUST be used before get_history, push_history, etc.
 
             
 
-            <td class="description last">type of machine from ['NFA', 'PDA', 'Turing']</td>
+            <td class="description last">the type of the graph in {"NFA", "PDA", "Turing"}</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>graph</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">check "graph_components.js" for the structure of the graph</td>
         </tr>
 
     
@@ -656,95 +347,7 @@ MUST be used before get_history, push_history, etc.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="history.js.html">history.js</a>, <a href="history.js.html#line16">line 16</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".undo"><span class="type-signature">(static) </span>undo<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    undos the last operation
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="history.js.html">history.js</a>, <a href="history.js.html#line79">line 79</a>
+        <a href="permalink.js.html">permalink.js</a>, <a href="permalink.js.html#line39">line 39</a>
     </li></ul></dd>
     
 
@@ -773,7 +376,7 @@ MUST be used before get_history, push_history, etc.
 
         
 <div class="param-desc">
-    the last graph
+    the graph as a string
 </div>
 
 
@@ -784,7 +387,7 @@ MUST be used before get_history, push_history, etc.
     </dt>
     <dd>
         
-<span class="param-type">Object</span>
+<span class="param-type">string</span>
 
 
     </dd>
@@ -802,7 +405,7 @@ MUST be used before get_history, push_history, etc.
     
 
     
-    <h4 class="name" id="~remove_ignores"><span class="type-signature">(inner) </span>remove_ignores<span class="signature">(graph)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    <h4 class="name" id="~char_url_compliance"><span class="type-signature">(inner) </span>char_url_compliance<span class="signature">(c)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
 
     
@@ -810,7 +413,7 @@ MUST be used before get_history, push_history, etc.
 
 
 <div class="description">
-    Some information of the graph should not be saved to the history. Remove them here.
+    makes a character url compliant and makes sure it does not clash with the delimiters
 </div>
 
 
@@ -846,13 +449,334 @@ MUST be used before get_history, push_history, etc.
 
         <tr>
             
-                <td class="name"><code>graph</code></td>
+                <td class="name"><code>c</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the character to be made url compliant</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="permalink.js.html">permalink.js</a>, <a href="permalink.js.html#line11">line 11</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    the url compliant character
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~parse_type"><span class="type-signature">(inner) </span>parse_type<span class="signature">(graph_str)</span><span class="type-signature"> &rarr; {Array.&lt;string>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    find the type of the graph and return it along with the rest of the unparsed graph string
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>graph_str</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the string representation of the graph</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="permalink.js.html">permalink.js</a>, <a href="permalink.js.html#line79">line 79</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    type of the graph in {"NFA", "PDA", "Turing"} and the rest of the unparsed graph string
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array.&lt;string></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~to_string_field"><span class="type-signature">(inner) </span>to_string_field<span class="signature">(field)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    turn a field into a string
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>field</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type">float</span>
 
 
             
@@ -903,7 +827,7 @@ MUST be used before get_history, push_history, etc.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="history.js.html">history.js</a>, <a href="history.js.html#line50">line 50</a>
+        <a href="permalink.js.html">permalink.js</a>, <a href="permalink.js.html#line28">line 28</a>
     </li></ul></dd>
     
 
@@ -932,7 +856,7 @@ MUST be used before get_history, push_history, etc.
 
         
 <div class="param-desc">
-    the graph without the unnecessary information
+    the string repr of the field
 </div>
 
 
@@ -943,7 +867,7 @@ MUST be used before get_history, push_history, etc.
     </dt>
     <dd>
         
-<span class="param-type">Object</span>
+<span class="param-type">string</span>
 
 
     </dd>
