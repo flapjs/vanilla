@@ -93,6 +93,11 @@ function parse_type(graph_str) {
 export function deserialize(graph_str) {
   const graph = {};
   const [type, typeless_graph_str] = parse_type(graph_str);
+
+  if (typeless_graph_str.length === 0) {  // the degenerate case when there is no vertex
+    return [type, graph];
+  }
+
   const split_by_vertex = typeless_graph_str.split(consts.VERTEX_DELIM);
   const vertices = split_by_vertex.slice(0, -1);
   const rest = split_by_vertex[split_by_vertex.length - 1];
@@ -111,7 +116,7 @@ export function deserialize(graph_str) {
   }
 
   if (rest.length === 0) {  // the degenerate case when there is no edge
-    return graph;
+    return [type, graph];
   }
 
   const edges = rest.split(consts.EDGE_DELIM).slice(0, -1);

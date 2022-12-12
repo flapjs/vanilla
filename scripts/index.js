@@ -337,7 +337,7 @@ function bind_switch_machine() {
     hist.set_history_keys(e.target.value);
     refresh_graph();  // switching graph
     menus.display_UI_for(e.target.value);
-    history.replaceState(undefined, undefined, '');  // clear the permalink
+    history.replaceState(undefined, undefined, '#');  // clear the permalink
   });
 }
 
