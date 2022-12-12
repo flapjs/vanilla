@@ -23,7 +23,7 @@ function char_url_compliance(c) {
 /**
  * turn a field into a string
  * @param {string | float} field 
- * @returns the string repr of the field
+ * @returns {string} the string repr of the field
  */
 function to_string_field(field) {
   const field_str = field.toString();
@@ -74,7 +74,7 @@ export function serialize(type, graph) {
 /**
  * find the type of the graph and return it along with the rest of the unparsed graph string
  * @param {string} graph_str - the string representation of the graph
- * @returns [type of the graph in {"NFA", "PDA", "Turing"}, rest of the unparsed graph string]
+ * @returns {Array<string>} type of the graph in {"NFA", "PDA", "Turing"} and the rest of the unparsed graph string
  */
 function parse_type(graph_str) {
   for (const type of Object.values(consts.MACHINE_TYPES)) {
@@ -88,7 +88,7 @@ function parse_type(graph_str) {
 /**
  * basically the "fromString" method for the graph
  * @param {string} graph_str - the string representation of the graph
- * @returns {Array<string|Object>} [type of the graph in {"NFA", "PDA", "Turing"}, graph]
+ * @returns {Array<string|Object>} type of the graph in {"NFA", "PDA", "Turing"} and the graph
  */
 export function deserialize(graph_str) {
   const graph = {};
