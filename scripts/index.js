@@ -337,7 +337,7 @@ function bind_switch_machine() {
     hist.set_history_keys(e.target.value);
     refresh_graph();  // switching graph
     menus.display_UI_for(e.target.value);
-    window.location.hash = '';  // clear the permalink
+    history.replaceState(undefined, undefined, '');  // clear the permalink
   });
 }
 
@@ -372,7 +372,7 @@ function bind_permalink() {
   permalink_btn.addEventListener('click', () => {
     const select = document.getElementById('select_machine');
     const graph_str = permalink.serialize(select.value, graph);
-    window.location.hash = '#'+graph_str;
+    history.replaceState(undefined, undefined, '#'+graph_str);
     navigator.clipboard.writeText(window.location.href)
       .then(() => alert('Permalink copied to clipboard!'));
   });
