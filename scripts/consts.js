@@ -106,3 +106,15 @@ export const TEXT_SIZING_CONSTS = {
   a: 3.96831,
   b: 6.36873  // note the accompanying function is e^(kx+a)+b
 };
+
+/** @constant {string} LEGAL_CHARS - a string consisting of all url-legal characters */
+export const LEGAL_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=";
+
+/** @constant {string} FIELD_DELIM - delimiter for fields in a permalink */
+export const FIELD_DELIM = ':';
+
+/** @constant {string} VERTEX_DELIM - delimiter for vertices in a permalink  */
+export const VERTEX_DELIM = ';';
+
+/** @constant {string} EDGE_DELIM - delimiter for edges in a permalink  */
+export const EDGE_DELIM = '~';
