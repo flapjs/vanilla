@@ -1,7 +1,7 @@
 /** @module permalink */
 
 import * as consts from './consts.js';
-import * as graph_components from './graph_components';
+import * as graph_components from './graph_components.js';
 
 /**
  * makes a character url compliant and makes sure it does not clash with the delimiters
@@ -27,16 +27,17 @@ function char_url_compliance(c) {
  */
 function to_string_field(field) {
   const field_str = field.toString();
-  return field_str.reduce((acc, c) => acc + char_url_compliance(c), '');
+  return Array.from(field_str).reduce((acc, c) => acc + char_url_compliance(c), '');
 }
 
 /**
  * basically the "toString" method for the graph
+ * @param {string} type - the type of the graph in {"NFA", "PDA", "Turing"}
  * @param {Object} graph - check "graph_components.js" for the structure of the graph
  * @returns {string} the graph as a string
  */
-export function serialize(graph) {
-  let result = '';
+export function serialize(type, graph) {
+  let result = type;
   
   for (const vertex of Object.values(graph)) {
     result += to_string_field(vertex.name)          + consts.FIELD_DELIM;
@@ -71,31 +72,47 @@ export function serialize(graph) {
 }
 
 /**
+ * find the type of the graph and return it along with the rest of the unparsed graph string
+ * @param {string} graph_str - the string representation of the graph
+ * @returns [type of the graph in {"NFA", "PDA", "Turing"}, rest of the unparsed graph string]
+ */
+function parse_type(graph_str) {
+  for (const type of Object.values(consts.MACHINE_TYPES)) {
+    if (graph_str.startsWith(type)) {
+      return [type, graph_str.slice(type.length)];
+    }
+  }
+  throw new Error('Invalid graph type');
+}
+
+/**
  * basically the "fromString" method for the graph
  * @param {string} graph_str - the string representation of the graph
- * @returns {Object} the graph
+ * @returns {Array<string|Object>} [type of the graph in {"NFA", "PDA", "Turing"}, graph]
  */
 export function deserialize(graph_str) {
   const graph = {};
-  const split_by_vertex = graph_str.split(consts.VERTEX_DELIM);
+  const [type, typeless_graph_str] = parse_type(graph_str);
+  const split_by_vertex = typeless_graph_str.split(consts.VERTEX_DELIM);
   const vertices = split_by_vertex.slice(0, -1);
   const rest = split_by_vertex[split_by_vertex.length - 1];
 
-  for (const vertex of split_by_vertex) {
+  const vertex_id_to_name = [];
+
+  for (const vertex of vertices) {
     const fields = vertex.split(consts.FIELD_DELIM).map(decodeURIComponent);
     const name          = fields[0];
     const y             = parseFloat(fields[1]);
     const x             = parseFloat(fields[2]);
     const r             = parseFloat(fields[3]);
     const composite_bit = parseInt(fields[4]);
-    graph[name] = graph_components.make_vertex(name, x, y, r, composite_bit&1, composite_bit&2); 
+    graph[name] = graph_components.make_vertex(name, x, y, r, composite_bit&1, composite_bit&2);
+    vertex_id_to_name.push(name);  // construct the mapping from id to name
   }
 
   if (rest.length === 0) {  // the degenerate case when there is no edge
     return graph;
   }
-
-  const vertex_id_to_name = Object.values(graph).entries();
 
   const edges = rest.split(consts.EDGE_DELIM).slice(0, -1);
   for (const edge of edges) {
@@ -116,5 +133,5 @@ export function deserialize(graph_str) {
     ));
   }
 
-  return graph;
+  return [type, graph];
 }

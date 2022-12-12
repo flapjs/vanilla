@@ -7,6 +7,7 @@ import * as drawing from './drawing.js';
 import * as compute from './compute.js';
 import * as graph_ops from './graph_ops.js';
 import * as menus from './menus.js';
+import * as permalink from './permalink.js';
 
 document.addEventListener('DOMContentLoaded', init);
 window.addEventListener('resize', () => drawing.draw(graph));
@@ -295,8 +296,35 @@ function bind_dd() {
   });
 }
 
-/** get the lastest graph from localstore and display */
+function hash_change_handler() {
+  if (window.location.hash.length > 1) {
+    const graph_str = window.location.hash.slice(1);
+    const select = document.getElementById('select_machine');
+    if (permalink.serialize(select.value, graph) === graph_str) {
+      // debounce two types of events
+      // 1. the permalink generation will trigger a hash change event, which we do not want to handle
+      // 2. the user might have inputed the same graph string, so we prevent duplicate history by not hanlding
+      return;
+    }
+
+    let type;
+    [type, graph] = permalink.deserialize(graph_str);
+    select.value = type;
+    hist.set_history_keys(type);  // set the history keys to the correct machine type
+    hist.push_history(graph);     // save the graph to history
+    menus.display_UI_for(type);   // change the UI elements manually
+    refresh_graph();              // draw the graph
+  }
+}
+
+/** draw the first graph (possibly by deserializing the permalink) */
 function init_graph() {
+  hash_change_handler();
+  refresh_graph();
+}
+
+/** get the newest graph from history and draw it */
+function refresh_graph() {
   graph = hist.retrieve_latest_graph();
   drawing.draw(graph);
 }
@@ -307,8 +335,9 @@ function bind_switch_machine() {
   select.value = consts.DEFAULT_MACHINE;  // set to default machine here too
   select.addEventListener('change', e => {
     hist.set_history_keys(e.target.value);
-    init_graph();  // switching graph
+    refresh_graph();  // switching graph
     menus.display_UI_for(e.target.value);
+    window.location.hash = '';  // clear the permalink
   });
 }
 
@@ -338,9 +367,20 @@ export function bind_elongate_textbox() {
   });
 }
 
+function bind_permalink() {
+  const permalink_btn = document.getElementById('permalink');
+  permalink_btn.addEventListener('click', () => {
+    const select = document.getElementById('select_machine');
+    const graph_str = permalink.serialize(select.value, graph);
+    window.location.hash = '#'+graph_str;
+    navigator.clipboard.writeText(window.location.href)
+      .then(() => alert('Permalink copied to clipboard!'));
+  });
+  window.addEventListener('hashchange', hash_change_handler);
+}
+
 /** run after all the contents are loaded to hook up callbacks */
 function init() {
-  init_graph();
   bind_switch_machine();
   bind_double_click();
   bind_drag();
@@ -352,4 +392,6 @@ function init() {
   bind_scroll();
   bind_dd();
   bind_elongate_textbox();
+  bind_permalink();
+  init_graph();  // leave this last since we want it to override some of the above
 }
