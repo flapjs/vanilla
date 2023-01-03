@@ -73,7 +73,7 @@ export function contains_final(graph, cur_states) {
  * @param {Object} graph 
  * @param {Iterable<string>} cur_states - vertex names
  */
-function highlight_cur_states(graph, cur_states) {
+export function highlight_states(graph, cur_states) {
   for (const vertex of Object.values(graph)) {  // eliminate all highlights
     vertex.highlighted = false;
   }
@@ -111,7 +111,7 @@ export function NFA_step(graph, cur_states, symbol) {
 function* run_input_NFA(graph, input, interactive=false) {
   let cur_states = closure(graph, new Set([find_start(graph)]));  // find closure of start
   if (interactive) {
-    highlight_cur_states(graph, cur_states);
+    highlight_states(graph, cur_states);
     yield;
   }
   for (let i = 0; i < input.length; ++i) {
@@ -121,7 +121,7 @@ function* run_input_NFA(graph, input, interactive=false) {
     }
     
     if (interactive) {
-      highlight_cur_states(graph, cur_states);
+      highlight_states(graph, cur_states);
       if (i === input.length-1) {  // last step
         break;
       } else {
@@ -190,7 +190,7 @@ function* BFS_step(graph, v, remaining_input, interactive=false, allowed_depth=6
   cur_configs.set(JSON.stringify([v, stack, remaining_input]), [v, stack, remaining_input]);
   PDA_closure(graph, cur_configs);
   if (interactive) {
-    highlight_cur_states(graph, config_to_vertices(cur_configs));
+    highlight_states(graph, config_to_vertices(cur_configs));
     yield;
   }
   
@@ -214,7 +214,7 @@ function* BFS_step(graph, v, remaining_input, interactive=false, allowed_depth=6
           if (interactive) {
             const cur_vertices = config_to_vertices(cur_configs);
             cur_vertices.add(to);
-            highlight_cur_states(graph, cur_vertices);
+            highlight_states(graph, cur_vertices);
           }
           return true;
         }
@@ -224,7 +224,7 @@ function* BFS_step(graph, v, remaining_input, interactive=false, allowed_depth=6
     PDA_closure(graph, nxt_configs);
     if (interactive) {
       if (nxt_configs.size) {  // not the last step
-        highlight_cur_states(graph, config_to_vertices(nxt_configs));
+        highlight_states(graph, config_to_vertices(nxt_configs));
         yield;
       } else {
         return false;
@@ -264,7 +264,7 @@ function* run_input_Turing(graph, input, interactive=false, allowed_steps=512) {
   let tape_idx = 0;  // starting tape index
   let cur_state = find_start(graph);
   if (interactive) {
-    highlight_cur_states(graph, [cur_state]);
+    highlight_states(graph, [cur_state]);
     yield;
   }
 
@@ -285,7 +285,7 @@ function* run_input_Turing(graph, input, interactive=false, allowed_steps=512) {
       break;  // determinism, so can't multi-branch
     }
     if (interactive) {
-      highlight_cur_states(graph, [cur_state]);
+      highlight_states(graph, [cur_state]);
       if (cur_state.is_final) {
         return true;
       } else if (stuck) {
@@ -310,7 +310,7 @@ function* run_input_Turing(graph, input, interactive=false, allowed_steps=512) {
  */
 export function run_input(graph, input, interactive=false) {
   if (interactive) {
-    highlight_cur_states(graph, []);  // clear all highlights
+    highlight_states(graph, []);  // clear all highlights
   }
 
   if (!Object.keys(graph).length) {  // empty graph
