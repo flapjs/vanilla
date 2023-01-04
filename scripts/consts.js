@@ -21,8 +21,26 @@ export const CLICK_HOLD_TIME = 240;
 /** @constant {float} DOUBLE_PRESS_TIME - [ms] the maximum time between key presses considered as a double press */
 export const DOUBLE_PRESS_TIME = 240;
 
-/** @constant {int} DEFAULT_VERTEX_RADIUS - [px] it is not a constant since we might zoom in and out */
+/** @constant {int} DEFAULT_VERTEX_RADIUS - [px] initial vertex radius */
 export const DEFAULT_VERTEX_RADIUS = 40;
+
+/** @constant {int} DEFAULT_TEXT_SIZE - [px] default text size for things like input visualization */
+export const DEFAULT_TEXT_SIZE = 30;
+
+/** @constant {float} INPUT_VIZ_WIDTH_R - a real between 0 and 1 controlling horizontal position of input viz*/
+export const INPUT_VIZ_WIDTH_R = 0.01;
+
+/** @constant {float} INPUT_VIZ_HEIGHT_R - a real between 0 and 1 controlling vertical position of input viz*/
+export const INPUT_VIZ_HEIGHT_R = 0.94;
+
+/** @constant {string} READ_INPUT_COLOR - color assigned to input string that has already been processed */
+export const READ_INPUT_COLOR = 'lightgray';
+
+/** @constant {string} READ_INPUT_COLOR - color assigned to input string that is about to be processed */
+export const CUR_INPUT_COLOR = 'darkcyan';
+
+/** @constant {string} READ_INPUT_COLOR - color assigned to input string that is yet to be processed */
+export const DEFAULT_INPUT_COLOR = 'black';
 
 /** @constant {string} HIGH_LIGHTED_VERTEX_COLOR - color of the highlighted vertex */
 export const HIGHLIGHTED_VERTEX_COLOR = 'rgba(96, 192, 128, 0.3)';

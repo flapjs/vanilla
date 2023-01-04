@@ -233,7 +233,7 @@ function bind_run_input() {
     const reset_btn = input_divs[i].querySelector('.reset_btn');
     reset_btn.addEventListener('click', () => {
       computations[i] = undefined;
-      compute.highlight_states(graph, []);  // clear the highlighting
+      drawing.highlight_states(graph, []);  // clear the highlighting
     });
   }
   // clear the partial computations when user switches machines
