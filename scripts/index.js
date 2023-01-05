@@ -373,6 +373,7 @@ export function bind_elongate_textbox() {
   });
 }
 
+/** button to generate permanent link */
 function bind_permalink() {
   const permalink_btn = document.getElementById('permalink');
   permalink_btn.addEventListener('click', () => {

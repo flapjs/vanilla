@@ -251,6 +251,7 @@ function* run_input_Turing(graph, input, interactive=false, allowed_steps=512) {
   let cur_state = find_start(graph);
   if (interactive) {
     drawing.highlight_states(graph, [cur_state]);
+    drawing.highlight_tape(tape, tape_idx);
     yield;
   }
 
@@ -272,6 +273,7 @@ function* run_input_Turing(graph, input, interactive=false, allowed_steps=512) {
     }
     if (interactive) {
       drawing.highlight_states(graph, [cur_state]);
+      drawing.highlight_tape(tape, tape_idx);
       if (cur_state.is_final) {
         return true;
       } else if (stuck) {

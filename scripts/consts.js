@@ -33,6 +33,11 @@ export const INPUT_VIZ_WIDTH_R = 0.01;
 /** @constant {float} INPUT_VIZ_HEIGHT_R - a real between 0 and 1 controlling vertical position of input viz*/
 export const INPUT_VIZ_HEIGHT_R = 0.94;
 
+export const TAPE_VIEW_RADIUS = 5;
+
+export const TAPE_LEFT_ARROW = '◀';
+export const TAPE_RIGHT_ARROW = '▶';
+
 /** @constant {string} READ_INPUT_COLOR - color assigned to input string that has already been processed */
 export const READ_INPUT_COLOR = 'lightgray';
 

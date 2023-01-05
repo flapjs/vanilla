@@ -54,7 +54,7 @@ function text_size_huristic(textbox_width, text) {
  * @param {string} text_align - choice from {'center', 'left', 'right'}
  * @param {Array<string>} color_map - an array of colors the same length as the text coding the color of each char
  */
-export function draw_text(text, pos, size, text_align='center', color_map) {
+export function draw_text(text, pos, size, color_map, text_align='center') {
   const ctx = get_canvas().getContext('2d');
   ctx.font = `${size}px Sans-Serif`;
   ctx.textAlign = text_align;
@@ -378,5 +378,31 @@ export function highlight_NFA_input(input_str, index) {
       color_map.push(consts.DEFAULT_INPUT_COLOR);
     }
   }
-  draw_text(input_str, pos, consts.DEFAULT_TEXT_SIZE, 'left', color_map);
+  draw_text(input_str, pos, consts.DEFAULT_TEXT_SIZE, color_map);
+}
+
+export function highlight_tape(tape, tape_idx) {
+  const canvas = get_canvas();
+  const pos = [canvas.width*consts.INPUT_VIZ_WIDTH_R, canvas.height*consts.INPUT_VIZ_HEIGHT_R];
+  const color_map = [consts.DEFAULT_INPUT_COLOR];
+  const tape_start = tape_idx-consts.TAPE_VIEW_RADIUS;
+  const tape_end = tape_idx+consts.TAPE_VIEW_RADIUS;
+  const tape_arr = [consts.TAPE_LEFT_ARROW];
+  for (let i = tape_start; i <= tape_end; ++i) {
+    if (i < tape_idx) {
+      color_map.push(consts.DEFAULT_INPUT_COLOR);
+    } else if (i == tape_idx) {
+      color_map.push(consts.CUR_INPUT_COLOR);
+    } else {
+      color_map.push(consts.DEFAULT_INPUT_COLOR);
+    }
+    if (i in tape) {
+      tape_arr.push(tape[i]);
+    } else {
+      tape_arr.push(consts.EMPTY_TAPE);
+    }
+  }
+  color_map.push(consts.DEFAULT_INPUT_COLOR);
+  tape_arr.push(consts.TAPE_RIGHT_ARROW);
+  draw_text(tape_arr.join(''), pos, consts.DEFAULT_TEXT_SIZE, color_map);
 }
