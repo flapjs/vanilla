@@ -96,7 +96,7 @@ function* run_input_NFA(graph, input, interactive=false) {
   let cur_states = closure(graph, new Set([find_start(graph)]));  // find closure of start
   if (interactive) {
     drawing.highlight_states(graph, cur_states);
-    drawing.highlight_NFA_input(input, 0);
+    drawing.viz_NFA_input(input, 0);
     yield;
   }
   for (let i = 0; i < input.length; ++i) {
@@ -107,7 +107,7 @@ function* run_input_NFA(graph, input, interactive=false) {
     
     if (interactive) {
       drawing.highlight_states(graph, cur_states);
-      drawing.highlight_NFA_input(input, i+1);
+      drawing.viz_NFA_input(input, i+1);
       if (i === input.length-1) {  // last step
         break;
       } else {
@@ -177,6 +177,7 @@ function* BFS_step(graph, v, remaining_input, interactive=false, allowed_depth=6
   PDA_closure(graph, cur_configs);
   if (interactive) {
     drawing.highlight_states(graph, config_to_vertices(cur_configs));
+    drawing.viz_PDA_configs(graph, cur_configs);
     yield;
   }
   
@@ -211,6 +212,7 @@ function* BFS_step(graph, v, remaining_input, interactive=false, allowed_depth=6
     if (interactive) {
       if (nxt_configs.size) {  // not the last step
         drawing.highlight_states(graph, config_to_vertices(nxt_configs));
+        drawing.viz_PDA_configs(graph, nxt_configs);
         yield;
       } else {
         return false;
@@ -251,7 +253,7 @@ function* run_input_Turing(graph, input, interactive=false, allowed_steps=512) {
   let cur_state = find_start(graph);
   if (interactive) {
     drawing.highlight_states(graph, [cur_state]);
-    drawing.highlight_tape(tape, tape_idx);
+    drawing.viz_TM_tape(tape, tape_idx);
     yield;
   }
 
@@ -273,7 +275,7 @@ function* run_input_Turing(graph, input, interactive=false, allowed_steps=512) {
     }
     if (interactive) {
       drawing.highlight_states(graph, [cur_state]);
-      drawing.highlight_tape(tape, tape_idx);
+      drawing.viz_TM_tape(tape, tape_idx);
       if (cur_state.is_final) {
         return true;
       } else if (stuck) {

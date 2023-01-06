@@ -47,6 +47,8 @@ export const CUR_INPUT_COLOR = 'darkcyan';
 /** @constant {string} READ_INPUT_COLOR - color assigned to input string that is yet to be processed */
 export const DEFAULT_INPUT_COLOR = 'black';
 
+export const PDA_CONF_COLOR = 'rgba(0, 0, 0, 0.7)';
+
 /** @constant {string} HIGH_LIGHTED_VERTEX_COLOR - color of the highlighted vertex */
 export const HIGHLIGHTED_VERTEX_COLOR = 'rgba(96, 192, 128, 0.3)';
 

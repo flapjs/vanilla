@@ -365,7 +365,7 @@ export function highlight_states(graph, cur_states) {
  * @param {string} input_str - the machine input that is currently being run
  * @param {int} index - index of the input_str the machine is currently consuming
  */
-export function highlight_NFA_input(input_str, index) {
+export function viz_NFA_input(input_str, index) {
   const canvas = get_canvas();
   const pos = [canvas.width*consts.INPUT_VIZ_WIDTH_R, canvas.height*consts.INPUT_VIZ_HEIGHT_R];
   const color_map = [];
@@ -381,7 +381,7 @@ export function highlight_NFA_input(input_str, index) {
   draw_text(input_str, pos, consts.DEFAULT_TEXT_SIZE, color_map);
 }
 
-export function highlight_tape(tape, tape_idx) {
+export function viz_TM_tape(tape, tape_idx) {
   const canvas = get_canvas();
   const pos = [canvas.width*consts.INPUT_VIZ_WIDTH_R, canvas.height*consts.INPUT_VIZ_HEIGHT_R];
   const color_map = [consts.DEFAULT_INPUT_COLOR];
@@ -405,4 +405,16 @@ export function highlight_tape(tape, tape_idx) {
   color_map.push(consts.DEFAULT_INPUT_COLOR);
   tape_arr.push(consts.TAPE_RIGHT_ARROW);
   draw_text(tape_arr.join(''), pos, consts.DEFAULT_TEXT_SIZE, color_map);
+}
+
+export function viz_PDA_configs(graph, PDA_configs) {
+  for (const [v, stack, remaining_input] of PDA_configs.values()) {
+    const vertex = graph[v];
+    const pos = [vertex.x+vertex.r, vertex.y-vertex.r];
+    const stack_str = stack.join('');
+    const input_str = [...remaining_input].reverse().join('');  // remaining_input is in reverse order for speed
+    const text = `${input_str};${stack_str}`;
+    const color_map = new Array(text.length).fill(consts.PDA_CONF_COLOR);
+    draw_text(text, pos, consts.DEFAULT_TEXT_SIZE, color_map);
+  }
 }
