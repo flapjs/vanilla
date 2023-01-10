@@ -3,7 +3,6 @@
 import * as consts from './consts.js';
 import * as menus from './menus.js';
 import * as drawing from './drawing.js';
-import { Queue } from './util.js';
 import { edge_equal } from './graph_components.js';
 
 /**
@@ -69,21 +68,6 @@ export function contains_final(graph, cur_states) {
 }
 
 /**
- * remove old highlited vertexes and mark current vertexes as highlited
- * @param {Object} graph 
- * @param {Iterable<string>} cur_states - vertex names
- */
-function highlight_cur_states(graph, cur_states) {
-  for (const vertex of Object.values(graph)) {  // eliminate all highlights
-    vertex.highlighted = false;
-  }
-  for (const v of cur_states) {  // highlight only those we want to highlight
-    graph[v].highlighted = true;
-  }
-  drawing.draw(graph);
-}
-
-/**
  * a single step of the NFA running algorithm
  * @param {Object} graph - the NFA of interest
  * @param {Set<string>} cur_states - all possible states the machine is in
@@ -111,7 +95,8 @@ export function NFA_step(graph, cur_states, symbol) {
 function* run_input_NFA(graph, input, interactive=false) {
   let cur_states = closure(graph, new Set([find_start(graph)]));  // find closure of start
   if (interactive) {
-    highlight_cur_states(graph, cur_states);
+    drawing.highlight_states(graph, cur_states);
+    drawing.viz_NFA_input(input, 0);
     yield;
   }
   for (let i = 0; i < input.length; ++i) {
@@ -121,7 +106,8 @@ function* run_input_NFA(graph, input, interactive=false) {
     }
     
     if (interactive) {
-      highlight_cur_states(graph, cur_states);
+      drawing.highlight_states(graph, cur_states);
+      drawing.viz_NFA_input(input, i+1);
       if (i === input.length-1) {  // last step
         break;
       } else {
@@ -190,7 +176,8 @@ function* BFS_step(graph, v, remaining_input, interactive=false, allowed_depth=6
   cur_configs.set(JSON.stringify([v, stack, remaining_input]), [v, stack, remaining_input]);
   PDA_closure(graph, cur_configs);
   if (interactive) {
-    highlight_cur_states(graph, config_to_vertices(cur_configs));
+    drawing.highlight_states(graph, config_to_vertices(cur_configs));
+    drawing.viz_PDA_configs(graph, cur_configs);
     yield;
   }
   
@@ -214,7 +201,7 @@ function* BFS_step(graph, v, remaining_input, interactive=false, allowed_depth=6
           if (interactive) {
             const cur_vertices = config_to_vertices(cur_configs);
             cur_vertices.add(to);
-            highlight_cur_states(graph, cur_vertices);
+            drawing.highlight_states(graph, cur_vertices);
           }
           return true;
         }
@@ -224,7 +211,8 @@ function* BFS_step(graph, v, remaining_input, interactive=false, allowed_depth=6
     PDA_closure(graph, nxt_configs);
     if (interactive) {
       if (nxt_configs.size) {  // not the last step
-        highlight_cur_states(graph, config_to_vertices(nxt_configs));
+        drawing.highlight_states(graph, config_to_vertices(nxt_configs));
+        drawing.viz_PDA_configs(graph, nxt_configs);
         yield;
       } else {
         return false;
@@ -264,7 +252,8 @@ function* run_input_Turing(graph, input, interactive=false, allowed_steps=512) {
   let tape_idx = 0;  // starting tape index
   let cur_state = find_start(graph);
   if (interactive) {
-    highlight_cur_states(graph, [cur_state]);
+    drawing.highlight_states(graph, [cur_state]);
+    drawing.viz_TM_tape(tape, tape_idx);
     yield;
   }
 
@@ -285,7 +274,8 @@ function* run_input_Turing(graph, input, interactive=false, allowed_steps=512) {
       break;  // determinism, so can't multi-branch
     }
     if (interactive) {
-      highlight_cur_states(graph, [cur_state]);
+      drawing.highlight_states(graph, [cur_state]);
+      drawing.viz_TM_tape(tape, tape_idx);
       if (cur_state.is_final) {
         return true;
       } else if (stuck) {
@@ -310,7 +300,7 @@ function* run_input_Turing(graph, input, interactive=false, allowed_steps=512) {
  */
 export function run_input(graph, input, interactive=false) {
   if (interactive) {
-    highlight_cur_states(graph, []);  // clear all highlights
+    drawing.highlight_states(graph, []);  // clear all highlights
   }
 
   if (!Object.keys(graph).length) {  // empty graph

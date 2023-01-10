@@ -51,13 +51,24 @@ function text_size_huristic(textbox_width, text) {
  * @param {string} text - the text you want to draw on the screen
  * @param {Array<float>} pos - the position wrt canvas
  * @param {float} size - font size
+ * @param {string} text_align - choice from {'center', 'left', 'right'}
+ * @param {Array<string>} color_map - an array of colors the same length as the text coding the color of each char
  */
-export function draw_text(text, pos, size) {
+export function draw_text(text, pos, size, color_map, text_align='center') {
   const ctx = get_canvas().getContext('2d');
   ctx.font = `${size}px Sans-Serif`;
-  ctx.textAlign = 'center';
+  ctx.textAlign = text_align;
   ctx.textBaseline = 'middle';
-  ctx.fillText(text, ...pos);
+  if (!color_map) {
+    ctx.fillText(text, ...pos);
+  } else {  // we want to control the individual character color
+    for (let i = 0; i < text.length; ++i) {
+      console.log(color_map[i]);
+      ctx.fillStyle = color_map[i];
+      ctx.fillText(text.charAt(i), pos[0]+i*consts.DEFAULT_TEXT_SIZE, pos[1]);
+    }
+    ctx.fillStyle = consts.DEFAULT_INPUT_COLOR;  // reset to default fill style
+  }
 }
 
 /**
@@ -268,7 +279,7 @@ export function draw_edge(graph, edge, text_size) {
 }
 
 /**
- * draw the entire canvas based on the graph
+ * draw the entire graph on the canvas
  * @param {Object} graph - the graph object to draw on the canvas
  */
 export function draw(graph) {
@@ -332,4 +343,78 @@ export function save_as_png(graph) {
   // GB date for sortability
   link.download = (new Date()).toLocaleString('en-GB').replace(' ', '')+'_machine.png';
   link.click();
+}
+
+/**
+ * remove old highlited vertexes and mark current vertexes as highlited
+ * @param {Object} graph 
+ * @param {Iterable<string>} cur_states - vertex names
+ */
+export function highlight_states(graph, cur_states) {
+  for (const vertex of Object.values(graph)) {  // eliminate all highlights
+    vertex.highlighted = false;
+  }
+  for (const v of cur_states) {  // highlight only those we want to highlight
+    graph[v].highlighted = true;
+  }
+  draw(graph);
+}
+
+/**
+ * displays the input_str and highlight the character being processed at this step
+ * @param {string} input_str - the machine input that is currently being run
+ * @param {int} index - index of the input_str the machine is currently consuming
+ */
+export function viz_NFA_input(input_str, index) {
+  const canvas = get_canvas();
+  const pos = [canvas.width*consts.INPUT_VIZ_WIDTH_R, canvas.height*consts.INPUT_VIZ_HEIGHT_R];
+  const color_map = [];
+  for (let i = 0; i < input_str.length; ++i) {
+    if (i < index) {
+      color_map.push(consts.READ_INPUT_COLOR);
+    } else if (i == index) {
+      color_map.push(consts.CUR_INPUT_COLOR);
+    } else {
+      color_map.push(consts.DEFAULT_INPUT_COLOR);
+    }
+  }
+  draw_text(input_str, pos, consts.DEFAULT_TEXT_SIZE, color_map);
+}
+
+export function viz_TM_tape(tape, tape_idx) {
+  const canvas = get_canvas();
+  const pos = [canvas.width*consts.INPUT_VIZ_WIDTH_R, canvas.height*consts.INPUT_VIZ_HEIGHT_R];
+  const color_map = [consts.DEFAULT_INPUT_COLOR];
+  const tape_start = tape_idx-consts.TAPE_VIEW_RADIUS;
+  const tape_end = tape_idx+consts.TAPE_VIEW_RADIUS;
+  const tape_arr = [consts.TAPE_LEFT_ARROW];
+  for (let i = tape_start; i <= tape_end; ++i) {
+    if (i < tape_idx) {
+      color_map.push(consts.DEFAULT_INPUT_COLOR);
+    } else if (i == tape_idx) {
+      color_map.push(consts.CUR_INPUT_COLOR);
+    } else {
+      color_map.push(consts.DEFAULT_INPUT_COLOR);
+    }
+    if (i in tape) {
+      tape_arr.push(tape[i]);
+    } else {
+      tape_arr.push(consts.EMPTY_TAPE);
+    }
+  }
+  color_map.push(consts.DEFAULT_INPUT_COLOR);
+  tape_arr.push(consts.TAPE_RIGHT_ARROW);
+  draw_text(tape_arr.join(''), pos, consts.DEFAULT_TEXT_SIZE, color_map);
+}
+
+export function viz_PDA_configs(graph, PDA_configs) {
+  for (const [v, stack, remaining_input] of PDA_configs.values()) {
+    const vertex = graph[v];
+    const pos = [vertex.x+vertex.r, vertex.y-vertex.r];
+    const stack_str = stack.join('');
+    const input_str = [...remaining_input].reverse().join('');  // remaining_input is in reverse order for speed
+    const text = `${input_str};${stack_str}`;
+    const color_map = new Array(text.length).fill(consts.PDA_CONF_COLOR);
+    draw_text(text, pos, consts.DEFAULT_TEXT_SIZE, color_map);
+  }
 }

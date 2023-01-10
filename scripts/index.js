@@ -229,6 +229,12 @@ function bind_run_input() {
         computations[i] = undefined;
       }
     });
+
+    const reset_btn = input_divs[i].querySelector('.reset_btn');
+    reset_btn.addEventListener('click', () => {
+      computations[i] = undefined;
+      drawing.highlight_states(graph, []);  // clear the highlighting
+    });
   }
   // clear the partial computations when user switches machines
   document.getElementById('select_machine').addEventListener('change', () => computations.fill(undefined));
@@ -367,6 +373,7 @@ export function bind_elongate_textbox() {
   });
 }
 
+/** button to generate permanent link */
 function bind_permalink() {
   const permalink_btn = document.getElementById('permalink');
   permalink_btn.addEventListener('click', () => {
