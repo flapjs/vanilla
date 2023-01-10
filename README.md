@@ -1,6 +1,9 @@
 # Welcome to [`flap.js`](https://flapjs.web.app/)
 This is a vanilla js rewrite of the [`flap.js`](https://github.com/flapjs/webapp) project. Alternatively, you can consider this a minimal [JFLAP](https://www.jflap.org/) clone in javscript so people only need their browser.
 
+# Usage
+Please refer to the [usage.md](usage.md) file.
+
 # Repo Setup
 1. clone this repo
 2. get [Node](https://nodejs.org/en/download/) if you don't have it
@@ -35,7 +38,7 @@ There is no front end frameworks involved. For drawing the nodes, the `canvas` e
 
 The drawing of edges uses the quadratic bezier curve provided by `canvas`. We specify the control point relative to where the vertices are placed so that the edges move with the vertices. In the diagram below, the red dot is the start, green dot is the control and the blue dot is the end. Moreover, the control point is stored in terms of the basis `v1` and `v2` so we get to write the control in terms of where the vertices are placed. The linear combination `a1*v1 + a2*v2` gives the coordinate of the control in terms of the standard basis (sans a translation constant).
 
-![edge_mechanics](edge_mechanics.png)
+![edge_mechanics](assets/edge_mechanics.png)
 
 Now, you may wonder what is the additional `angle1` and `angle2` when we have a self loop. These two angles are where the mouse left the vertex and where it came back in the vertex. We use these two angles to determine the starting and ending point of the self loop.
 
