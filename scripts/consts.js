@@ -24,8 +24,8 @@ export const DOUBLE_PRESS_TIME = 240;
 /** @constant {int} DEFAULT_VERTEX_RADIUS - [px] initial vertex radius */
 export const DEFAULT_VERTEX_RADIUS = 40;
 
-/** @constant {int} DEFAULT_TEXT_SIZE - [px] default text size for things like input visualization */
-export const DEFAULT_TEXT_SIZE = 30;
+/** @constant {int} DEFAULT_VIZ_SIZE - [px] default text size for things like input visualization */
+export const DEFAULT_VIZ_SIZE = 30;
 
 /** @constant {float} INPUT_VIZ_WIDTH_R - a real between 0 and 1 controlling horizontal position of input viz*/
 export const INPUT_VIZ_WIDTH_R = 0.01;
@@ -47,7 +47,7 @@ export const CUR_INPUT_COLOR = 'darkcyan';
 /** @constant {string} READ_INPUT_COLOR - color assigned to input string that is yet to be processed */
 export const DEFAULT_INPUT_COLOR = 'black';
 
-export const PDA_CONF_COLOR = 'rgba(0, 0, 0, 0.7)';
+export const PDA_CONF_COLOR = 'rgba(255, 0, 0, 0.7)';
 
 /** @constant {string} HIGH_LIGHTED_VERTEX_COLOR - color of the highlighted vertex */
 export const HIGHLIGHTED_VERTEX_COLOR = 'rgba(96, 192, 128, 0.3)';
