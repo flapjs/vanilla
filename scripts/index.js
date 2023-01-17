@@ -9,8 +9,11 @@ import * as graph_ops from './graph_ops.js';
 import * as menus from './menus.js';
 import * as permalink from './permalink.js';
 
-document.addEventListener('DOMContentLoaded', init);
-window.addEventListener('resize', () => drawing.draw(graph));
+// if not in browser, don't run
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', init);
+  window.addEventListener('resize', () => drawing.draw(graph));
+}
 
 let graph = consts.EMPTY_GRAPH;  // global graph
 
@@ -211,7 +214,7 @@ function bind_run_input() {
     
     const run_btn = input_divs[i].querySelector('.run_btn');
     run_btn.addEventListener('click', () => {
-      computations[i] = compute.run_input(graph, textbox.value);  // noninteractive computation
+      computations[i] = compute.run_input(graph, menus.machine_type(), textbox.value);  // noninteractive computation
       const { value, _ } = computations[i].next();  // second value is always true since it is noninteractive
       alert(value);
       computations[i] = undefined;
@@ -220,7 +223,7 @@ function bind_run_input() {
     const step_btn = input_divs[i].querySelector('.step_btn');
     step_btn.addEventListener('click', () => {
       if (!computations[i]) {
-        computations[i] = compute.run_input(graph, textbox.value, true);  // true for interactive
+        computations[i] = compute.run_input(graph, menus.machine_type(), textbox.value, true);  // true for interactive
       }
       const { value, done } = computations[i].next();
       if (done) {

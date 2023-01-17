@@ -1,7 +1,6 @@
 /** @module compute */
 
 import * as consts from './consts.js';
-import * as menus from './menus.js';
 import * as drawing from './drawing.js';
 import { edge_equal } from './graph_components.js';
 
@@ -298,18 +297,18 @@ function* run_input_Turing(graph, input, interactive=false, allowed_steps=512) {
  *                     if noninteractive, evaluates to immediately in one step
  *                     if interactive, evaluates step by step with highlight
  */
-export function run_input(graph, input, interactive=false) {
+export function run_input(graph, machine_type, input, interactive=false) {
   if (interactive) {
     drawing.highlight_states(graph, []);  // clear all highlights
   }
 
   if (!Object.keys(graph).length) {  // empty graph
     return false;
-  } else if (menus.is_NFA()) {
+  } else if (machine_type === consts.MACHINE_TYPES.NFA) {
     return run_input_NFA(graph, input, interactive);
-  } else if (menus.is_PDA()) {
+  } else if (machine_type === consts.MACHINE_TYPES.PDA) {
     return run_input_PDA(graph, input, interactive);
-  } else if (menus.is_Turing()) {
+  } else if (machine_type === consts.MACHINE_TYPES.Turing) {
     return run_input_Turing(graph, input, interactive);
   }
 }

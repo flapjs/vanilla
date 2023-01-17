@@ -372,7 +372,7 @@ export function viz_NFA_input(input_str, index) {
   for (let i = 0; i < input_str.length; ++i) {
     if (i < index) {
       color_map.push(consts.READ_INPUT_COLOR);
-    } else if (i == index) {
+    } else if (i === index) {
       color_map.push(consts.CUR_INPUT_COLOR);
     } else {
       color_map.push(consts.DEFAULT_INPUT_COLOR);
@@ -396,7 +396,7 @@ export function viz_TM_tape(tape, tape_idx) {
   for (let i = tape_start; i <= tape_end; ++i) {
     if (i < tape_idx) {
       color_map.push(consts.DEFAULT_INPUT_COLOR);
-    } else if (i == tape_idx) {
+    } else if (i === tape_idx) {
       color_map.push(consts.CUR_INPUT_COLOR);
     } else {
       color_map.push(consts.DEFAULT_INPUT_COLOR);

@@ -4,12 +4,16 @@ import * as consts from './consts.js';
 import * as graph_ops from './graph_ops.js';
 import { bind_elongate_textbox } from './index.js';
 
+export function machine_type() {
+  return document.getElementById('select_machine').value;
+}
+
 /**
  * reports the type of machine the user is working on
  * @returns {boolean} true or false 
  */
 export function is_NFA() {
-  return document.getElementById('select_machine').value === consts.MACHINE_TYPES.NFA;
+  return machine_type() === consts.MACHINE_TYPES.NFA;
 }
 
 /**
@@ -17,7 +21,7 @@ export function is_NFA() {
  * @returns {boolean} true or false 
  */
 export function is_PDA() {
-  return document.getElementById('select_machine').value === consts.MACHINE_TYPES.PDA;
+  return machine_type() === consts.MACHINE_TYPES.PDA;
 }
 
 /**
@@ -25,7 +29,7 @@ export function is_PDA() {
  * @returns {boolean} true or false 
  */
 export function is_Turing() {
-  return document.getElementById('select_machine').value === consts.MACHINE_TYPES.Turing;
+  return machine_type() === consts.MACHINE_TYPES.Turing;
 }
 
 /**
