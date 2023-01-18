@@ -1,6 +1,10 @@
 # Welcome to [`flap.js`](https://flapjs.web.app/)
 This is a vanilla js rewrite of the [`flap.js`](https://github.com/flapjs/webapp) project. Alternatively, you can consider this a minimal [JFLAP](https://www.jflap.org/) clone in javscript so people only need their browser.
 
+[![CI](https://github.com/flapjs/vanilla/actions/workflows/main.yml/badge.svg)](https://github.com/flapjs/vanilla/actions)
+[![CD](https://github.com/flapjs/vanilla/actions/workflows/firebase-hosting-merge.yml/badge.svg)](https://flapjs.web.app)
+[![DOC](https://github.com/flapjs/vanilla/actions/workflows/doc.yml/badge.svg)](https://flapjs.github.io/vanilla/)
+
 # Usage
 Please refer to the [usage.md](usage.md) file.
 
