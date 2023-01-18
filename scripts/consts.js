@@ -71,7 +71,7 @@ export const ARROW_WIDTH = 10;
 export const EMPTY_SYMBOL = 'ε';
 
 /** @constant {string} EMPTY_TYPE - symbol for an empty cell of a Turing Machine */
-export const EMPTY_TAPE = '☐'
+export const EMPTY_TAPE = '☐';
 
 /** @constant {string} ARROW_SYMBOL - arrow symbol */
 export const ARROW_SYMBOL = '→';
@@ -133,7 +133,7 @@ export const TEXT_SIZING_CONSTS = {
 };
 
 /** @constant {string} LEGAL_CHARS - a string consisting of all url-legal characters */
-export const LEGAL_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=";
+export const LEGAL_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&\'()*+,;=';
 
 /** @constant {string} FIELD_DELIM - delimiter for fields in a permalink */
 export const FIELD_DELIM = ':';

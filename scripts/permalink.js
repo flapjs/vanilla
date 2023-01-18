@@ -31,9 +31,9 @@ function to_string_field(field) {
 }
 
 /**
- * basically the "toString" method for the graph
- * @param {string} type - the type of the graph in {"NFA", "PDA", "Turing"}
- * @param {Object} graph - check "graph_components.js" for the structure of the graph
+ * basically the 'toString' method for the graph
+ * @param {string} type - the type of the graph in {'NFA', 'PDA', 'Turing'}
+ * @param {Object} graph - check 'graph_components.js' for the structure of the graph
  * @returns {string} the graph as a string
  */
 export function serialize(type, graph) {
@@ -74,7 +74,7 @@ export function serialize(type, graph) {
 /**
  * find the type of the graph and return it along with the rest of the unparsed graph string
  * @param {string} graph_str - the string representation of the graph
- * @returns {Array<string>} type of the graph in {"NFA", "PDA", "Turing"} and the rest of the unparsed graph string
+ * @returns {Array<string>} type of the graph in {'NFA', 'PDA', 'Turing'} and the rest of the unparsed graph string
  */
 function parse_type(graph_str) {
   for (const type of Object.values(consts.MACHINE_TYPES)) {
@@ -86,9 +86,9 @@ function parse_type(graph_str) {
 }
 
 /**
- * basically the "fromString" method for the graph
+ * basically the 'fromString' method for the graph
  * @param {string} graph_str - the string representation of the graph
- * @returns {Array<string|Object>} type of the graph in {"NFA", "PDA", "Turing"} and the graph
+ * @returns {Array<string|Object>} type of the graph in {'NFA', 'PDA', 'Turing'} and the graph
  */
 export function deserialize(graph_str) {
   const graph = {};
