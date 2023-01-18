@@ -370,7 +370,7 @@ function bind_save_drawing() {
 export function bind_elongate_textbox() {
   const change_width_func = e => {  // minimum width of 4ch
     e.target.style.width = `${Math.max(4, e.target.value.length)}ch`;
-  }
+  };
   document.querySelectorAll('input[type=text]').forEach(textbox => {
     textbox.addEventListener('input', change_width_func);
   });

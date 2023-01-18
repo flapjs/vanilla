@@ -77,7 +77,7 @@ export function rename_vertex(graph, v, new_name) {
   } else if (new_name in graph) {
     alert(new_name + ' already exists');
   } else if (new_name === '') {
-    alert('vertex name cannot be empty')
+    alert('vertex name cannot be empty');
   } else {
     graph[new_name] = graph[v];  // duplicate
     graph[new_name].name = new_name;
