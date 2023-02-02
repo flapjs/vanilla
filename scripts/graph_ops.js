@@ -69,29 +69,39 @@ export function delete_vertex(graph, v) {
  * @param {Object} graph - the graph containing the vertex v
  * @param {string} v - the vertex to rename
  * @param {*} new_name - new name of the vertex
+ * @param {string} new_moore_output - side effect of entering the state
  */
-export function rename_vertex(graph, v, new_name) {
+export function rename_vertex(graph, v, new_name, new_moore_output) {
   menus.remove_context_menu();
-  if (v === new_name) {  // nothing to do
+  if (v === new_name && graph[v].moore_output === new_moore_output) {  // nothing to do
     return;
-  } else if (new_name in graph) {
+  } else if (new_name in graph && new_moore_output === undefined) {  // not moore and name already exists
     alert(new_name + ' already exists');
   } else if (new_name === '') {
     alert('vertex name cannot be empty');
+  } else if (new_moore_output === '') {
+    alert('vertex name cannot be empty');
   } else {
-    graph[new_name] = graph[v];  // duplicate
-    graph[new_name].name = new_name;
-    delete graph[v];  // remove old
-    for (const vertex of Object.values(graph)) {
-      for (const edge of vertex.out) {
-        if (edge.from === v) {
-          edge.from = new_name;
-        }
-        if (edge.to === v) {
-          edge.to = new_name;
+    if (v !== new_name) {  // purely renaming
+      graph[new_name] = graph[v];  // duplicate
+      graph[new_name].name = new_name;
+      delete graph[v];  // remove old
+      for (const vertex of Object.values(graph)) {
+        for (const edge of vertex.out) {
+          if (edge.from === v) {
+            edge.from = new_name;
+          }
+          if (edge.to === v) {
+            edge.to = new_name;
+          }
         }
       }
     }
+  
+    if (new_moore_output !== undefined) {  // purely changing the moore output
+      graph[new_name].moore_output = new_moore_output;
+    }
+  
     drawing.draw(graph);
     hist.push_history(graph);
   }

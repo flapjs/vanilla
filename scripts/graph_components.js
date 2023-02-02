@@ -1,7 +1,7 @@
 /** @module graph_components */
 
 import * as consts from './consts.js';
-import { is_Turing } from './menus.js';
+import { is_Moore, is_Turing } from './menus.js';
 
 /**
  * making a new vertex
@@ -22,6 +22,7 @@ export function make_vertex(name, x, y, r, is_start, is_final, out) {
     r: r ? r : consts.DEFAULT_VERTEX_RADIUS,
     is_start: is_start ? is_start : false,
     is_final: is_final ? is_final : false,
+    moore_output: consts.DEFAULT_MOORE_OUTPUT,
     out: out ? out : [],
     highlighted: false  // a vertex is lit up during running the machine if it is in the current state
   };
@@ -32,7 +33,13 @@ export function make_vertex(name, x, y, r, is_start, is_final, out) {
  * @returns {string} ☐ if dealing with Turing machine and ε otherwise
  */
 export function get_empty_symbol() {
-  return is_Turing() ? consts.EMPTY_TAPE : consts.EMPTY_SYMBOL;
+  if (is_Turing()) {
+    return consts.EMPTY_TAPE;
+  } else if (is_Moore()) {
+    return consts.DEFAULT_MOORE_TRANSITION;
+  } else {
+    return consts.EMPTY_SYMBOL;
+  }
 }
 
 /**
