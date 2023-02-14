@@ -266,7 +266,7 @@ export function compute_edge_geometry(graph, edge) {
  * @param {float} text_size - the font size of the transition label
  */
 export function draw_edge(graph, edge, text_size) {
-  let {transition, pop_symbol, push_symbol, move} = edge;
+  let {transition, pop_symbol, push_symbol, move, mealy_output} = edge;
   const [start, end, mid] = compute_edge_geometry(graph, edge);
   draw_arrow(start, end, mid);
   let edge_text = transition;  // vanilla NFA only uses transition
@@ -274,6 +274,8 @@ export function draw_edge(graph, edge, text_size) {
     edge_text += ','+pop_symbol+consts.ARROW_SYMBOL+push_symbol;
   } else if (menus.is_Turing()) {  // append push and left/right if we have turing
     edge_text += consts.ARROW_SYMBOL+push_symbol+','+move;
+  } else if (menus.is_Mealy()) {
+    edge_text += " / " + mealy_output;
   }
   draw_text(edge_text, mid, text_size);
 }

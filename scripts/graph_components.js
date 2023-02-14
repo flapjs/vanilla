@@ -47,9 +47,10 @@ export function get_empty_symbol() {
  * @param {string} pop_symbol - the read symbol
  * @param {string} push_symbol - the write symbol
  * @param {string} move - whether move left of right
+ * @param {string} mealy_output - output for a Mealy machine
  * @returns {Object} the edge as a json object
  */
-export function make_edge(from, to, transition, a1, a2, angle1, angle2, pop_symbol, push_symbol, move) {
+export function make_edge(from, to, transition, a1, a2, angle1, angle2, pop_symbol, push_symbol, move, mealy_output) {
   if (from === to && (angle1 === undefined || angle2 === undefined)) {
     angle1 = 0, angle2 = Math.PI/2, a1 = 0.5, a2 = 1;
   } else if (a1 === undefined || a2 === undefined) {
@@ -65,7 +66,8 @@ export function make_edge(from, to, transition, a1, a2, angle1, angle2, pop_symb
     angle2: angle2,
     pop_symbol: pop_symbol ? pop_symbol : get_empty_symbol(),
     push_symbol: push_symbol ? push_symbol : get_empty_symbol(),
-    move: move ? move : consts.RIGHT
+    move: move ? move : consts.RIGHT,
+    mealy_output: mealy_output ? mealy_output : get_empty_symbol()
   };
 }
 
@@ -81,5 +83,6 @@ export function edge_equal(e1, e2) {
          e1.transition === e2.transition &&
          e1.pop_symbol === e2.pop_symbol &&
          e1.push_symbol === e2.push_symbol &&
-         e1.move === e2.move;
+         e1.move === e2.move &&
+         e1.mealy_output === e2.mealy_output;
 }

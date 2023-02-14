@@ -192,13 +192,16 @@ export function delete_edge(graph, edge) {
  * @param {string} new_push - new push symbol
  * @param {string} new_left_right - new move (left or right)
  */
-export function rename_edge(graph, edge, new_transition, new_pop, new_push, new_left_right) {
+export function rename_edge(graph, edge, new_transition, new_pop, new_push, new_left_right, new_mealy_output) {
   menus.remove_context_menu();
   const new_edge = {...edge,
     transition: new_transition ? new_transition : graph_components.get_empty_symbol(),
     pop_symbol: new_pop ? new_pop : graph_components.get_empty_symbol(),
     push_symbol: new_push ? new_push : graph_components.get_empty_symbol(),
-    move: new_left_right};
+    move: new_left_right,
+    mealy_output: new_mealy_output ? new_mealy_output : graph_components.get_empty_symbol()
+  };
+  
   if (compute.edge_has_equiv_edge_in_graph(graph, new_edge)) {  // new edge clashes with old
     alert('an equivalent edge already exists');
     return;
