@@ -20,7 +20,7 @@ export function make_vertex(name, x, y, r, is_start, is_final, out) {
     x: x,
     y: y,
     r: r ? r : consts.DEFAULT_VERTEX_RADIUS,
-    is_start: is_start ? is_start : false,
+    is_start: is_start ? true : false,
     is_final: is_final ? true : false,
     out: out ? out : [],
     highlighted: false  // a vertex is lit up during running the machine if it is in the current state
