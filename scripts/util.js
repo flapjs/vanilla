@@ -27,6 +27,31 @@ export class Queue {
   }
 }
 
+export class Stack {
+  constructor() {
+    this.arr = [];
+    //this.top_idx = 0;
+  }
+  push(item) {
+    this.arr.push(item); 
+  }
+  peek() {
+    return this.arr[this.arr.length - 1];
+  }
+  pop() {
+    return this.arr.pop();
+  }
+  // get entire_queue() {
+  //   return this.arr.slice(this.head_idx, this.tail_idx-this.head_idx);
+  // }
+  isEmpty() {
+    return this.arr.length === 0;
+  }
+  get length() {
+    return this.arr.length;
+  }
+}
+
 /**
  * compare the equality of the two objects
  * @param {string|number|Object} obj1 - object 1
