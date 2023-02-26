@@ -43,6 +43,7 @@ class regex
         while (!opStack.isEmpty() && opStack.peek() !== OPEN) {
           outQueue.enqueue(opStack.pop());
         }
+        opStack.pop();
       }
     }
     
@@ -62,6 +63,8 @@ class regex
 
 let test = new regex();
 console.log(test.convertToPostFix("a"+CONCAT+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+CONCAT+"b"));
+
+// plus is union, ? is concat
 
 // convert regex to postfix notation using shunting yard algorithm
 // convert to nfa using thompson's construction algorithm for NFAs
