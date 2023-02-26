@@ -77,6 +77,8 @@ let nfa2 = new RegexNFA(node, new Array(accept1));
 let nfa3 = unionNFA(nfa1,nfa2);
 console.log(node);
 console.log(nfa3.startNode().inputs);
+
+
 // plus is union, ? is concat
 
 

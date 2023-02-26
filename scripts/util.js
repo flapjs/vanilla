@@ -63,7 +63,12 @@ export class Stack {
   }
 }
 
+
 export class RegexNode {
+
+  //Member variables 
+  //accept: boolean whether node is an accept state or not
+  //inputs: Dictionary where key:input character, value:List of connecting nodes
   constructor() {
     this.accept = false;
     this.inputs = {};
@@ -73,14 +78,17 @@ export class RegexNode {
     this.accept = val;
   }
 
+  // just for debugging/printing purposes to identify node
   setId(id) {
     this.id = id;
   }
 
+  // Return list of nodes connecting when given @input
   nodesFromInput(input) {
     return this.inputs[input];
   }
 
+  // Add @node as connecting node when given @input
   addNode(input, node) {
     if (!(input in this.inputs) ) {
       this.inputs[input] = [];
@@ -90,18 +98,17 @@ export class RegexNode {
     
   }
 
-  toString() {
-    return "TEST";
-  }
 }
 
 export class RegexNFA {
 
+  // Member Variables
+  // start: Node to start at
+  // acceptNodes: List of nodes that are accept state nodes.
   constructor(startNode, acceptNodes) {
     this.start = startNode;
     this.acceptNodes = acceptNodes;
   }
-
 
   startNode() {
     return this.start;
@@ -113,6 +120,10 @@ export class RegexNFA {
   
 }
 
+// Union two NFA's
+// Creates a start node that has epsilon transitions to start nodes of @first and @second
+// and creates epsilon transitions from accept nodes of @first and @second to a new accept node
+// Returns newly created NFA
 export function unionNFA(first, second) {
 
   let start = new RegexNode();
