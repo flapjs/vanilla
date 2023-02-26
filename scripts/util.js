@@ -1,4 +1,15 @@
 /** @module util */
+export const OPEN = '(';
+export const CLOSE = ')';
+export const UNION = '\u222A';
+export const CONCAT = '\u25E6';
+export const KLEENE = '*';
+export const PLUS = '\u207A';
+
+export const EMPTY = '\u03B5';
+export const SIGMA = '\u03A3';
+export const EMPTY_SET = '\u2205';
+
 
 export class Queue {
   constructor() {
@@ -50,6 +61,78 @@ export class Stack {
   get length() {
     return this.arr.length;
   }
+}
+
+export class RegexNode {
+  constructor() {
+    this.accept = false;
+    this.inputs = {};
+  }
+
+  setAccept(val) {
+    this.accept = val;
+  }
+
+  setId(id) {
+    this.id = id;
+  }
+
+  nodesFromInput(input) {
+    return this.inputs[input];
+  }
+
+  addNode(input, node) {
+    if (!(input in this.inputs) ) {
+      this.inputs[input] = [];
+    }
+
+    this.inputs[input].push(node);
+    
+  }
+
+  toString() {
+    return "TEST";
+  }
+}
+
+export class RegexNFA {
+
+  constructor(startNode, acceptNodes) {
+    this.start = startNode;
+    this.acceptNodes = acceptNodes;
+  }
+
+
+  startNode() {
+    return this.start;
+  }
+
+  acceptNodes() {
+    return this.acceptNodes;
+  }
+  
+}
+
+export function unionNFA(first, second) {
+
+  let start = new RegexNode();
+  let accept = new RegexNode();
+  accept.setAccept(true);
+
+  start.addNode(EMPTY, first.startNode() );
+  start.addNode(EMPTY, second.startNode() );
+  
+  for (let node of first.acceptNodes) {
+    node.setAccept(false);
+    node.addNode(EMPTY, accept);
+  }
+
+  for (let node of second.acceptNodes) {
+     node.setAccept(false);
+    node.addNode(EMPTY, accept);
+  }
+
+  return new RegexNFA(start, new Array(accept) );
 }
 
 /**

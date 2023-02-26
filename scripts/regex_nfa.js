@@ -1,4 +1,4 @@
-import { Queue, Stack, RegexNode, RegexNFA, unionNFA } from './util.js';
+import { Queue, Stack } from './util.js';
 
 export const OPEN = '(';
 export const CLOSE = ')';
@@ -64,21 +64,7 @@ class regex
 let test = new regex();
 console.log(test.convertToPostFix("a"+CONCAT+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+CONCAT+"b"));
 
-//testing regexnode stuff
-let node = new RegexNode();
-let deadend = new RegexNode();
-let accept1 = new RegexNode();
-accept1.setAccept(true);
-node.addNode(EMPTY, deadend);
-node.addNode('a', accept1);
-
-let nfa1 = new RegexNFA(node, new Array(accept1));
-let nfa2 = new RegexNFA(node, new Array(accept1));
-let nfa3 = unionNFA(nfa1,nfa2);
-console.log(node);
-console.log(nfa3.startNode().inputs);
 // plus is union, ? is concat
-
 
 // convert regex to postfix notation using shunting yard algorithm
 // convert to nfa using thompson's construction algorithm for NFAs
