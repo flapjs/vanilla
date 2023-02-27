@@ -37,6 +37,14 @@ export function is_Mealy() {
 }
 
 /**
+ * reports the type of machine the user is working on
+ * @returns {boolean} true or false 
+ */
+export function is_Moore() {
+  return machine_type() === consts.MACHINE_TYPES.Moore;
+}
+
+/**
  * creates the context menu to change a vertex and display it
  * @param {Object} graph - the graph containing the vertex v
  * @param {string} v - the vertex we clicked on and want to change
@@ -59,6 +67,13 @@ export function display_vertex_menu(graph, v, x, y) {
   rename.type = 'text';
   rename.value = v;  // prepopulate vertex name
   rename_div.appendChild(rename);
+  let moore_output;
+  if (is_Moore()) {
+    moore_output = document.createElement('input');
+    moore_output.type = 'text';
+    moore_output.value = graph[v].moore_output;
+    rename_div.appendChild(moore_output);
+  }
   const start_btn = document.createElement('button');
   start_btn.innerText = 'make start';
   start_btn.addEventListener('click', () => graph_ops.set_start(graph, v));
@@ -70,7 +85,11 @@ export function display_vertex_menu(graph, v, x, y) {
   container.style = `left:${x}px; top:${y}px`;
   container.addEventListener('keyup', e => {
     if (e.key === 'Enter') {
-      graph_ops.rename_vertex(graph, v, rename.value);
+      if (is_Moore()) {
+        graph_ops.rename_vertex(graph, v, rename.value, moore_output.value);
+      } else {
+        graph_ops.rename_vertex(graph, v, rename.value);
+      }
     }
   });
   document.querySelector('body').appendChild(container);

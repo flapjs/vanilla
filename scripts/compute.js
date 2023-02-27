@@ -287,7 +287,7 @@ function* run_input_Turing(graph, input, interactive=false, allowed_steps=512) {
     stuck = true;  // assume we are stuck and change to not stuck in the loop
     for (const edge of graph[cur_state].out) {
       if (!tape[tape_idx]) {  // fill in empty if tape null/undefined
-        tape[tape_idx] = consts.EMPTY_SYMBOL;
+        tape[tape_idx] = consts.EMPTY_TAPE;
       }
       if (edge.transition !== tape[tape_idx]) {  // cannot take this transition
         continue;
@@ -301,7 +301,7 @@ function* run_input_Turing(graph, input, interactive=false, allowed_steps=512) {
     if (interactive) {
       drawing.highlight_states(graph, [cur_state]);
       drawing.viz_TM_tape(tape, tape_idx);
-      if (cur_state.is_final) {
+      if (graph[cur_state].is_final) {
         return true;
       } else if (stuck) {
         return false;

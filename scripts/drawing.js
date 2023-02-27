@@ -107,8 +107,13 @@ export function draw_final_circle(vertex) {
 export function draw_vertex(vertex) {
   // draw the circle
   draw_cricle(vertex.x, vertex.y, vertex.r, vertex.highlighted);
+  let text = vertex.name;
+  if (menus.is_Moore()) {
+    text += ` / ${vertex.moore_output}`;
+  }
   // find an appropriate text size and draw the text inside the vertex
-  draw_text(vertex.name, [vertex.x, vertex.y], text_size_huristic(vertex.r, vertex.name));
+  const text_size = text_size_huristic(vertex.r, text)
+  draw_text(text, [vertex.x, vertex.y], text_size);
   if (vertex.is_start) {  // it is the starting vertex
     const tip1 = [vertex.x-vertex.r, vertex.y],
       tip2 = linalg.sub(tip1, linalg.scale(consts.START_TRIANGLE_SCALE, [vertex.r, vertex.r])),
