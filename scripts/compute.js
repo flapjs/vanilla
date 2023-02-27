@@ -104,7 +104,7 @@ export function mealy_step(graph, cur_state, symbol) {
   }
 
   if(!next_state || !output) {
-    alert("Invalid Mealy machine!");
+    alert('Invalid Mealy machine!');
     return;
   } else {
     return { next_state, output };
@@ -322,7 +322,7 @@ function* run_input_Turing(graph, input, interactive=false, allowed_steps=512) {
  */
 function* run_input_Mealy(graph, input, interactive) {
   let cur_state = find_start(graph);  // find closure of start
-  let output_string = "";
+  let output_string = '';
 
   if (interactive) {
     drawing.highlight_states(graph, [cur_state]);
@@ -335,7 +335,7 @@ function* run_input_Mealy(graph, input, interactive) {
     output_string += mealy_output.output;
     
     if (interactive) {
-      drawing.highlight_states(graph, cur_states);
+      drawing.highlight_states(graph, [cur_state]);
       drawing.viz_NFA_input(input, i+1);
       if (i === input.length-1) {  // last step
         break;
