@@ -32,6 +32,10 @@ export function is_Turing() {
   return machine_type() === consts.MACHINE_TYPES.Turing;
 }
 
+export function is_Mealy() {
+  return machine_type() === consts.MACHINE_TYPES.Mealy;
+}
+
 /**
  * reports the type of machine the user is working on
  * @returns {boolean} true or false 
@@ -124,6 +128,9 @@ export function display_edge_menu(graph, edge, x, y) {
   left_right_choice.type = 'checkbox';
   left_right_choice.className = 'L_R_toggle';
   left_right_choice.checked = edge.move === consts.LEFT;
+  const m_output = document.createElement('input');
+  m_output.type = 'text';
+  m_output.value = edge.mealy_output;
   rename_div.appendChild(transition);
   if (is_PDA()) {
     rename_div.appendChild(pop);
@@ -131,13 +138,15 @@ export function display_edge_menu(graph, edge, x, y) {
   } else if (is_Turing()) {
     rename_div.appendChild(push);
     rename_div.appendChild(left_right_choice);
+  } else if (is_Mealy()) {
+    rename_div.appendChild(m_output);
   }
   container.style = `left:${x}px; top:${y}px`;
   container.addEventListener('keyup', e => {
     if (e.key === 'Enter') {
       graph_ops.rename_edge(graph, edge,
         transition.value, pop.value, push.value,
-        left_right_choice.checked ? consts.LEFT : consts.RIGHT);
+        left_right_choice.checked ? consts.LEFT : consts.RIGHT, m_output.value);
     }
   });
   document.querySelector('body').appendChild(container);
