@@ -1,7 +1,7 @@
 /** @module graph_components */
 
 import * as consts from './consts.js';
-import { is_Moore, is_Turing } from './menus.js';
+import { is_Mealy, is_Moore, is_Turing } from './menus.js';
 
 /**
  * making a new vertex
