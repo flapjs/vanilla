@@ -111,6 +111,23 @@ export function mealy_step(graph, cur_state, symbol) {
   }
 }
 
+export function moore_step(graph, cur_state, symbol) {
+  let next_state;
+
+  for (const edge of graph[cur_state].out) {
+    if(edge.transition === symbol) {
+      next_state = edge.to;
+    }
+  }
+
+  if(!next_state) {
+    alert('Invalid Mealy machine!');
+    return;
+  } else {
+    return next_state;
+  }
+}
+
 /**
  * check if the input is accepted
  * @param {Object} graph - machine graph
@@ -348,6 +365,33 @@ function* run_input_Mealy(graph, input, interactive) {
   return output_string;
 }
 
+function* run_input_Moore(graph, input, interactive) {
+  let cur_state = find_start(graph);
+  let output_string = graph[cur_state].moore_output;
+
+  if (interactive) {
+    drawing.highlight_states(graph, [cur_state]);
+    drawing.viz_NFA_input(input, 0);
+    yield;
+  }
+  for (let i = 0; i < input.length; ++i) {
+    cur_state = moore_step(graph, cur_state, input.charAt(i));
+    output_string += graph[cur_state].moore_output;
+    
+    if (interactive) {
+      drawing.highlight_states(graph, [cur_state]);
+      drawing.viz_NFA_input(input, i+1);
+      if (i === input.length-1) {  // last step
+        break;
+      } else {
+        yield;
+      }
+    }
+  }
+
+  return output_string;
+}
+
 /**
  * determines whether the machine is PDA or normal NFA and checks if the input is accepted
  * @param {Object} graph - machine graph
@@ -373,6 +417,8 @@ export function run_input(graph, machine_type, input, interactive=false) {
     return run_input_Turing(graph, input, interactive);
   } else if (machine_type === consts.MACHINE_TYPES.Mealy) {
     return run_input_Mealy(graph, input, interactive);
+  } else if (machine_type === consts.MACHINE_TYPES.Moore) {
+    return run_input_Moore(graph, input, interactive);
   }
 }
 
