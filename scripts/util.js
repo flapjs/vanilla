@@ -10,6 +10,8 @@ export const EMPTY = '\u03B5';
 export const SIGMA = '\u03A3';
 export const EMPTY_SET = '\u2205';
 
+import * as graph_components from './graph_components.js';
+
 
 export class Queue {
   constructor() {
@@ -63,7 +65,7 @@ export class Stack {
   }
 }
 
-
+/*
 export class RegexNode {
 
   //Member variables 
@@ -98,7 +100,7 @@ export class RegexNode {
     
   }
 
-}
+}*/
 
 export class RegexNFA {
 
@@ -110,11 +112,11 @@ export class RegexNFA {
     this.acceptNodes = acceptNodes;
   }
 
-  startNode() {
+  get startNode() {
     return this.start;
   }
 
-  acceptNodes() {
+  get acceptNodes() {
     return this.acceptNodes;
   }
   
@@ -126,24 +128,45 @@ export class RegexNFA {
 // Returns newly created NFA
 export function unionNFA(first, second) {
 
-  let start = new RegexNode();
-  let accept = new RegexNode();
-  accept.setAccept(true);
+  let start = graph_components.make_vertex("start", undefined, undefined, undefined, true, false, new Array() );
+  let accept = graph_components.make_vertex("end", undefined, undefined, undefined, false, true, new Array() );
 
-  start.addNode(EMPTY, first.startNode() );
-  start.addNode(EMPTY, second.startNode() );
+  start.out.push( graph_components.make_edge(start, first.startNode(), EMPTY) );
+  start.out.push( graph_components.make_edge(start, second.startNode(), EMPTY) );
   
-  for (let node of first.acceptNodes) {
-    node.setAccept(false);
-    node.addNode(EMPTY, accept);
+  for (let node of first.acceptNodes()) {
+    node.is_final = false;
+    node.out.push( graph_components.make_edge(node, accept, EMPTY) );
   }
 
-  for (let node of second.acceptNodes) {
-     node.setAccept(false);
-    node.addNode(EMPTY, accept);
+  for (let node of second.acceptNodes()) {
+    node.is_final = false;
+    node.out.push( graph_components.make_edge(node, accept, EMPTY) );
   }
 
   return new RegexNFA(start, new Array(accept) );
+}
+
+export function concatNFA(first, second) {
+  for (let node of first.acceptNodes()) {
+    node.is_final = false;
+    node.out.push(graph_components.make_edge(node, second.startNode(), EMPTY));
+  }
+
+  return new RegexNFA(first.startNode(), second.acceptNodes());
+}
+
+export function kleeneNFA(first) {
+  let start = graph_components.make_vertex("start", undefined, undefined, undefined, true, false, new Array() );
+  let accept = graph_components.make_vertex("end", undefined, undefined, undefined, false, true, new Array() );
+
+  start.out.push( graph_components.make_edge(start, first.startNode(), EMPTY) );
+  start.out.push( graph_components.make_edge(start, accept, EMPTY) );
+
+  for (let node of first.acceptNodes()) {
+    node.out.push( graph_components.make_edge(node, first.startNode(), EMPTY) );
+    node.out.push( graph_components.make_edge(node, accept, EMPTY) );
+  }
 }
 
 /**

@@ -1,4 +1,6 @@
-import { Queue, Stack, RegexNode, RegexNFA, unionNFA } from './util.js';
+import * as util from './util.js';
+import * as graph_components from './graph_components.js';
+import * as permalink from './permalink.js';
 
 export const OPEN = '(';
 export const CLOSE = ')';
@@ -13,71 +15,68 @@ export const EMPTY_SET = '\u2205';
 
 export const PRECEDENCE = [UNION, CONCAT, KLEENE, PLUS];
 
-class regex 
-{
-  constructor() {
-    
+export function convertToPostFix(regex) {
+  let opStack = new util.Stack();
+  let outQueue = new util.Queue();
+  for (let ch of regex) {
+    //console.log(ch + " " + opStack.peek());
+    // i means case insensitive
+    if (ch.match(/[a-z]/i)) {
+      outQueue.enqueue(ch);
+    }
+    else if ((ch === KLEENE || ch ===  CONCAT || ch === UNION || ch === PLUS) && opStack.peek() === OPEN)  {
+      opStack.push(ch);
+    }
+    else if (ch === KLEENE || ch ===  CONCAT || ch === UNION || ch === PLUS) {
+      while (!opStack.isEmpty() && PRECEDENCE.indexOf(opStack.peek()) >= PRECEDENCE.indexOf(ch) ) {
+        outQueue.enqueue(opStack.pop());
+      }
+      opStack.push(ch);
+    }
+    else if (ch === OPEN) {
+      opStack.push(ch);
+    }
+    else if (ch === CLOSE) {
+      while (!opStack.isEmpty() && opStack.peek() !== OPEN) {
+        outQueue.enqueue(opStack.pop());
+      }
+      opStack.pop();
+    }
   }
-  convertToPostFix(regex) {
-    let opStack = new Stack();
-    let outQueue = new Queue();
-    for (let ch of regex) {
-      //console.log(ch + " " + opStack.peek());
-      // i means case insensitive
-      if (ch.match(/[a-z]/i)) {
-        outQueue.enqueue(ch);
-      }
-      else if ((ch === KLEENE || ch ===  CONCAT || ch === UNION || ch === PLUS) && opStack.peek() === OPEN)  {
-        opStack.push(ch);
-      }
-      else if (ch === KLEENE || ch ===  CONCAT || ch === UNION || ch === PLUS) {
-        while (!opStack.isEmpty() && PRECEDENCE.indexOf(opStack.peek()) >= PRECEDENCE.indexOf(ch) ) {
-          outQueue.enqueue(opStack.pop());
-        }
-        opStack.push(ch);
-      }
-      else if (ch === OPEN) {
-        opStack.push(ch);
-      }
-      else if (ch === CLOSE) {
-        while (!opStack.isEmpty() && opStack.peek() !== OPEN) {
-          outQueue.enqueue(opStack.pop());
-        }
-        opStack.pop();
-      }
-    }
-    
-    // empty out remaining items from stack
-    while (!opStack.isEmpty()) {
-      outQueue.enqueue(opStack.pop());
-    }
-
-    let result = "";
-    while (outQueue.length > 0) {
-      result += outQueue.dequeue();
-    }
-
-    return result;
+  
+  // empty out remaining items from stack
+  while (!opStack.isEmpty()) {
+    outQueue.enqueue(opStack.pop());
   }
+
+  let result = "";
+  while (outQueue.length > 0) {
+    result += outQueue.dequeue();
+  }
+
+  return result;
 }
 
-let test = new regex();
-console.log(test.convertToPostFix("a"+CONCAT+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+CONCAT+"b"));
 
-//testing regexnode stuff
-let node = new RegexNode();
-let deadend = new RegexNode();
-let accept1 = new RegexNode();
-accept1.setAccept(true);
-node.addNode(EMPTY, deadend);
-node.addNode('a', accept1);
+console.log(this.convertToPostFix("a"+CONCAT+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+CONCAT+"b"));
 
-let nfa1 = new RegexNFA(node, new Array(accept1));
-let nfa2 = new RegexNFA(node, new Array(accept1));
-let nfa3 = unionNFA(nfa1,nfa2);
-console.log(node);
-console.log(nfa3.startNode().inputs);
 
+function testUnion(str1, str2) {
+  let decode1 = permalink.deserialize(str1)[1];
+  let decode2 = permalink.deserialize(str2)[1];
+
+  let firstNFAStartNode;
+  let firstNFAAcceptNodes = new Array();
+  for (node in decode1) {
+    if (node.is_start) firstNFAStartNode = node;
+    if (node.is_final) firstNFAAcceptNodes.push(node);
+  }
+  let firstNFA = new RegexNFA(firstNFAStartNode, firstNFAAcceptNodes);
+  
+}
+startNode.push.out( graph_components.make_edge(start, first.startNode(), EMPTY) )
+
+let graph1 = new RegexNFA(startNode, )
 
 // plus is union, ? is concat
 
