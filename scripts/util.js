@@ -122,30 +122,128 @@ export class RegexNFA {
   
 }
 
-// Union two NFA's
-// Creates a start node that has epsilon transitions to start nodes of @first and @second
-// and creates epsilon transitions from accept nodes of @first and @second to a new accept node
-// Returns newly created NFA
-export function unionNFA(first, second) {
-
-  let start = graph_components.make_vertex("start", undefined, undefined, undefined, true, false, new Array() );
-  let accept = graph_components.make_vertex("end", undefined, undefined, undefined, false, true, new Array() );
-
-  start.out.push( graph_components.make_edge(start, first.startNode(), EMPTY) );
-  start.out.push( graph_components.make_edge(start, second.startNode(), EMPTY) );
-  
-  for (let node of first.acceptNodes()) {
-    node.is_final = false;
-    node.out.push( graph_components.make_edge(node, accept, EMPTY) );
-  }
-
-  for (let node of second.acceptNodes()) {
-    node.is_final = false;
-    node.out.push( graph_components.make_edge(node, accept, EMPTY) );
-  }
-
-  return new RegexNFA(start, new Array(accept) );
+// is start: bool
+// is final: bool
+// out: dict, key is transition symbol, value is list of Nodes to connect to
+export function createNode(name, is_start, is_final, out) {
+  return {
+    name: name,
+    is_start: is_start,
+    is_final: is_final,
+    out: out
+  };
 }
+// node1: start node
+// node2: end node
+// symbol: transition symbol as a string
+export function addTransition(node1, node2, symbol) {
+  if (!(symbol in node1.out)) {
+    node1.out[symbol] = new Array(node2);
+  }
+  else {
+    node1.out[String(symbol)].push(node2);
+  }
+}
+
+// graph: list of Nodes in the graph
+export function getStartNode(graph) {
+  for (let node of graph) {
+    if (node.is_start) return node;
+  }
+}
+
+// graph: list of Nodes in the graph
+export function getAcceptNodes(graph) {
+  let result = new Array();
+  for (let node of graph) {
+    if (node.is_final) result.push(node);
+  }
+  return result;
+}
+
+// first: lsit of nodes, graph 1
+// second: list of nodes, graph 2
+export function union(first, second) {
+  let start = createNode('union start', true, false, {} );
+  let accept = createNode('union accept', false, true, {} );
+  
+  let firstStart = getStartNode(first);
+  firstStart.is_start = false;
+  addTransition(start, firstStart, EMPTY);
+  
+  let secondStart = getStartNode(second);
+  secondStart.is_start = false;
+  addTransition(start, secondStart, EMPTY);
+
+  for (let node of getAcceptNodes(first)) {
+    node.is_final = false;
+    addTransition(node, accept, EMPTY);
+  }
+
+  for (let node of getAcceptNodes(second)) {
+    node.is_final = false;
+    addTransition(node, accept, EMPTY);
+  }
+
+  for (let node of second) {
+    first.push(node);
+  }
+
+  first.push(start);
+  first.push(accept);
+
+  return first;
+  
+}
+
+export function concat(first, second) {
+  let secondStart = getStartNode(second);
+  for (let node of getAcceptNodes(first)) {
+    node.is_final = false;
+    addTransition(node, secondStart, EMPTY);
+  }
+
+  for (let node of second) {
+    first.push(node);
+  }
+
+  return first;
+}
+
+export function kleene(first) {
+  let start = getStartNode(first);
+  start.is_start = false;
+  let acceptNodes = getAcceptNodes(first);
+  
+  let newStart = createNode('kleene start', true, false, {});
+  let newAccept = createNode('kleene accept', false, true, {});
+
+  addTransition(newStart, start, EMPTY);
+  addTransition(newStart, newAccept, EMPTY);
+  for (let node of acceptNodes) {
+    node.is_final = false;
+    addTransition(node, start, EMPTY);
+    addTransition(node, newAccept, EMPTY);
+  }
+
+  first.push(newStart);
+  first.push(newAccept);
+  return first;
+}
+
+export function createNFA(symbol) {
+  let start = createNode("st " + symbol, true, false, {});
+  let end = createNode("accept" + symbol, false, true, {});
+  
+  addTransition(start, end, symbol);
+  
+  return new Array(start, end);
+}
+
+
+
+
+
 
 export function concatNFA(first, second) {
   for (let node of first.acceptNodes()) {

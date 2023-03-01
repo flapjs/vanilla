@@ -1,6 +1,4 @@
 import * as util from './util.js';
-import * as graph_components from './graph_components.js';
-import * as permalink from './permalink.js';
 
 export const OPEN = '(';
 export const CLOSE = ')';
@@ -14,6 +12,29 @@ export const SIGMA = '\u03A3';
 export const EMPTY_SET = '\u2205';
 
 export const PRECEDENCE = [UNION, CONCAT, KLEENE, PLUS];
+
+// copied over code from previous implementation
+export function injectConcatSymbols(expressionString)
+{
+    let result = '';
+    for (let i = 0; i < expressionString.length; i++)
+    {
+        let currChar = expressionString.charAt(i);
+        result += currChar;
+        if (i + 1 < expressionString.length)
+        {
+            let nextChar = expressionString.charAt(i + 1);
+            if (currChar != OPEN && currChar != UNION
+                && currChar != CONCAT && nextChar != CLOSE
+                && nextChar != UNION && nextChar != KLEENE
+                && nextChar != PLUS && nextChar != CONCAT)
+            {
+                result += CONCAT;
+            }
+        }
+    }
+    return result;
+}
 
 export function convertToPostFix(regex) {
   let opStack = new util.Stack();
@@ -57,26 +78,29 @@ export function convertToPostFix(regex) {
   return result;
 }
 
-
-console.log(this.convertToPostFix("a"+CONCAT+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+CONCAT+"b"));
-
-
-function testUnion(str1, str2) {
-  let decode1 = permalink.deserialize(str1)[1];
-  let decode2 = permalink.deserialize(str2)[1];
-
-  let firstNFAStartNode;
-  let firstNFAAcceptNodes = new Array();
-  for (node in decode1) {
-    if (node.is_start) firstNFAStartNode = node;
-    if (node.is_final) firstNFAAcceptNodes.push(node);
-  }
-  let firstNFA = new RegexNFA(firstNFAStartNode, firstNFAAcceptNodes);
+function testUnion() {
+  let start1 = util.createNode('start1', true, false, {} );
+  let end1 = util.createNode('end1', false, true, {} );
+  util.addTransition(start1, end1, '\u03A3');
   
-}
-startNode.push.out( graph_components.make_edge(start, first.startNode(), EMPTY) )
+  let graph1 = new Array(start1, end1);
 
-let graph1 = new RegexNFA(startNode, )
+  let start2 = util.createNode('start2', true, false, {} );
+  let end2 = util.createNode('end2', false, true, {} );
+  util.addTransition(start2, end2, "B");
+  let graph2 = new Array(start2, end2);
+
+  let result = util.union(graph1, graph2);
+
+  console.log(JSON.stringify(result));
+  //console.log(result);
+}
+
+//testUnion();
+console.log(injectConcatSymbols("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+"b"));
+console.log(injectConcatSymbols("abc"+UNION+"de"));
+
+//console.log(this.convertToPostFix("a"+CONCAT+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+CONCAT+"b"));
 
 // plus is union, ? is concat
 
