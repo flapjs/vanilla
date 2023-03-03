@@ -37,46 +37,46 @@ export function injectConcatSymbols(expressionString)
     return result;
 }
 
-export function convertToPostFix(regex) {
-  let PRECEDENCE = [UNION, CONCAT, KLEENE, PLUS];
+export function shunting_yard(string) {
+  let precedence = {
+    KLEENE: 3,
+    CONCAT: 2,
+    UNION: 1
+  };
+  let stack = new util.Stack();
+  let queue = new util.Queue();
 
-  let opStack = new util.Stack();
-  let outQueue = new util.Queue();
-  for (let ch of regex) {
-    // case if ch is an alphanumeric character or epsilon
+  for (let ch of string) {
+    // case if ch is a character or epsilon
     if (ch.match(/[a-z]/i) || ch === EMPTY) {
-      outQueue.enqueue(ch);
+      queue.enqueue(ch);
     }
-    // case if ch is an operator and ( is on the top of the stack
-    else if ((ch === KLEENE || ch ===  CONCAT || ch === UNION || ch === PLUS) && opStack.peek() === OPEN)  {
-      opStack.push(ch);
-    }
-    // case if 
-    else if (ch === KLEENE || ch ===  CONCAT || ch === UNION || ch === PLUS) {
-      while (!opStack.isEmpty() && PRECEDENCE.indexOf(opStack.peek()) >= PRECEDENCE.indexOf(ch) ) {
-        outQueue.enqueue(opStack.pop());
+    else if (ch === UNION || ch === KLEENE || ch === CONCAT) {
+      while (precedence[stack.peek()] > precedence[ch]) {
+        queue.enqueue(stack.pop());
       }
-      opStack.push(ch);
+      stack.push(ch);
     }
     else if (ch === OPEN) {
-      opStack.push(ch);
+      stack.push(ch);
     }
     else if (ch === CLOSE) {
-      while (!opStack.isEmpty() && opStack.peek() !== OPEN) {
-        outQueue.enqueue(opStack.pop());
+      while (stack.peek() != OPEN) {
+        queue.enqueue(stack.pop());
       }
-      opStack.pop();
+      stack.pop();
     }
   }
-  
-  // empty out remaining items from stack
-  while (!opStack.isEmpty()) {
-    outQueue.enqueue(opStack.pop());
+
+  //empty remaining elements from stack
+  while (!stack.isEmpty()) {
+    queue.enqueue(stack.pop());
   }
 
+  // put resulting string together
   let result = "";
-  while (outQueue.length > 0) {
-    result += outQueue.dequeue();
+  while (queue.length > 0) {
+    result += queue.dequeue();
   }
 
   return result;
@@ -148,7 +148,8 @@ function test(string) {
 //console.log(test("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE));
 //console.log(testConcat());
 
-console.log(convertToPostFix(EMPTY+UNION+"a"+KLEENE+"b"));
+console.log(convertToPostFix(injectConcatSymbols(EMPTY+UNION+"a"+KLEENE+"b")));
+
 
 //testUnion();
 // console.log(injectConcatSymbols("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+"b"));
