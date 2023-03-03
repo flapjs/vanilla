@@ -51,15 +51,18 @@ export function shunting_yard(string) {
     if (ch.match(/[a-z]/i) || ch === EMPTY) {
       queue.enqueue(ch);
     }
+    // case if ch is an operator
     else if (ch === UNION || ch === KLEENE || ch === CONCAT) {
       while (precedence[stack.peek()] > precedence[ch]) {
         queue.enqueue(stack.pop());
       }
       stack.push(ch);
     }
+    // case if ch is (
     else if (ch === OPEN) {
       stack.push(ch);
     }
+    // case if ch is )
     else if (ch === CLOSE) {
       while (stack.peek() != OPEN) {
         queue.enqueue(stack.pop());
