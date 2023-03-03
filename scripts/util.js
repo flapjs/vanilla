@@ -11,6 +11,7 @@ export const SIGMA = '\u03A3';
 export const EMPTY_SET = '\u2205';
 
 import * as graph_components from './graph_components.js';
+import { create_edge } from './graph_ops.js';
 
 
 export class Queue {
@@ -133,6 +134,7 @@ export function createNode(name, is_start, is_final, out) {
     out: out
   };
 }
+
 // node1: start node
 // node2: end node
 // symbol: transition symbol as a string
@@ -198,6 +200,7 @@ export function union(first, second) {
 
 export function concat(first, second) {
   let secondStart = getStartNode(second);
+  secondStart.is_start = false;
   for (let node of getAcceptNodes(first)) {
     node.is_final = false;
     addTransition(node, secondStart, EMPTY);
@@ -240,32 +243,97 @@ export function createNFA(symbol) {
   return new Array(start, end);
 }
 
+// returns NFA given postfix regex string
+export function thompson(regex) {
+  let stack = new Stack();
+  for (let char of regex) {
+    // case 1: character
+    if (char.match(/[a-z]/i) || char === EMPTY) {
+      let NFA = createNFA(char);
+      stack.push(NFA);
+    }
+    // case 2: union
+    else if (char === UNION) {
+      let second = stack.pop();
+      let first = stack.pop();
+      let NFA = union(first, second);
+      stack.push(NFA);
+    }
+    // case 3: concat
+    else if (char === CONCAT) {
+      let second = stack.pop();
+      let first = stack.pop();
+      let NFA = concat(first, second);
+      stack.push(NFA);
+    }
+    // case 4: kl
+    else if (char === KLEENE) {
+      let first = stack.pop();
 
-
-
-
-
-export function concatNFA(first, second) {
-  for (let node of first.acceptNodes()) {
-    node.is_final = false;
-    node.out.push(graph_components.make_edge(node, second.startNode(), EMPTY));
+      let NFA = kleene(first);
+      stack.push(NFA);
+    }
+    // all other cases
+    else {
+      //unknown character, error
+    }
   }
 
-  return new RegexNFA(first.startNode(), second.acceptNodes());
+  return stack.pop();
 }
 
-export function kleeneNFA(first) {
-  let start = graph_components.make_vertex("start", undefined, undefined, undefined, true, false, new Array() );
-  let accept = graph_components.make_vertex("end", undefined, undefined, undefined, false, true, new Array() );
+// converts a NFA in our format to a graph in other format
+export function convertToDrawing(nfa) {
 
-  start.out.push( graph_components.make_edge(start, first.startNode(), EMPTY) );
-  start.out.push( graph_components.make_edge(start, accept, EMPTY) );
+  let graph = {};
 
-  for (let node of first.acceptNodes()) {
-    node.out.push( graph_components.make_edge(node, first.startNode(), EMPTY) );
-    node.out.push( graph_components.make_edge(node, accept, EMPTY) );
+  let i = 0;
+  for (let node of nfa) {
+    let vertex = graph_components.make_vertex("q" + i, 0, 0, 0, node.is_start, node.is_final, new Array() );
+    graph["q"+i] = vertex;
+    i++;
   }
+
+
+  i = 0;
+  for (let node of nfa) {
+    let vertex = graph["q"+i];
+    for (let symbol in node.out) {
+      for (let neighbor of node.out[symbol]) {
+        let neighborIndex = nfa.indexOf(neighbor);
+        let edge = graph_components.make_edge_temp("q"+i, "q"+neighborIndex, symbol, 0, 0, 0, 0, EMPTY, EMPTY, EMPTY);
+        vertex.out.push(edge);
+      }
+    }
+    i++;
+  }
+
+  return ['NFA', graph];
 }
+
+
+
+// export function concatNFA(first, second) {
+//   for (let node of first.acceptNodes()) {
+//     node.is_final = false;
+//     node.out.push(graph_components.make_edge(node, second.startNode(), EMPTY));
+//   }
+
+//   return new RegexNFA(first.startNode(), second.acceptNodes());
+// }
+
+// export function kleeneNFA(first) {
+//   let start = graph_components.make_vertex("start", undefined, undefined, undefined, true, false, new Array() );
+//   let accept = graph_components.make_vertex("end", undefined, undefined, undefined, false, true, new Array() );
+
+//   start.out.push( graph_components.make_edge(start, first.startNode(), EMPTY) );
+//   start.out.push( graph_components.make_edge(start, accept, EMPTY) );
+
+//   for (let node of first.acceptNodes()) {
+//     node.out.push( graph_components.make_edge(node, first.startNode(), EMPTY) );
+//     node.out.push( graph_components.make_edge(node, accept, EMPTY) );
+//   }
+// }
 
 /**
  * compare the equality of the two objects

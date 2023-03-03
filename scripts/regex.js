@@ -1,4 +1,5 @@
 import * as util from './util.js';
+import * as permalink from './permalink.js';
 
 export const OPEN = '(';
 export const CLOSE = ')';
@@ -11,7 +12,7 @@ export const EMPTY = '\u03B5';
 export const SIGMA = '\u03A3';
 export const EMPTY_SET = '\u2205';
 
-export const PRECEDENCE = [UNION, CONCAT, KLEENE, PLUS];
+
 
 // copied over code from previous implementation
 export function injectConcatSymbols(expressionString)
@@ -37,17 +38,20 @@ export function injectConcatSymbols(expressionString)
 }
 
 export function convertToPostFix(regex) {
+  let PRECEDENCE = [UNION, CONCAT, KLEENE, PLUS];
+
   let opStack = new util.Stack();
   let outQueue = new util.Queue();
   for (let ch of regex) {
-    //console.log(ch + " " + opStack.peek());
-    // i means case insensitive
-    if (ch.match(/[a-z]/i)) {
+    // case if ch is an alphanumeric character or epsilon
+    if (ch.match(/[a-z]/i) || ch === EMPTY) {
       outQueue.enqueue(ch);
     }
+    // case if ch is an operator and ( is on the top of the stack
     else if ((ch === KLEENE || ch ===  CONCAT || ch === UNION || ch === PLUS) && opStack.peek() === OPEN)  {
       opStack.push(ch);
     }
+    // case if 
     else if (ch === KLEENE || ch ===  CONCAT || ch === UNION || ch === PLUS) {
       while (!opStack.isEmpty() && PRECEDENCE.indexOf(opStack.peek()) >= PRECEDENCE.indexOf(ch) ) {
         outQueue.enqueue(opStack.pop());
@@ -91,14 +95,64 @@ function testUnion() {
   let graph2 = new Array(start2, end2);
 
   let result = util.union(graph1, graph2);
+  
+  let graph = util.convertToDrawing(result);
+  console.log(permalink.serialize(graph[0], graph[1]) );
 
-  console.log(JSON.stringify(result));
+  //console.log(JSON.stringify(result));
+  //console.log(result);
+}
+function testConcat() {
+  let start1 = util.createNode('start1', true, false, {} );
+  let end1 = util.createNode('end1', false, true, {} );
+  util.addTransition(start1, end1, '\u03A3');
+  
+  let graph1 = new Array(start1, end1);
+
+  let start2 = util.createNode('start2', true, false, {} );
+  let end2 = util.createNode('end2', false, true, {} );
+  util.addTransition(start2, end2, "B");
+  let graph2 = new Array(start2, end2);
+
+  let result = util.concat(graph1, graph2);
+  
+  let graph = util.convertToDrawing(result);
+  console.log(permalink.serialize(graph[0], graph[1]) );
+
+  //console.log(JSON.stringify(result));
   //console.log(result);
 }
 
+function testKleene() {  
+  let graph1 = util.createNFA(a);
+
+  let result = util.kleene(graph1);
+  
+  let graph = util.convertToDrawing(result);
+  console.log(permalink.serialize(graph[0], graph[1]) );
+
+  //console.log(JSON.stringify(result));
+  //console.log(result);
+}
+
+function test(string) {
+  string = injectConcatSymbols(string);
+  string = convertToPostFix(string);
+  let NFA = util.thompson(string);
+  let graph = util.convertToDrawing(NFA);
+  let link = permalink.serialize(graph[0], graph[1]);
+  return link
+}
+
+//console.log(test("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+"b"));
+//console.log(test("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE));
+//console.log(testConcat());
+
+console.log(convertToPostFix(EMPTY+UNION+"a"+KLEENE+"b"));
+
 //testUnion();
-console.log(injectConcatSymbols("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+"b"));
-console.log(injectConcatSymbols("abc"+UNION+"de"));
+// console.log(injectConcatSymbols("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+"b"));
+// console.log(injectConcatSymbols("abc"+UNION+"de"));
 
 //console.log(this.convertToPostFix("a"+CONCAT+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+CONCAT+"b"));
 
