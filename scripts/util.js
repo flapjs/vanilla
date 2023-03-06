@@ -297,6 +297,7 @@ export function validateString(NFA, currentState, string) {
   // input
   let symbol = string.charAt(0);
 
+
   // check all epsilon transitions first
   if (currentState.out.hasOwnProperty(EMPTY) ) {
     for (let neighbor of currentState.out[EMPTY]) {
@@ -311,7 +312,7 @@ export function validateString(NFA, currentState, string) {
     }
   }
 
-  return returnVal;
+  return false;
 }
 // converts a NFA in our format to a graph in other format
 export function convertToDrawing(nfa) {

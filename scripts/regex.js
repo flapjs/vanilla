@@ -155,7 +155,7 @@ function test(string) {
 function testValidate() {
   let string = "a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE;
   string = injectConcatSymbols(string);
-  string = convertToPostFix(string);
+  string = shunting_yard(string);
   console.log("POST FIX: " + string);
   let NFA = util.thompson(string);
   
