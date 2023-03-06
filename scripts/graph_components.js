@@ -35,8 +35,6 @@ export function make_vertex(name, x, y, r, is_start, is_final, out) {
 export function get_empty_symbol() {
   if (is_Turing()) {
     return consts.EMPTY_TAPE;
-  } else if (is_Moore()) {
-    return consts.DEFAULT_MOORE_TRANSITION;
   } else {
     return consts.EMPTY_SYMBOL;
   }
@@ -74,7 +72,7 @@ export function make_edge(from, to, transition, a1, a2, angle1, angle2, pop_symb
     pop_symbol: pop_symbol ? pop_symbol : get_empty_symbol(),
     push_symbol: push_symbol ? push_symbol : get_empty_symbol(),
     move: move ? move : consts.RIGHT,
-    mealy_output: mealy_output ? mealy_output : get_empty_symbol()
+    mealy_output: mealy_output ? mealy_output : consts.DEFAULT_MEALY_OUTPUT
   };
 }
 

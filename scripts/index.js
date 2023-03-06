@@ -25,7 +25,7 @@ function bind_double_click() {
     }  // shifted, don't create
     const [x, y] = drawing.event_position_on_canvas(e);
     const v = drawing.in_any_vertex(graph, x, y);
-    if (v && !menus.is_Mealy()) {     // Mealy machines do not have a final accept state
+    if (v) {
       graph_ops.toggle_final(graph, v);
     } else {
       // use the default radius if there is no vertex for reference

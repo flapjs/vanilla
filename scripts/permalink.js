@@ -57,9 +57,11 @@ export function serialize(type, graph) {
     for (const edge of vertex.out) {
       result += to_string_field(vertex_name_to_id[edge.from]) + consts.FIELD_DELIM;
       result += to_string_field(vertex_name_to_id[edge.to])   + consts.FIELD_DELIM;
+      result += to_string_field(vertex.moore_output)          + consts.FIELD_DELIM;
       result += to_string_field(edge.transition)              +
                 to_string_field(edge.pop_symbol)              +
                 to_string_field(edge.push_symbol)             +
+                to_string_field(edge.mealy_symbol)            +
                 to_string_field(edge.move)                    + consts.FIELD_DELIM;
       result += to_string_field(Math.round(edge.a1*10))       + consts.FIELD_DELIM;
       result += to_string_field(Math.round(edge.a2*10))       + consts.FIELD_DELIM;

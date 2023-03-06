@@ -424,7 +424,34 @@ export function run_input(graph, machine_type, input, interactive=false) {
 
 /** given an NFA, check if it is in fact deterministic */
 export function is_DFA(NFA) {
+  let alphabet = new Set();
+  for(const v of Object.values(graph)) {
+    for(const e of vertex.out) {
+      alphabet.add(e.symbol);
+    }
+  }
 
+  for(const v of Object.values(graph)) {
+    let outgoing = new Set();
+    for(const e of vertex.out) {
+      outgoing.add(e.symbol);
+    }
+
+    if(outgoing.size < alphabet.size) {
+      let missing_transitions = '';
+      let alpha_array = Array.from(alphabet);
+      for(let i = 0; i < alpha_array.length; i++) {
+        if(!outgoing.has(alpha_array[i])) {
+          missing_transitions += alpha_array[i] + ', ';
+        }
+      }
+
+      alert("Missing transitions " + missing_transitions.substring(0, missing_transitions.length - 2) + " for " + v.name);
+      return false;
+    }
+  }
+
+  return true;
 }
 
 /**

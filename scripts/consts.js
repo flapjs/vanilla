@@ -76,6 +76,9 @@ export const EMPTY_TAPE = '☐';
 /** @constant {string} DEFAULT_MOORE_OUTPUT - prepoluate moore output with this */
 export const DEFAULT_MOORE_OUTPUT = '0';
 
+/** @constant {string} DEFAULT_MEALY_OUTPUT - prepoluate mealy output with this */
+export const DEFAULT_MEALY_OUTPUT = '0';
+
 /** @constant {string} ARROW_SYMBOL - arrow symbol */
 export const ARROW_SYMBOL = '→';
 
