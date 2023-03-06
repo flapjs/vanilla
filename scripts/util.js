@@ -282,6 +282,37 @@ export function thompson(regex) {
   return stack.pop();
 }
 
+
+// Given an NFA (List of Nodes), currentState Node, and String where current input is at index 0
+export function validateString(NFA, currentState, string) {
+  // if empty string, check if current state is final and check all epsilon transitions
+  if (string.length == 0) {
+    if (currentState.is_final) return true;
+    if (!currentState.out.hasOwnProperty(EMPTY) ) return false;
+    for (let neighbor of currentState.out[EMPTY]) {
+      if (validateString(NFA, neighbor, string ) ) return true;
+    }
+    return false;
+  }
+  // input
+  let symbol = string.charAt(0);
+
+  // check all epsilon transitions first
+  if (currentState.out.hasOwnProperty(EMPTY) ) {
+    for (let neighbor of currentState.out[EMPTY]) {
+      if (validateString(NFA, neighbor, string ) ) return true;
+    }
+  }
+
+  // check all transitions with current input symbol
+  if (currentState.out.hasOwnProperty(symbol)) {
+    for (let neighbor of currentState.out[symbol]) {
+      if (validateString(NFA, neighbor, string.substring(1) ) ) return true;
+    }
+  }
+
+  return returnVal;
+}
 // converts a NFA in our format to a graph in other format
 export function convertToDrawing(nfa) {
 
@@ -289,11 +320,10 @@ export function convertToDrawing(nfa) {
 
   let i = 0;
   for (let node of nfa) {
-    let vertex = graph_components.make_vertex("q" + i, 0, 0, 0, node.is_start, node.is_final, new Array() );
+    let vertex = graph_components.make_vertex("q" + i, 488, 788, 0, node.is_start, node.is_final, new Array() );
     graph["q"+i] = vertex;
     i++;
   }
-
 
   i = 0;
   for (let node of nfa) {

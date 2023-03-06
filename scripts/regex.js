@@ -1,4 +1,5 @@
 import * as util from './util.js';
+import * as util2 from 'util'
 import * as permalink from './permalink.js';
 
 export const OPEN = '(';
@@ -141,19 +142,45 @@ function testKleene() {
 function test(string) {
   string = injectConcatSymbols(string);
   string = convertToPostFix(string);
+  console.log("POST FIX: " + string);
   let NFA = util.thompson(string);
+  
+  //console.log(util2.inspect(NFA, {depth: 4 }));
+  // 
   let graph = util.convertToDrawing(NFA);
   let link = permalink.serialize(graph[0], graph[1]);
   return link
 }
 
+function testValidate() {
+  let string = "a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE;
+  string = injectConcatSymbols(string);
+  string = convertToPostFix(string);
+  console.log("POST FIX: " + string);
+  let NFA = util.thompson(string);
+  
+  let input = ["a", "aa", "ab", "ac", "aba", "abba", "abbbc"];
+  let graph = util.convertToDrawing(NFA);
+  let link = permalink.serialize(graph[0], graph[1]);
+  console.log(link);
+  let startNode = util.getStartNode(NFA);
+  for (let i of input) {
+    console.log("For input " + i + " returned " + util.validateString(NFA, startNode, i));
+  }
+  //console.log(util2.inspect(NFA, {depth: 4 }));
+  // 
+  //let graph = util.convertToDrawing(NFA);
+  //let link = permalink.serialize(graph[0], graph[1]);
+  //return link
+}
+
+
 //console.log(test("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+"b"));
 //console.log(test("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE));
 //console.log(testConcat());
 
-console.log(convertToPostFix(injectConcatSymbols(EMPTY+UNION+"a"+KLEENE+"b")));
-
-
+//console.log(test("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE));
+testValidate();
 //testUnion();
 // console.log(injectConcatSymbols("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+"b"));
 // console.log(injectConcatSymbols("abc"+UNION+"de"));
