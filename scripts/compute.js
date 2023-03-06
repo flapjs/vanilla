@@ -425,13 +425,13 @@ export function run_input(graph, machine_type, input, interactive=false) {
 /** given an NFA, check if it is in fact deterministic */
 export function is_DFA(NFA) {
   let alphabet = new Set();
-  for(const v of Object.values(graph)) {
+  for(const vertex of Object.values(NFA)) {
     for(const e of vertex.out) {
       alphabet.add(e.symbol);
     }
   }
 
-  for(const v of Object.values(graph)) {
+  for(const vertex of Object.values(NFA)) {
     let outgoing = new Set();
     for(const e of vertex.out) {
       outgoing.add(e.symbol);
