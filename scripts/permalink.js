@@ -61,7 +61,7 @@ export function serialize(type, graph) {
       result += to_string_field(edge.transition)              +
                 to_string_field(edge.pop_symbol)              +
                 to_string_field(edge.push_symbol)             +
-                to_string_field(edge.mealy_symbol)            +
+                to_string_field(edge.mealy_output)            +
                 to_string_field(edge.move)                    + consts.FIELD_DELIM;
       result += to_string_field(Math.round(edge.a1*10))       + consts.FIELD_DELIM;
       result += to_string_field(Math.round(edge.a2*10))       + consts.FIELD_DELIM;
@@ -130,13 +130,14 @@ export function deserialize(graph_str) {
     const transition    = composite_str.charAt(0);
     const pop_symbol    = composite_str.charAt(1);
     const push_symbol   = composite_str.charAt(2);
-    const move          = composite_str.charAt(3);
+    const mealy_output  = composite_str.charAt(3);
+    const move          = composite_str.charAt(4);
     const a1            = parseFloat(fields[3])/10.0;
     const a2            = parseFloat(fields[4])/10.0;
     const angle1        = parseFloat(fields[5])/10.0;
     const angle2        = parseFloat(fields[6])/10.0;
     graph[from].out.push(graph_components.make_edge(
-      from, to, transition, a1, a2, angle1, angle2, pop_symbol, push_symbol, move
+      from, to, transition, a1, a2, angle1, angle2, pop_symbol, push_symbol, move, mealy_output
     ));
   }
 
