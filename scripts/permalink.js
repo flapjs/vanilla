@@ -62,6 +62,7 @@ export function serialize(type, graph) {
                 to_string_field(edge.pop_symbol)              +
                 to_string_field(edge.push_symbol)             +
                 to_string_field(edge.mealy_output)            +
+                to_string_field(edge.moore_output)            +
                 to_string_field(edge.move)                    + consts.FIELD_DELIM;
       result += to_string_field(Math.round(edge.a1*10))       + consts.FIELD_DELIM;
       result += to_string_field(Math.round(edge.a2*10))       + consts.FIELD_DELIM;
