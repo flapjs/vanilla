@@ -446,7 +446,7 @@ export function is_DFA(NFA) {
         }
       }
 
-      alert("Missing transitions " + missing_transitions.substring(0, missing_transitions.length - 2) + " for " + v.name);
+      alert("Missing transitions " + missing_transitions.substring(0, missing_transitions.length - 2) + " for " + vertex.name);
       return false;
     }
   }
