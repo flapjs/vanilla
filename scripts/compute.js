@@ -103,12 +103,7 @@ export function mealy_step(graph, cur_state, symbol) {
     }
   }
 
-  if(!next_state || !output) {
-    alert('Invalid Mealy machine!');
-    return;
-  } else {
-    return { next_state, output };
-  }
+  return { next_state, output };
 }
 
 export function moore_step(graph, cur_state, symbol) {
@@ -119,13 +114,8 @@ export function moore_step(graph, cur_state, symbol) {
       next_state = edge.to;
     }
   }
-
-  if(!next_state) {
-    alert('Invalid Mealy machine!');
-    return;
-  } else {
-    return next_state;
-  }
+  
+  return next_state;
 }
 
 /**
@@ -341,6 +331,10 @@ function* run_input_Mealy(graph, input, interactive) {
   let cur_state = find_start(graph);  // find closure of start
   let output_string = '';
 
+  if(!is_DFA(graph, input)) {
+    return;
+  }
+
   if (interactive) {
     drawing.highlight_states(graph, [cur_state]);
     drawing.viz_NFA_input(input, 0);
@@ -368,6 +362,10 @@ function* run_input_Mealy(graph, input, interactive) {
 function* run_input_Moore(graph, input, interactive) {
   let cur_state = find_start(graph);
   let output_string = graph[cur_state].moore_output;
+
+  if(!is_DFA(graph, input)) {
+    return;
+  }
 
   if (interactive) {
     drawing.highlight_states(graph, [cur_state]);
@@ -423,18 +421,22 @@ export function run_input(graph, machine_type, input, interactive=false) {
 }
 
 /** given an NFA, check if it is in fact deterministic */
-export function is_DFA(NFA) {
+export function is_DFA(NFA, input) {
   let alphabet = new Set();
   for(const vertex of Object.values(NFA)) {
     for(const e of vertex.out) {
-      alphabet.add(e.symbol);
+      alphabet.add(e.transition);
     }
+  }
+
+  for(let i = 0; i < input.length; i++) {
+    alphabet.add(input.charAt(i));
   }
 
   for(const vertex of Object.values(NFA)) {
     let outgoing = new Set();
     for(const e of vertex.out) {
-      outgoing.add(e.symbol);
+      outgoing.add(e.transition);
     }
 
     if(outgoing.size < alphabet.size) {
@@ -445,6 +447,8 @@ export function is_DFA(NFA) {
           missing_transitions += alpha_array[i] + ', ';
         }
       }
+
+      console.log(missing_transitions);
 
       alert("Missing transitions " + missing_transitions.substring(0, missing_transitions.length - 2) + " for " + vertex.name);
       return false;
