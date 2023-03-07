@@ -12,8 +12,9 @@ export const EMPTY_SET = '\u2205';
 
 import * as graph_components from './graph_components.js';
 import { create_edge } from './graph_ops.js';
+import * as compute from './compute.js';
 
-
+let nameCount = 0;
 export class Queue {
   constructor() {
     this.arr = [];
@@ -126,9 +127,10 @@ export class RegexNFA {
 // is start: bool
 // is final: bool
 // out: dict, key is transition symbol, value is list of Nodes to connect to
-export function createNode(name, is_start, is_final, out) {
+export function createNode(is_start, is_final, out) {
+  nameCount++;
   return {
-    name: name,
+    name: "q" + nameCount,
     is_start: is_start,
     is_final: is_final,
     out: out
@@ -166,8 +168,8 @@ export function getAcceptNodes(graph) {
 // first: lsit of nodes, graph 1
 // second: list of nodes, graph 2
 export function union(first, second) {
-  let start = createNode('union start', true, false, {} );
-  let accept = createNode('union accept', false, true, {} );
+  let start = createNode(true, false, {} );
+  let accept = createNode( false, true, {} );
   
   let firstStart = getStartNode(first);
   firstStart.is_start = false;
@@ -201,7 +203,8 @@ export function union(first, second) {
 export function concat(first, second) {
   let secondStart = getStartNode(second);
   secondStart.is_start = false;
-  for (let node of getAcceptNodes(first)) {
+  let listOfNodes = getAcceptNodes(first);
+  for (let node of listOfNodes) {
     node.is_final = false;
     addTransition(node, secondStart, EMPTY);
   }
@@ -218,8 +221,8 @@ export function kleene(first) {
   start.is_start = false;
   let acceptNodes = getAcceptNodes(first);
   
-  let newStart = createNode('kleene start', true, false, {});
-  let newAccept = createNode('kleene accept', false, true, {});
+  let newStart = createNode(true, false, {});
+  let newAccept = createNode(false, true, {});
 
   addTransition(newStart, start, EMPTY);
   addTransition(newStart, newAccept, EMPTY);
@@ -235,9 +238,8 @@ export function kleene(first) {
 }
 
 export function createNFA(symbol) {
-  let start = createNode("st " + symbol, true, false, {});
-  let end = createNode("accept" + symbol, false, true, {});
-  
+  let start = createNode(true, false, {});
+  let end = createNode(false, true, {});
   addTransition(start, end, symbol);
   
   return new Array(start, end);
@@ -266,7 +268,7 @@ export function thompson(regex) {
       let NFA = concat(first, second);
       stack.push(NFA);
     }
-    // case 4: kl
+    // case 4: kleene
     else if (char === KLEENE) {
       let first = stack.pop();
 
@@ -275,7 +277,7 @@ export function thompson(regex) {
     }
     // all other cases
     else {
-      //unknown character, error
+      //unknown character, error?
     }
   }
 
@@ -314,6 +316,11 @@ export function validateString(NFA, currentState, string) {
 
   return false;
 }
+
+export function test_input(NFA, input) {
+  return compute.run_input(NFA, input);
+}
+
 // converts a NFA in our format to a graph in other format
 export function convertToDrawing(nfa) {
 
@@ -321,10 +328,17 @@ export function convertToDrawing(nfa) {
 
   let i = 0;
   for (let node of nfa) {
+    //node.name = "q" + i;
     let vertex = graph_components.make_vertex("q" + i, 488, 788, 0, node.is_start, node.is_final, new Array() );
     graph["q"+i] = vertex;
     i++;
   }
+
+  // i = 0;
+  // for (let node of nfa) {
+  //   node.name = i;
+  //   i++;
+  // }
 
   i = 0;
   for (let node of nfa) {

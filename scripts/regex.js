@@ -38,12 +38,25 @@ export function injectConcatSymbols(expressionString)
     return result;
 }
 
+export function getPrecendence(key) {
+  switch (key) {
+    case KLEENE:
+      return 3;
+    case CONCAT:
+      return 2;
+    case UNION:
+      return 1;
+    default:
+      return 0;         
+  }
+}
 export function shunting_yard(string) {
-  let precedence = {
-    KLEENE: 3,
-    CONCAT: 2,
-    UNION: 1
-  };
+  let precedence = {};
+  precedence[KLEENE] = 3;
+  precedence[CONCAT] = 2;
+  precedence[UNION] = 1;
+  
+
   let stack = new util.Stack();
   let queue = new util.Queue();
 
@@ -54,7 +67,8 @@ export function shunting_yard(string) {
     }
     // case if ch is an operator
     else if (ch === UNION || ch === KLEENE || ch === CONCAT) {
-      while (precedence[stack.peek()] > precedence[ch]) {
+      //while (precedence[stack.peek()] > precedence[ch]) {
+      while (getPrecendence(stack.peek()) > getPrecendence(ch)) {
         queue.enqueue(stack.pop());
       }
       stack.push(ch);
@@ -141,11 +155,12 @@ function testKleene() {
 
 function test(string) {
   string = injectConcatSymbols(string);
-  string = convertToPostFix(string);
+  string = shunting_yard(string);
   console.log("POST FIX: " + string);
   let NFA = util.thompson(string);
   
-  //console.log(util2.inspect(NFA, {depth: 4 }));
+  console.log(util2.inspect(NFA, {depth: 6 }) );
+  //console.log(util2.inspect(NFA, ));
   // 
   let graph = util.convertToDrawing(NFA);
   let link = permalink.serialize(graph[0], graph[1]);
@@ -174,13 +189,30 @@ function testValidate() {
   //return link
 }
 
+function test_run_input() {
+  let string = "a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE;
+  string = injectConcatSymbols(string);
+  string = shunting_yard(string);
 
-//console.log(test("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+"b"));
+  let NFA = util.thompson(string);
+  NFA = util.convertToDrawing(NFA);
+
+  console.log(NFA);
+
+  return util.test_input(NFA[1], "abc");
+}
+
+
+console.log(test("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+"b"));
+//console.log(test("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE));
+
 //console.log(test("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE));
 //console.log(testConcat());
 
 //console.log(test("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE));
-testValidate();
+//testValidate();
+//console.log(test_run_input());
+
 //testUnion();
 // console.log(injectConcatSymbols("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+"b"));
 // console.log(injectConcatSymbols("abc"+UNION+"de"));
