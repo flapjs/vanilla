@@ -21,6 +21,7 @@
     <select id="select_machine">
       <option value="NFA">NFA</option>
       <option value="PDA">PDA</option>
+      <option value="CFG">CFG</option>
       <option value="Turing">Turing</option>
     </select>
 
@@ -28,14 +29,14 @@
     
     <button id="save_machine">Save as png</button>
 
-    <button id="permalink">Permalink</button>
+    <button id="permalink">Permalink</button> 
     
     <button onclick=
       "document.getElementById('tutorial-content').hidden = !document.getElementById('tutorial-content').hidden">
       Toggle Tutorial
     </button>
   
-    <div class="machine_input" id="input1">
+    <div class="machine_input" id="input">
       <input type="text">
       <button class="run_btn">run</button>
       <button class="step_btn">step</button>
@@ -57,6 +58,22 @@
 
   <!-- the big canvas that we draw on -->
   <canvas id='machine_drawing'>Your browser does not support canvas</canvas>
+
+  <section hidden id="cfg-content">
+    <div class = "list">
+    Starting symbol: <input type="text" id = "starting_symbol">
+    <ul>
+    </ul>
+    <div>
+    <button id = "create_new_rule"> Create </button>
+    <br>
+    <button id = "delete_rule"> Delete </button>
+    <br>
+    <button id = "submit"> Submit </button>
+    <br>
+    <button id = "test"> Show graph </button>
+    </div>
+  </section>
 
 </body>
 <script src="scripts/index.js" type="module"></script>

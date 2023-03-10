@@ -79,7 +79,7 @@ export function draw_text(text, pos, size, color_map, text_align='center') {
  * @param {boolean} highlighted - if true, fill the circle with color
  * @param {float} thickness - line width
  */
-export function draw_cricle(x, y, r, highlighted=false, thickness=1) {
+export function draw_circle(x, y, r, highlighted=false, thickness=1) {
   const ctx = get_canvas().getContext('2d');
   ctx.beginPath();
   ctx.arc(x, y, r, 0, 2*Math.PI);
@@ -97,7 +97,7 @@ export function draw_cricle(x, y, r, highlighted=false, thickness=1) {
  * @param {Object} vertex - the vertex object in which we want to draw a circle
  */
 export function draw_final_circle(vertex) {
-  draw_cricle(vertex.x, vertex.y, vertex.r*consts.FINAL_CIRCLE_SIZE);
+  draw_circle(vertex.x, vertex.y, vertex.r*consts.FINAL_CIRCLE_SIZE);
 }
 
 /**
@@ -106,7 +106,7 @@ export function draw_final_circle(vertex) {
  */
 export function draw_vertex(vertex) {
   // draw the circle
-  draw_cricle(vertex.x, vertex.y, vertex.r, vertex.highlighted);
+  draw_circle(vertex.x, vertex.y, vertex.r, vertex.highlighted);
   // find an appropriate text size and draw the text inside the vertex
   draw_text(vertex.name, [vertex.x, vertex.y], text_size_huristic(vertex.r, vertex.name));
   if (vertex.is_start) {  // it is the starting vertex
@@ -270,7 +270,7 @@ export function draw_edge(graph, edge, text_size) {
   const [start, end, mid] = compute_edge_geometry(graph, edge);
   draw_arrow(start, end, mid);
   let edge_text = transition;  // vanilla NFA only uses transition
-  if (menus.is_PDA()) {  // append pop and push if we have PDA
+  if (menus.is_PDA() || menus.is_CFG()) {  // append pop and push if we have PDA
     edge_text += ','+pop_symbol+consts.ARROW_SYMBOL+push_symbol;
   } else if (menus.is_Turing()) {  // append push and left/right if we have turing
     edge_text += consts.ARROW_SYMBOL+push_symbol+','+move;

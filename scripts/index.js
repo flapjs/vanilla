@@ -8,9 +8,10 @@ import * as compute from './compute.js';
 import * as graph_ops from './graph_ops.js';
 import * as menus from './menus.js';
 import * as permalink from './permalink.js';
+import * as cfg from './CFG.js';
 
 // if not in browser, don't run
-if (typeof document !== 'undefined') {
+if (typeof document !== 'undefined' || menus.machine_type !== consts.machine_type.CFG) {
   document.addEventListener('DOMContentLoaded', init);
   window.addEventListener('resize', () => drawing.draw(graph));
 }
@@ -214,6 +215,9 @@ function bind_run_input() {
     
     const run_btn = input_divs[i].querySelector('.run_btn');
     run_btn.addEventListener('click', () => {
+      if (menus.machine_type() === consts.MACHINE_TYPES.CFG){
+        graph = cfg.get_graph();
+      }
       computations[i] = compute.run_input(graph, menus.machine_type(), textbox.value);  // noninteractive computation
       const { value, _ } = computations[i].next();  // second value is always true since it is noninteractive
       alert(value);
@@ -342,11 +346,23 @@ function refresh_graph() {
 function bind_switch_machine() {
   const select = document.getElementById('select_machine');
   select.value = consts.DEFAULT_MACHINE;  // set to default machine here too
+  menus.display_UI_for(consts.DEFAULT_MACHINE);
   select.addEventListener('change', e => {
-    hist.set_history_keys(e.target.value);
-    refresh_graph();  // switching graph
-    menus.display_UI_for(e.target.value);
-    history.replaceState(undefined, undefined, '#');  // clear the permalink
+    if(e.target.value == consts.MACHINE_TYPES.CFG){
+      hist.set_history_keys(e.target.value);
+      menus.display_UI_for(e.target.value);
+      drawing.get_canvas().hidden = true;
+      document.getElementById('cfg-content').hidden = false;
+      history.replaceState(undefined, undefined, '#');  // clear the permalink
+      cfg.CFG_switch();
+    }else{
+      document.getElementById('cfg-content').hidden = true;
+      drawing.get_canvas().hidden = false;
+      hist.set_history_keys(e.target.value);
+      refresh_graph();  // switching graph
+      menus.display_UI_for(e.target.value);
+      history.replaceState(undefined, undefined, '#');  // clear the permalink
+    }
   });
 }
 
@@ -381,7 +397,11 @@ function bind_permalink() {
   const permalink_btn = document.getElementById('permalink');
   permalink_btn.addEventListener('click', () => {
     const select = document.getElementById('select_machine');
-    const graph_str = permalink.serialize(select.value, graph);
+    let type = select.value;
+    if (type === consts.MACHINE_TYPES.CFG){
+      type = consts.MACHINE_TYPES.PDA;
+    }
+    const graph_str = permalink.serialize(type, graph);
     history.replaceState(undefined, undefined, '#'+graph_str);
     navigator.clipboard.writeText(window.location.href)
       .then(() => alert('Permalink copied to clipboard!'));

@@ -9,6 +9,7 @@ import { edge_equal } from './graph_components.js';
  * @param {Object} graph - the graph whose alphebet is to be computed
  * @returns {Set<string>} a set of letters used in the transitions
  */
+
 export function compute_alphabet(graph) {
   const alphabet = new Set();
   for (const vertex of Object.values(graph)) {
@@ -238,6 +239,24 @@ function run_input_PDA(graph, input, interactive) {
 
 /**
  * check if the input is accepted
+ * @param {Map<String, String} rules - machine rules
+ * @param {string} input - input string
+ * @param {boolean} interactive - whether to show the computation step by step
+ * @returns {Iterable} a generator that evaluates to true iff the input is accepted by the machine
+ */
+export function run_input_CFG(rules, input, interactive) {
+  let r = rules;
+  for (let [symbol, rule] of rules) {
+    console.log(symbol + " = " + rule);
+  }
+  /*const v = find_start(graph);
+  const remaining_input = input.split('').reverse();
+  return BFS_step(graph, v, remaining_input, interactive);*/
+  return false;
+}
+
+/**
+ * check if the input is accepted
  * @param {Object} graph - machine graph
  * @param {string} input - input string
  * @param {int} allowed_steps - the computation will halt and return false if the step limit is reached
@@ -306,7 +325,7 @@ export function run_input(graph, machine_type, input, interactive=false) {
     return false;
   } else if (machine_type === consts.MACHINE_TYPES.NFA) {
     return run_input_NFA(graph, input, interactive);
-  } else if (machine_type === consts.MACHINE_TYPES.PDA) {
+  } else if (machine_type === consts.MACHINE_TYPES.PDA || machine_type == consts.MACHINE_TYPES.CFG) {
     return run_input_PDA(graph, input, interactive);
   } else if (machine_type === consts.MACHINE_TYPES.Turing) {
     return run_input_Turing(graph, input, interactive);

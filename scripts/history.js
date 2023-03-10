@@ -1,6 +1,7 @@
 /** @module history */
 
 import * as consts from './consts.js';
+import { machine_type } from './menus.js';
 
 // default keys and their pointers
 let hist_key = consts.HIST_KEYS[consts.DEFAULT_MACHINE],
@@ -57,14 +58,20 @@ function remove_ignores(graph) {
 
 /**
  * push the current state of the graph onto history
- * @param {Object} graph - the graph you want to add to history
+ * @param {Object} graph_or_rules - the graph you want to add to history
  * @param {Array<Object>} history - array of graphs, force rewrite
  */
-export function push_history(graph, history = null) {
+export function push_history(graph_or_rules, history = null) {
   if (!history) {
     history = get_history(); 
   }
-  history[++hist_ptr] = remove_ignores(graph);
+  // If machine is cfg
+  if (hist_key === consts.HIST_KEYS.CFG){
+    history[++hist_ptr] = graph_or_rules;
+  }else{
+    //console.log("HERE");
+    history[++hist_ptr] = remove_ignores(graph_or_rules);
+  }
   hist_tip = hist_ptr;  // we just pushed, so that is the new tip
   const hist_str = JSON.stringify(history);
   localStorage.setItem(hist_key, hist_str);

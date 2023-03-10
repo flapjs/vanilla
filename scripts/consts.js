@@ -80,6 +80,7 @@ export const ARROW_SYMBOL = '→';
 export const MACHINE_TYPES = {
   NFA: 'NFA',
   PDA: 'PDA',
+  CFG: 'CFG',
   Turing: 'Turing'
 };
 
@@ -90,6 +91,7 @@ export const DEFAULT_MACHINE = MACHINE_TYPES.NFA;
 export const HIST_KEYS = {
   NFA: '%nfa_history',
   PDA: '%PDA_history',
+  CFG: '%CFG_history',
   Turing: '%turing_history'
 };
 
@@ -97,6 +99,7 @@ export const HIST_KEYS = {
 export const HIST_TIP_KEYS = {
   NFA: '%nfa_hist_tip',
   PDA: '%PDA_hist_tip',
+  CFG: '%CFG_hist_tip',
   Turing: '%turing_hist_tip'
 };
 
@@ -104,6 +107,7 @@ export const HIST_TIP_KEYS = {
 export const HIST_PTR_KEYS = {
   NFA: '%nfa_hist_ptr',
   PDA: '%PDA_hist_ptr',
+  CFG: '%CFG_hist_ptr',
   Turing: '%turing_hist_ptr'
 };
 

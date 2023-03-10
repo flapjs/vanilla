@@ -28,6 +28,14 @@ export function is_PDA() {
  * reports the type of machine the user is working on
  * @returns {boolean} true or false 
  */
+export function is_CFG() {
+  return machine_type() === consts.MACHINE_TYPES.CFG;
+}
+
+/**
+ * reports the type of machine the user is working on
+ * @returns {boolean} true or false 
+ */
 export function is_Turing() {
   return machine_type() === consts.MACHINE_TYPES.Turing;
 }
@@ -106,7 +114,7 @@ export function display_edge_menu(graph, edge, x, y) {
   left_right_choice.className = 'L_R_toggle';
   left_right_choice.checked = edge.move === consts.LEFT;
   rename_div.appendChild(transition);
-  if (is_PDA()) {
+  if (is_PDA() || is_CFG()) {
     rename_div.appendChild(pop);
     rename_div.appendChild(push);
   } else if (is_Turing()) {
