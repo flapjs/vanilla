@@ -1,6 +1,9 @@
 import * as util from './util.js';
 import * as permalink from './permalink.js';
 import * as consts from './consts.js';
+import * as graph_components from './graph_components.js';
+
+let nameCount = 0;
 
 /**
  * inserts omitted concatenation symbols in regular expression
@@ -277,7 +280,7 @@ export function createNFA(symbol) {
  * @returns the regular expression's corresponding NFA
  */
 export function thompson(regex) {
-  let stack = new Stack();
+  let stack = new util.Stack();
   for (let char of regex) {
     // case 1: character
     if (char.match(/[a-z]/i) || char === consts.EMPTY) {
@@ -337,7 +340,7 @@ export function convertToDrawing(nfa) {
     for (let symbol in node.out) {
       for (let neighbor of node.out[symbol]) {
         let neighborIndex = nfa.indexOf(neighbor);
-        let edge = graph_components.make_edge_temp("q"+i, "q"+neighborIndex, symbol, 0, 0, 0, 0, consts.EMPTY, consts.EMPTY, consts.EMPTY);
+        let edge = graph_components.make_edge("q"+i, "q"+neighborIndex, symbol, 0, 0, 0, 0, consts.EMPTY, consts.EMPTY, consts.EMPTY);
         vertex.out.push(edge);
       }
     }
@@ -386,12 +389,12 @@ function test(string) {
   string = injectConcatSymbols(string);
   string = shunting_yard(string);
   console.log("POST FIX: " + string);
-  let NFA = util.thompson(string);
+  let NFA = thompson(string);
   
   //console.log(util2.inspect(NFA, {depth: 6 }) );
   //console.log(util2.inspect(NFA, ));
 
-  let graph = util.convertToDrawing(NFA);
+  let graph = convertToDrawing(NFA);
   let link = permalink.serialize(graph[0], graph[1]);
   return link
 }
