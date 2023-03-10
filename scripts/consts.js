@@ -143,3 +143,30 @@ export const VERTEX_DELIM = ';';
 
 /** @constant {string} EDGE_DELIM - delimiter for edges in a permalink  */
 export const EDGE_DELIM = '~';
+
+/** @constant {string} OPEN - opening parentheses for regular expressions */
+export const OPEN = '(';
+
+/** @constant {string} CLOSE - closing parentheses for regular expressions */
+export const CLOSE = ')';
+
+/** @constant {string} UNION - union of sets for regular expressions */
+export const UNION = '\u222A';
+
+/** @constant {string} CONCAT - concatenation of symbols for regular expressions */
+export const CONCAT = '\u25E6';
+
+/** @constant {string} KLEENE - kleene star for regular expressions */
+export const KLEENE = '*';
+
+/** @constant {string} PLUS - plus symbol (one or more) for regular expressions */
+export const PLUS = '\u207A';
+
+/** @constant {string} EMPTY - epsilon symbol for regular expressions */
+export const EMPTY = '\u03B5';
+
+/** @constant {string} SIGMA - alphabet symbol for regular expressions */
+export const SIGMA = '\u03A3';
+
+/** @constant {string} EMPTY_SET - empty set symbol for regular expressions */
+export const EMPTY_SET = '\u2205';

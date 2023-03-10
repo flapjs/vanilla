@@ -69,26 +69,6 @@ export function make_edge(from, to, transition, a1, a2, angle1, angle2, pop_symb
   };
 }
 
-export function make_edge_temp(from, to, transition, a1, a2, angle1, angle2, pop_symbol, push_symbol, move) {
-  if (from === to && (angle1 === undefined || angle2 === undefined)) {
-    angle1 = 0, angle2 = Math.PI/2, a1 = 0.5, a2 = 1;
-  } else if (a1 === undefined || a2 === undefined) {
-    a1 = 0.5, a2 = 0;
-  }  // making sure edges are properly drawn
-  return {
-    from: from,
-    to: to,
-    transition: transition,
-    a1: a1,
-    a2: a2,
-    angle1: angle1,
-    angle2: angle2,
-    pop_symbol: pop_symbol,
-    push_symbol: push_symbol,
-    move: move
-  };
-}
-
 /**
  * check if the two edges are equal up to graphical representation
  * @param {Object} e1 - edge 1
