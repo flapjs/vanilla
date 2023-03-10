@@ -159,7 +159,7 @@ function test(string) {
   console.log("POST FIX: " + string);
   let NFA = util.thompson(string);
   
-  console.log(util2.inspect(NFA, {depth: 6 }) );
+  //console.log(util2.inspect(NFA, {depth: 6 }) );
   //console.log(util2.inspect(NFA, ));
   // 
   let graph = util.convertToDrawing(NFA);
@@ -203,7 +203,7 @@ function test_run_input() {
 }
 
 
-console.log(test("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+"b"));
+//console.log(test("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+"b"));
 //console.log(test("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE));
 
 //console.log(test("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE));
@@ -219,11 +219,28 @@ console.log(test("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+"b"));
 
 //console.log(this.convertToPostFix("a"+CONCAT+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+CONCAT+"b"));
 
-// plus is union, ? is concat
+function demo() {
+  /**
+   * process:
+   * 1. inject concatenation symbols into input 
+   * 2. use Shunting-Yard algorithm to convert input to postfix notation
+   * 3. build the corresponding NFA using Thompson's NFA algorithm
+   * 
+   * From here, we have the corresponding NFA of the given regular expression, so:
+   * We can test if a given string is in the language of the NFA
+   * We can visualize the NFA as a drawing on the webpage
+   * 
+   * problems:
+   * Our implementation of Thompson's NFA algorithm doesn't always generate the simplest NFA
+   *    often has many extra epsilon transitions
+   * When we draw the graph on the webpage, all the elements are stacked together
+   *    this is another feature to be added in the future: auto graph layouts
+   * Our implementation currently utilizes a wrapper class, which causes some duplicate code
+   *    also introduces the issue of converting between our NFA class and the graph object used
+   *    by the rest of the code base
+   */
 
+  console.log(test("a"+OPEN+"a"+UNION+"b"+CLOSE+KLEENE+"b"));
+}
 
-// convert regex to postfix notation using shunting yard algorithm
-// convert to nfa using thompson's construction algorithm for NFAs
-
-// since we already have code for building NFAs, we can use that
-// also already have a string testing feature for NFAs, can use that to test the regular expression
+demo();
