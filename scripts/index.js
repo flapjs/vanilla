@@ -342,6 +342,14 @@ function refresh_graph() {
   drawing.draw(graph);
 }
 
+/** get the newest rules from history and fill the textbox */
+function reload_rules() {
+  let rules = hist.retrieve_latest_graph();
+  console.log("Reload rules: ");
+  console.log(rules);
+  cfg.reload(rules);
+}
+
 /** handle switching machine type event */
 function bind_switch_machine() {
   const select = document.getElementById('select_machine');
@@ -350,6 +358,7 @@ function bind_switch_machine() {
   select.addEventListener('change', e => {
     if(e.target.value == consts.MACHINE_TYPES.CFG){
       hist.set_history_keys(e.target.value);
+      reload_rules();  // switching graph
       menus.display_UI_for(e.target.value);
       drawing.get_canvas().hidden = true;
       document.getElementById('cfg-content').hidden = false;

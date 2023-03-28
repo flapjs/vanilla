@@ -239,24 +239,6 @@ function run_input_PDA(graph, input, interactive) {
 
 /**
  * check if the input is accepted
- * @param {Map<String, String} rules - machine rules
- * @param {string} input - input string
- * @param {boolean} interactive - whether to show the computation step by step
- * @returns {Iterable} a generator that evaluates to true iff the input is accepted by the machine
- */
-export function run_input_CFG(rules, input, interactive) {
-  let r = rules;
-  for (let [symbol, rule] of rules) {
-    console.log(symbol + " = " + rule);
-  }
-  /*const v = find_start(graph);
-  const remaining_input = input.split('').reverse();
-  return BFS_step(graph, v, remaining_input, interactive);*/
-  return false;
-}
-
-/**
- * check if the input is accepted
  * @param {Object} graph - machine graph
  * @param {string} input - input string
  * @param {int} allowed_steps - the computation will halt and return false if the step limit is reached

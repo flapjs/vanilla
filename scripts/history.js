@@ -1,6 +1,7 @@
 /** @module history */
 
 import * as consts from './consts.js';
+import * as cfg from './CFG.js';
 import { machine_type } from './menus.js';
 
 // default keys and their pointers
@@ -67,7 +68,7 @@ export function push_history(graph_or_rules, history = null) {
   }
   // If machine is cfg
   if (hist_key === consts.HIST_KEYS.CFG){
-    history[++hist_ptr] = graph_or_rules;
+    history[++hist_ptr] = cfg.get_graph();
   }else{
     //console.log("HERE");
     history[++hist_ptr] = remove_ignores(graph_or_rules);
