@@ -22,7 +22,7 @@ function char_url_compliance(c) {
 
 /**
  * turn a field into a string
- * @param {string | float} field 
+ * @param {string | float} field
  * @returns {string} the string repr of the field
  */
 function to_string_field(field) {
@@ -38,7 +38,7 @@ function to_string_field(field) {
  */
 export function serialize(type, graph) {
   let result = type;
-  
+
   for (const vertex of Object.values(graph)) {
     result += to_string_field(vertex.name)          + consts.FIELD_DELIM;
     result += to_string_field(Math.round(vertex.y)) + consts.FIELD_DELIM;
@@ -112,9 +112,9 @@ export function deserialize(graph_str) {
     const y             = parseFloat(fields[1]);
     const x             = parseFloat(fields[2]);
     const r             = parseFloat(fields[3]);
-    const output        = parseFloat(fields[4]);
+    const moore_output  = parseFloat(fields[4]);
     const composite_bit = parseInt(fields[5]);
-    graph[name] = graph_components.make_vertex(name, x, y, r, composite_bit&1, composite_bit&2, undefined, output);
+    graph[name] = graph_components.make_vertex(name, x, y, r, composite_bit&1, composite_bit&2, [], moore_output);
     vertex_id_to_name.push(name);  // construct the mapping from id to name
   }
 
