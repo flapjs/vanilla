@@ -35,6 +35,8 @@ export function make_vertex(name, x, y, r, is_start, is_final, out) {
 export function get_empty_symbol() {
   if (is_Turing()) {
     return consts.EMPTY_TAPE;
+  } else if(is_Moore() || is_Mealy()) {
+    return consts.DEFAULT_MOORE_MEALY_TRANSITION;
   } else {
     return consts.EMPTY_SYMBOL;
   }

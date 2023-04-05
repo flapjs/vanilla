@@ -73,11 +73,14 @@ export const EMPTY_SYMBOL = 'ε';
 /** @constant {string} EMPTY_TYPE - symbol for an empty cell of a Turing Machine */
 export const EMPTY_TAPE = '☐';
 
-/** @constant {string} DEFAULT_MOORE_OUTPUT - prepoluate moore output with this */
+/** @constant {string} DEFAULT_MOORE_OUTPUT - prepopulate moore output with this */
 export const DEFAULT_MOORE_OUTPUT = '0';
 
-/** @constant {string} DEFAULT_MEALY_OUTPUT - prepoluate mealy output with this */
+/** @constant {string} DEFAULT_MEALY_OUTPUT - prepopulate mealy output with this */
 export const DEFAULT_MEALY_OUTPUT = '0';
+
+/** @constant {string} DEFAULT_MOORE_MEALY_TRANSITION - prepopulate transitions for Moore / Mealy machines with this */
+export const DEFAULT_MOORE_MEALY_TRANSITION = '0';
 
 /** @constant {string} ARROW_SYMBOL - arrow symbol */
 export const ARROW_SYMBOL = '→';
