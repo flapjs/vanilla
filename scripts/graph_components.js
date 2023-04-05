@@ -14,7 +14,7 @@ import { is_Mealy, is_Moore, is_Turing } from './menus.js';
  * @param {Array<Object>} out - neighbors, more specifically array of edges to neighbors
  * @returns {Object} the vertex as a json object
  */
-export function make_vertex(name, x, y, r, is_start, is_final, moore_output, out) {
+export function make_vertex(name, x, y, r, is_start, is_final, out, moore_output) {
   return {
     name: name,
     x: x,
