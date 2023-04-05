@@ -44,6 +44,7 @@ export function serialize(type, graph) {
     result += to_string_field(Math.round(vertex.y)) + consts.FIELD_DELIM;
     result += to_string_field(Math.round(vertex.x)) + consts.FIELD_DELIM;
     result += to_string_field(Math.round(vertex.r)) + consts.FIELD_DELIM;
+    result += to_string_field(vertex.moore_output)  + consts.FIELD_DELIM;
     const composite_bit = (vertex.is_start ? 1 : 0) + (vertex.is_final ? 2 : 0);
     result += to_string_field(composite_bit)        + consts.VERTEX_DELIM;
   }
@@ -57,12 +58,10 @@ export function serialize(type, graph) {
     for (const edge of vertex.out) {
       result += to_string_field(vertex_name_to_id[edge.from]) + consts.FIELD_DELIM;
       result += to_string_field(vertex_name_to_id[edge.to])   + consts.FIELD_DELIM;
-      result += to_string_field(vertex.moore_output)          + consts.FIELD_DELIM;
       result += to_string_field(edge.transition)              +
                 to_string_field(edge.pop_symbol)              +
                 to_string_field(edge.push_symbol)             +
                 to_string_field(edge.mealy_output)            +
-                to_string_field(edge.moore_output)            +
                 to_string_field(edge.move)                    + consts.FIELD_DELIM;
       result += to_string_field(Math.round(edge.a1*10))       + consts.FIELD_DELIM;
       result += to_string_field(Math.round(edge.a2*10))       + consts.FIELD_DELIM;
@@ -113,8 +112,9 @@ export function deserialize(graph_str) {
     const y             = parseFloat(fields[1]);
     const x             = parseFloat(fields[2]);
     const r             = parseFloat(fields[3]);
-    const composite_bit = parseInt(fields[4]);
-    graph[name] = graph_components.make_vertex(name, x, y, r, composite_bit&1, composite_bit&2);
+    const output        = parseFloat(fields[4]);
+    const composite_bit = parseInt(fields[5]);
+    graph[name] = graph_components.make_vertex(name, x, y, r, composite_bit&1, composite_bit&2, output);
     vertex_id_to_name.push(name);  // construct the mapping from id to name
   }
 

@@ -14,7 +14,7 @@ import { is_Mealy, is_Moore, is_Turing } from './menus.js';
  * @param {Array<Object>} out - neighbors, more specifically array of edges to neighbors
  * @returns {Object} the vertex as a json object
  */
-export function make_vertex(name, x, y, r, is_start, is_final, out) {
+export function make_vertex(name, x, y, r, is_start, is_final, moore_output, out) {
   return {
     name: name,
     x: x,
@@ -22,7 +22,7 @@ export function make_vertex(name, x, y, r, is_start, is_final, out) {
     r: r ? r : consts.DEFAULT_VERTEX_RADIUS,
     is_start: is_start ? is_start : false,
     is_final: is_final ? is_final : false,
-    moore_output: consts.DEFAULT_MOORE_OUTPUT,
+    moore_output: moore_output ? moore_output : consts.DEFAULT_MOORE_OUTPUT,
     out: out ? out : [],
     highlighted: false  // a vertex is lit up during running the machine if it is in the current state
   };
