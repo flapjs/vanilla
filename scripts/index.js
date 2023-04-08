@@ -11,7 +11,7 @@ import * as permalink from './permalink.js';
 import * as cfg from './CFG.js';
 
 // if not in browser, don't run
-if (typeof document !== 'undefined' || menus.machine_type !== consts.machine_type.CFG) {
+if (typeof document !== 'undefined') {
   document.addEventListener('DOMContentLoaded', init);
   window.addEventListener('resize', () => drawing.draw(graph));
 }
@@ -345,8 +345,6 @@ function refresh_graph() {
 /** get the newest rules from history and fill the textbox */
 function reload_rules() {
   let rules = hist.retrieve_latest_graph();
-  console.log("Reload rules: ");
-  console.log(rules);
   cfg.reload(rules);
 }
 

@@ -68,9 +68,8 @@ export function push_history(graph_or_rules, history = null) {
   }
   // If machine is cfg
   if (hist_key === consts.HIST_KEYS.CFG){
-    history[++hist_ptr] = cfg.get_graph();
+    history[++hist_ptr] = graph_or_rules;
   }else{
-    //console.log("HERE");
     history[++hist_ptr] = remove_ignores(graph_or_rules);
   }
   hist_tip = hist_ptr;  // we just pushed, so that is the new tip
