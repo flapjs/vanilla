@@ -147,3 +147,9 @@ export const VERTEX_DELIM = ';';
 
 /** @constant {string} EDGE_DELIM - delimiter for edges in a permalink  */
 export const EDGE_DELIM = '~';
+
+/** @constant {int} CFG_EDGE_X_DISTANCE - horizontal distance between nodes in the PDA created from a CFG*/
+export const CFG_EDGE_X_DISTANCE = 300;
+
+/** @constant {int} CFG_EDGE_Y_DISTANCE - vertical distance between nodes in the PDA created from a CFG*/
+export const CFG_EDGE_Y_DISTANCE = 200;

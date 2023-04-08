@@ -69,13 +69,13 @@ export function CFG_switch(){
 //Initializer for an empty graph
 function make_start_and_final_edges(){
   graph = consts.EMPTY_GRAPH;
-  graph["final"] = graph_components.make_vertex("final", 650, 50, consts.DEFAULT_VERTEX_RADIUS, false, true);
-  graph["loop"] = graph_components.make_vertex("loop", 450, 50, consts.DEFAULT_VERTEX_RADIUS, false, false, 
+  graph["final"] = graph_components.make_vertex("final", 3*consts.CFG_EDGE_X_DISTANCE + 50, 0, consts.DEFAULT_VERTEX_RADIUS, false, true);
+  graph["loop"] = graph_components.make_vertex("loop", 2*consts.CFG_EDGE_X_DISTANCE + 50, 0, consts.DEFAULT_VERTEX_RADIUS, false, false, 
                   [graph_components.make_edge("loop", "final", undefined, undefined, undefined, undefined,
                   undefined, "$", undefined, undefined)]);
 
-  graph["push$"] = graph_components.make_vertex("push$", 250, 50, consts.DEFAULT_VERTEX_RADIUS, false, false);
-  graph["start"] = graph_components.make_vertex("start", 50, 50, consts.DEFAULT_VERTEX_RADIUS, true, false, 
+  graph["push$"] = graph_components.make_vertex("push$", consts.CFG_EDGE_X_DISTANCE + 50, 0, consts.DEFAULT_VERTEX_RADIUS, false, false);
+  graph["start"] = graph_components.make_vertex("start", 50, 0, consts.DEFAULT_VERTEX_RADIUS, true, false, 
                   [graph_components.make_edge("start", "push$", undefined, undefined, undefined, undefined,
                   undefined, undefined, "$")]);
 }
@@ -170,14 +170,14 @@ function create_edges(terminal_symbols){
         // char, and at the end make an edge back to loop vertex.
 
         // Last edge back to loop/First letter
-        graph["q" + index] = graph_components.make_vertex("q" + index, 250 + str.length*300, 200 + row*200, consts.DEFAULT_VERTEX_RADIUS, false, false, 
+        graph["q" + index] = graph_components.make_vertex("q" + index, 2*consts.CFG_EDGE_X_DISTANCE + str.length*consts.CFG_EDGE_X_DISTANCE, consts.CFG_EDGE_Y_DISTANCE + row*consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false, 
                               [graph_components.make_edge("q" + index, "empty", undefined, undefined, undefined, undefined,
                               undefined, undefined, str[0])]);
         index--;
 
         // Create edges and vertexes until the second character in the string
         for(let i = 1; i < str.length; i++){
-          graph["q" + index] = graph_components.make_vertex("q" + index,  250 + 300*(str.length - i), 200 + row*200, consts.DEFAULT_VERTEX_RADIUS, false, false, 
+          graph["q" + index] = graph_components.make_vertex("q" + index,  2*consts.CFG_EDGE_X_DISTANCE + consts.CFG_EDGE_Y_DISTANCE*(str.length - i), consts.CFG_EDGE_Y_DISTANCE + row*consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false, 
                               [graph_components.make_edge("q" + index, "q" + (index + 1), undefined, undefined, undefined, undefined,
                               undefined, undefined, str[i])]);
           if(!alphabet.has(str[i]) && !terminal_symbols.has(str[i])){ // Differentiate between terminal symbols and alphabet
@@ -203,7 +203,7 @@ function create_edges(terminal_symbols){
                                 -1 - cnt, -2.8, -1.1, l));
     cnt++;
   }
-  graph["empty"] = graph_components.make_vertex("empty", 800 + longest*300, row/2 *300, consts.DEFAULT_VERTEX_RADIUS, false, false,
+  graph["empty"] = graph_components.make_vertex("empty", (longest + 3)*consts.CFG_EDGE_X_DISTANCE, row/2 *consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false,
                                                 [graph_components.make_edge("empty", "loop", undefined, 0.5, 8.55)]);
 }
 
