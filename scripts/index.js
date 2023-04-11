@@ -215,8 +215,9 @@ function bind_run_input() {
     const run_btn = input_divs[i].querySelector('.run_btn');
     run_btn.addEventListener('click', () => {
       computations[i] = compute.run_input(graph, menus.machine_type(), textbox.value);  // noninteractive computation
-      const { value, _ } = computations[i].next();  // second value is always true since it is noninteractive
-      alert(value);
+      // eslint-disable-next-line no-unused-vars
+      const { value: accepted, _ } = computations[i].next();  // second value is always true since it is noninteractive
+      alert(accepted ? 'Accepted' : 'Rejected');
       computations[i] = undefined;
     });
     
@@ -225,10 +226,10 @@ function bind_run_input() {
       if (!computations[i]) {
         computations[i] = compute.run_input(graph, menus.machine_type(), textbox.value, true);  // true for interactive
       }
-      const { value, done } = computations[i].next();
+      const { value: accepted, done } = computations[i].next();
       if (done) {
         // whether true or false. We wrap this in timeout to execute after the vertex coloring is done
-        setTimeout(() => alert(value));
+        setTimeout(() => alert(accepted ? 'Accepted' : 'Rejected'));
         computations[i] = undefined;
       }
     });

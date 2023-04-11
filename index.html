@@ -19,9 +19,9 @@
   <section class="topnav">
 
     <select id="select_machine">
-      <option value="NFA">NFA</option>
-      <option value="PDA">PDA</option>
-      <option value="Turing">Turing</option>
+      <option value="NFA">Finite Automata</option>
+      <option value="PDA">Pushdown Automata</option>
+      <option value="Turing">Turing Machine</option>
     </select>
 
     <button class="NFA_specific" id="NFA_2_DFA">NFA to DFA</button>
@@ -46,13 +46,15 @@
 
   <!-- user guide content -->
   <section hidden id="tutorial-content">
-    <div>double click to create vertices, additional double clicks to toggle final</div>
-    <div>right click on vertices (or ctrl) drag to create edges</div>
-    <div>right click on vertices or edge texts to inspect</div>
-    <div>left click drag on vertices or edge texts to drag</div>
-    <div>left click drag on empty space to pan, use scroll wheel to zoom</div>
-    <div>ctrl+z to undo, ctrl+shift+z to redo</div>
-    <div>dd to delete</li>
+    <a href="https://github.com/flapjs/vanilla/blob/master/usage.md">
+      <div>double click to create vertices, additional double clicks to toggle final</div>
+      <div>right click on vertices (or ctrl) drag to create edges</div>
+      <div>right click on vertices or edge texts to inspect</div>
+      <div>left click drag on vertices or edge texts to drag</div>
+      <div>left click drag on empty space to pan, use scroll wheel to zoom</div>
+      <div>ctrl+z to undo, ctrl+shift+z to redo</div>
+      <div>dd to delete</div>
+    </a>
   </section>
 
   <!-- the big canvas that we draw on -->
