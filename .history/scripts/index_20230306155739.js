@@ -216,7 +216,7 @@ function bind_run_input() {
     run_btn.addEventListener('click', () => {
       computations[i] = compute.run_input(graph, menus.machine_type(), textbox.value);  // noninteractive computation
       const { value, _ } = computations[i].next();  // second value is always true since it is noninteractive
-      if(value != undefined) {
+      if(value) {
         alert(value);
       }
       computations[i] = undefined;
@@ -231,7 +231,7 @@ function bind_run_input() {
       if (done) {
         // whether true or false. We wrap this in timeout to execute after the vertex coloring is done
         setTimeout(() => {
-          if(value != undefined) {
+          if(value) {
             alert(value);
           }
         });

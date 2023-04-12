@@ -12,6 +12,7 @@ import { is_Mealy, is_Moore, is_Turing } from './menus.js';
  * @param {boolean} is_start - is the vertex a start state?
  * @param {boolean} is_final - is the vertex an accept state?
  * @param {Array<Object>} out - neighbors, more specifically array of edges to neighbors
+ * @param {string} moore_output - the output associated with the vertex (for Moore machines)
  * @returns {Object} the vertex as a json object
  */
 export function make_vertex(name, x, y, r, is_start, is_final, out, moore_output) {
