@@ -1,9 +1,9 @@
+/** @module regex */
+
 import * as util from './util.js';
 import * as permalink from './permalink.js';
 import * as consts from './consts.js';
 import * as graph_components from './graph_components.js';
-
-let nameCount = 0;
 
 /**
  * inserts omitted concatenation symbols in regular expression
@@ -99,339 +99,200 @@ export function shunting_yard(string) {
   return result;
 }
 
-export class RegexNFA {
-  // Member Variables
-  // start: Node to start at
-  // acceptNodes: List of nodes that are accept state nodes.
-  constructor(startNode, acceptNodes) {
-    this.start = startNode;
-    this.acceptNodes = acceptNodes;
-  }
+// union and concat dont work, if i'm changing names, need to change names of outgoing edges too
+export function union(graph1, graph2) {
+  let graph = consts.EMPTY_GRAPH;
+  graph["q0"] = graph_components.make_vertex("q0", 300, 300, consts.DEFAULT_VERTEX_RADIUS, true, false, []);
 
-  get startNode() {
-    return this.start;
-  }
+  let graph1start, graph2start = "";
 
-  get acceptNodes() {
-    return this.acceptNodes;
-  }
-}
+  // rename all nodes in graph1
+  for (let node of Object.keys(graph1)) {
+    const new_name = node + ",1";
+    graph1[new_name] = graph1[node];
+    graph1[new_name].name = new_name;
+    delete graph1[node];
 
-/**
- * creates a new vertex in the graph
- * @param {boolean} is_start - true if this vertex is the start state
- * @param {boolean} is_start - true if this vertex is an end state
- * @param {Object} out - dict where key is transition symbol, value is list of connected vertices
- * @returns {Object} the object representing the vertex
- */
-export function createNode(is_start, is_final, out) {
-  nameCount++;
-  return {
-    name: "q" + nameCount,
-    is_start: is_start,
-    is_final: is_final,
-    out: out
-  };
-}
-
-/**
- * creates a new edge from node1 to node2
- * @param {boolean} node1 - start vertex
- * @param {boolean} node2 - end vertex
- * @param {Object} symbol - transition symbol
- */
-export function addTransition(node1, node2, symbol) {
-  if (!(symbol in node1.out)) {
-    node1.out[symbol] = new Array(node2);
-  }
-  else {
-    node1.out[String(symbol)].push(node2);
-  }
-}
-
-/**
- * Gets the start node from a graph
- * @param {Object} graph - list of vertices representing a graph
- * @returns the start node
- */
-export function getStartNode(graph) {
-  for (let node of graph) {
-    if (node.is_start) return node;
-  }
-}
-
-/**
- * Returns an array of accept nodes
- * @param {Object} graph - list of vertices representing a graph
- * @returns an Array of accept nodes
- */
-export function getAcceptNodes(graph) {
-  let result = new Array();
-  for (let node of graph) {
-    if (node.is_final) result.push(node);
-  }
-  return result;
-}
-
-/**
- * Applies the union operator on two graphs
- * @param {Object} first - the first graph
- * @param {Object} second - the second graph
- * @returns a new graph where it is a union of the two inputted graphs
- */
-export function union(first, second) {
-  let start = createNode(true, false, {} );
-  let accept = createNode( false, true, {} );
-  
-  let firstStart = getStartNode(first);
-  firstStart.is_start = false;
-  addTransition(start, firstStart, consts.EMPTY);
-  
-  let secondStart = getStartNode(second);
-  secondStart.is_start = false;
-  addTransition(start, secondStart, consts.EMPTY);
-
-  for (let node of getAcceptNodes(first)) {
-    node.is_final = false;
-    addTransition(node, accept, consts.EMPTY);
-  }
-
-  for (let node of getAcceptNodes(second)) {
-    node.is_final = false;
-    addTransition(node, accept, consts.EMPTY);
-  }
-
-  for (let node of second) {
-    first.push(node);
-  }
-
-  first.push(start);
-  first.push(accept);
-
-  return first;
-  
-}
-
-/**
- * Performs the concatenation operation on two graphs
- * @param {Object} first - the first graph
- * @param {Object} second - the second graph
- * @returns a new graph after performing the concatenation operation
- */
-export function concat(first, second) {
-  let secondStart = getStartNode(second);
-  secondStart.is_start = false;
-  let listOfNodes = getAcceptNodes(first);
-  for (let node of listOfNodes) {
-    node.is_final = false;
-    addTransition(node, secondStart, consts.EMPTY);
-  }
-
-  for (let node of second) {
-    first.push(node);
-  }
-
-  return first;
-}
-
-/**
- * performs the kleene star operation on a graph
- * @param {Object} first - the graph
- * @returns a new graph with the kleene star operation applied
- */
-export function kleene(first) {
-  let start = getStartNode(first);
-  start.is_start = false;
-  let acceptNodes = getAcceptNodes(first);
-  
-  let newStart = createNode(true, false, {});
-  let newAccept = createNode(false, true, {});
-
-  addTransition(newStart, start, consts.EMPTY);
-  addTransition(newStart, newAccept, consts.EMPTY);
-  for (let node of acceptNodes) {
-    node.is_final = false;
-    addTransition(node, start, consts.EMPTY);
-    addTransition(node, newAccept, consts.EMPTY);
-  }
-
-  first.push(newStart);
-  first.push(newAccept);
-  return first;
-}
-
-/**
- * takes a symbol and converts it into an NFA - used to build intermediate NFAs
- * in Thompson's NFA algorithm
- * @param {string} symbol transition symbol
- * @returns a new NFA created from a single character
- */
-export function createNFA(symbol) {
-  let start = createNode(true, false, {});
-  let end = createNode(false, true, {});
-  addTransition(start, end, symbol);
-  
-  return new Array(start, end);
-}
-
-/**
- * Converts a regular expression in postfix notation into an NFA
- * @param {string} regex - the regular expression in postfix notation
- * @returns the regular expression's corresponding NFA
- */
-export function thompson(regex) {
-  let stack = new util.Stack();
-  for (let char of regex) {
-    // case 1: character
-    if (char.match(/[a-z]/i) || char === consts.EMPTY) {
-      let NFA = createNFA(char);
-      stack.push(NFA);
-    }
-    // case 2: union
-    else if (char === consts.UNION) {
-      let second = stack.pop();
-      let first = stack.pop();
-      let NFA = union(first, second);
-      stack.push(NFA);
-    }
-    // case 3: concat
-    else if (char === consts.CONCAT) {
-      let second = stack.pop();
-      let first = stack.pop();
-      let NFA = concat(first, second);
-      stack.push(NFA);
-    }
-    // case 4: kleene
-    else if (char === consts.KLEENE) {
-      let first = stack.pop();
-
-      let NFA = kleene(first);
-      stack.push(NFA);
-    }
-    // all other cases
-    else {
-      //unknown character, error?
-    }
-  }
-
-  return stack.pop();
-}
-
-/**
- * Converts the wrapper class NFA into the object representation used by the 
- * rest of the codebase
- * @param {Array} nfa Array of node objects representing an NFA
- * @returns the object representation of the NFA
- */
-export function convertToDrawing(nfa) {
-  let graph = {};
-
-  let i = 0;
-  for (let node of nfa) {
-    //node.name = "q" + i;
-    let vertex = graph_components.make_vertex("q" + i, 488, 788, 0, node.is_start, node.is_final, new Array() );
-    graph["q"+i] = vertex;
-    i++;
-  }
-
-  i = 0;
-  for (let node of nfa) {
-    let vertex = graph["q"+i];
-    for (let symbol in node.out) {
-      for (let neighbor of node.out[symbol]) {
-        let neighborIndex = nfa.indexOf(neighbor);
-        let edge = graph_components.make_edge("q"+i, "q"+neighborIndex, symbol, 0, 0, 0, 0, consts.EMPTY, consts.EMPTY, consts.EMPTY);
-        vertex.out.push(edge);
+    // rename edges
+    for (const inner of Object.values(graph1)) {
+      for (const edge of inner.out) {
+        if (edge.from === node) {
+          edge.from = new_name;
+        }
+        if (edge.to === node) {
+          edge.to = new_name;
+        }
       }
     }
-    i++;
-  }
 
-  return ['NFA', graph];
-}
-
-// Given an NFA (List of Nodes), currentState Node, and String where current input is at index 0
-export function validateString(NFA, currentState, string) {
-  // if empty string, check if current state is final and check all epsilon transitions
-  if (string.length == 0) {
-    if (currentState.is_final) return true;
-    if (!currentState.out.hasOwnProperty(consts.EMPTY) ) return false;
-    for (let neighbor of currentState.out[consts.EMPTY]) {
-      if (validateString(NFA, neighbor, string ) ) return true;
-    }
-    return false;
-  }
-  // input
-  let symbol = string.charAt(0);
-
-  // check all epsilon transitions first
-  if (currentState.out.hasOwnProperty(consts.EMPTY) ) {
-    for (let neighbor of currentState.out[consts.EMPTY]) {
-      if (validateString(NFA, neighbor, string ) ) return true;
+    // check if current node is graph1's start node
+    if (graph1[new_name].is_start) {
+      graph1start = new_name;
+      graph1[new_name].is_start = false;
     }
   }
 
-  // check all transitions with current input symbol
-  if (currentState.out.hasOwnProperty(symbol)) {
-    for (let neighbor of currentState.out[symbol]) {
-      if (validateString(NFA, neighbor, string.substring(1) ) ) return true;
+  // rename all nodes in graph2
+  for (let node of Object.keys(graph2)) {
+    const new_name = node + ",2";
+    graph2[new_name] = graph2[node];
+    graph2[new_name].name = new_name;
+    delete graph2[node];
+
+    // rename all edges
+    for (const inner of Object.values(graph2)) {
+      for (const edge of inner.out) {
+        if (edge.from === node) {
+          edge.from = new_name;
+        }
+        if (edge.to === node) {
+          edge.to = new_name;
+        }
+      }
+    }
+
+    // check if current node is graph2's start node
+    if (graph2[new_name].is_start) {
+      graph2start = new_name;
+      graph2[new_name].is_start = false;
     }
   }
 
-  return false;
-}
-
-export function test_input(NFA, input) {
-  return compute.run_input(NFA, input);
-}
-
-function test(string) {
-  string = injectConcatSymbols(string);
-  string = shunting_yard(string);
-  console.log("POST FIX: " + string);
-  let NFA = thompson(string);
-  
-  //console.log(util2.inspect(NFA, {depth: 6 }) );
-  //console.log(util2.inspect(NFA, ));
-
-  let graph = convertToDrawing(NFA);
-  let link = permalink.serialize(graph[0], graph[1]);
-  return link
-}
-
-function testValidate() {
-  let string = "a"+consts.OPEN+"a"+consts.UNION+"b"+consts.CLOSE+consts.KLEENE;
-  string = injectConcatSymbols(string);
-  string = shunting_yard(string);
-  console.log("POST FIX: " + string);
-  let NFA = util.thompson(string);
-  
-  let input = ["a", "aa", "ab", "ac", "aba", "abba", "abbbc"];
-  let graph = util.convertToDrawing(NFA);
-  let link = permalink.serialize(graph[0], graph[1]);
-  console.log(link);
-  let startNode = util.getStartNode(NFA);
-  for (let i of input) {
-    console.log("For input " + i + " returned " + util.validateString(NFA, startNode, i));
+  // add all nodes to new graph
+  for (let node of Object.keys(graph1)) {
+    graph[node] = graph1[node];
   }
-  //console.log(util2.inspect(NFA, {depth: 4 }));
-  // 
-  //let graph = util.convertToDrawing(NFA);
-  //let link = permalink.serialize(graph[0], graph[1]);
-  //return link
+  for (let node of Object.keys(graph2)) {
+    graph[node] = graph2[node];
+  }
+
+  // add epsilon transitions from new start to old starts
+  graph["q0"].out.push(graph_components.make_edge("q0", graph1start, consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, 
+                      consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
+  graph["q0"].out.push(graph_components.make_edge("q0", graph2start, consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, 
+                      consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
+
+  return graph;
 }
 
-function test_run_input() {
-  let string = "a"+consts.OPEN+"a"+consts.UNION+"b"+consts.CLOSE+consts.KLEENE;
-  string = injectConcatSymbols(string);
-  string = shunting_yard(string);
+export function concat(graph1, graph2) {
+  let graph1accept = [];
+  let graph2start = "";
 
-  let NFA = util.thompson(string);
-  NFA = util.convertToDrawing(NFA);
+  // modify names of all nodes in graph1
+  for (let node of Object.keys(graph1)) {
+    const new_name = node + ",1";
+    graph1[new_name] = graph1[node];
+    graph1[new_name].name = new_name;
+    delete graph1[node];
 
-  console.log(NFA);
+    // rename all edges
+    for (const inner of Object.values(graph1)) {
+      for (const edge of inner.out) {
+        if (edge.from === node) {
+          edge.from = new_name;
+        }
+        if (edge.to === node) {
+          edge.to = new_name;
+        }
+      }
+    }
 
-  return util.test_input(NFA[1], "abc");
+    // check if current node is an accept node for graph1
+    if (graph1[new_name].is_final) {
+      graph1accept.push(new_name);
+      graph1[new_name].is_final = false;
+    }
+  }
+
+  // modify names of all nodes in graph2
+  for (let node of Object.keys(graph2)) {
+    const new_name = node + ",2";
+    graph2[new_name] = graph2[node];
+    graph2[new_name].name = new_name;
+    delete graph2[node];
+
+    // rename all edges
+    for (const inner of Object.values(graph2)) {
+      for (const edge of inner.out) {
+        if (edge.from === node) {
+          edge.from = new_name;
+        }
+        if (edge.to === node) {
+          edge.to = new_name;
+        }
+      }
+    }
+
+    // check if current node is graph2's start node
+    if (graph2[new_name].is_start) {
+      graph2start = new_name;
+      graph2[new_name].is_start = false;
+    }
+  }
+
+  // add all nodes from graph1 and graph2 to a new graph
+  let graph = consts.EMPTY_GRAPH;
+  for (let node of Object.keys(graph1)) {
+    graph[node] = graph1[node];
+  }
+  for (let node of Object.keys(graph2)) {
+    graph[node] = graph2[node];
+  }
+
+  // create edges from all accept nodes in graph1 to the start node in graph2
+  for (let node of graph1accept) {
+    graph[node].out.push(graph_components.make_edge(node, graph2start, consts.EMPTY_SYMBOL, 
+                        0.5, 0, 0, 0, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
+  }
+
+  return graph;
 }
 
-console.log(test("a"+consts.OPEN+"a"+consts.UNION+"b"+consts.CLOSE+consts.KLEENE+"b"));
+export function kleene(graph) {
+  // make new start and end states
+  graph["new start"] = graph_components.make_vertex("new start", 300, 300, consts.DEFAULT_VERTEX_RADIUS, true, false, []);
+  graph["new end"] = graph_components.make_vertex("new end", 1000, 300, consts.DEFAULT_VERTEX_RADIUS, false, true, []);
+
+  graph["new start"].out.push(graph_components.make_edge("new start", "new end", consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
+
+  let oldStart = "";
+
+  for (let node of Object.keys(graph)) {
+    // for each start state in original graph, create an edge from new start state to original start state
+    // set node to not be a start state
+    if (graph[node].is_start && node !== "new start") {
+      oldStart = node;
+      graph[node].is_start = false;
+      graph["new start"].out.push(graph_components.make_edge("new start", node, consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
+    }
+    // for each accept state in original graph, create an edge from that node to new accept state
+    // set each node to not be an accept state
+    if (graph[node].is_final && node !== "new end") {
+      graph[node].is_final = false;
+      graph[node].out.push(graph_components.make_edge(node, oldStart, consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
+      graph[node].out.push(graph_components.make_edge(node, "new end", consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
+    }
+  }
+
+  return graph;
+}
+
+export function thompson() {
+
+}
+
+function test() {
+  let graph1 = permalink.deserialize('NFAq0:321:500:40:1;q1:319:902:40:2;q2:539:934:40:2;0:1:aεεR:5:0:-1:29~0:2:bεεR:5:0:2:29~');
+  let graph2 = permalink.deserialize('NFAq0:309:584:40:1;q1:363:1056:40:0;q2:381:1450:40:2;0:1:cεεR:5:0:2:27~1:2:dεεR:5:0:-4:-28~');
+
+  const kleene_result = kleene(graph[1]);
+  const union_result = union(graph1[1], graph2[1]);
+  const concat_result = concat(graph1[1], graph2[1]);
+
+  console.log(kleene_result);
+  console.log(union_result);
+  console.log(concat_result);
+}
+
+test();
