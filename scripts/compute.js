@@ -188,6 +188,7 @@ function PDA_closure(graph, cur_configs) {
  */
 function config_to_vertices(cur_configs) {
   const cur_vertices = new Set();
+  // eslint-disable-next-line no-unused-vars
   for (const [v, _, __] of cur_configs.values()) {
     cur_vertices.add(v);
   }
@@ -397,7 +398,7 @@ function* run_input_Moore(graph, input, interactive) {
  * @param {string} input - input string
  * @param {boolean} interactive - whether to step through and highlight the computation
  * @returns {Iterable} return a generator that
- *                     if noninteractive, evaluates to immediately in one step
+ *                     if noninteractive, evaluates to  the final accept/reject immediately in one step
  *                     if interactive, evaluates step by step with highlight
  */
 export function run_input(graph, machine_type, input, interactive=false) {
@@ -406,7 +407,7 @@ export function run_input(graph, machine_type, input, interactive=false) {
   }
 
   if (!Object.keys(graph).length) {  // empty graph
-    return false;
+    return 'The graph is empty; nothing to do...';
   } else if (machine_type === consts.MACHINE_TYPES.NFA) {
     return run_input_NFA(graph, input, interactive);
   } else if (machine_type === consts.MACHINE_TYPES.PDA) {
