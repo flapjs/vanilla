@@ -352,3 +352,42 @@ export function edge_in_graph(graph, edge) {
   }
   return false;
 }
+
+/**
+ * Derives a CFG with an equivalent language to that of the input PDA
+ * @param {Object} graph The PDA to convert
+ * @returns {HTMLUlistElement} An equivalent CFG
+ */
+export function PDA_to_CFG(graph) {
+  const alphabet = compute.compute_alphabet(graph);
+  //Modify graph to satisfy required conditions for conversion
+  const PLACEHOLDER_SYMB = '|'; //TODO: figure out better placeholder
+  let name = find_unused_name(graph);
+  const final_vertex_empty = make_vertex(name,0,0); //vertex used to empty stack after computation
+  graph[name] = final_vertex_empty;
+  for (const vertex of Object.values(graph)) {
+    for (const edge of vertex.out) {
+      //if edge does nothing to stack, add transition state to push/pop placeholder
+      if (edge.push_symbol == EMPTY_SYMBOL && edge.pop_symbol == EMPTY_SYMBOL) {
+        name = find_unused_name(graph);
+        const newVertex = make_vertex(name,0,0);
+        graph[name] = newVertex;
+        make_edge(vertex, EMPTY_SYMBOL, newVertex, 0.5, 0, 0, 0, EMPTY_SYMBOL, PLACEHOLDER_SYMB);
+        make_edge(newVertex, EMPTY_SYMBOL, edge.to, 0.5, 0, 0, 0, PLACEHOLDER_SYMB, EMPTY_SYMBOL);
+      }
+      //if edge both pushes and pops, add transition state to separate the two
+      else if (edge.push_symbol != EMPTY_SYMBOL && edge.pop_symbol != EMPTY_SYMBOL) {
+        const name = find_unused_name(graph);
+        const newVertex = make_vertex(name,0,0);
+        graph[name] = newVertex;
+        make_edge(vertex, EMPTY_SYMBOL, newVertex, 0.5, 0, 0, 0, EMPTY_SYMBOL, edge.push_symbol);
+        make_edge(newVertex, EMPTY_SYMBOL, edge.to, 0.5, 0, 0, 0, edge.pop_symbol, EMPTY_SYMBOL);
+      }
+    }
+    //Funnel all accept states into one state
+    if (vertex.is_final) {
+
+    }
+  }
+
+}
