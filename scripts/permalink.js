@@ -112,9 +112,9 @@ export function deserialize(graph_str) {
     const y             = parseFloat(fields[1]);
     const x             = parseFloat(fields[2]);
     const r             = parseFloat(fields[3]);
-    const output        = parseFloat(fields[4]);
-    const composite_bit = parseInt(fields[5]);
-    graph[name] = graph_components.make_vertex(name, x, y, r, composite_bit&1, composite_bit&2, undefined, output);
+    const mooreOutput   = (fields.length == 6) ? fields[4] : consts.DEFAULT_MOORE_OUTPUT;
+    const composite_bit = (fields.length == 6) ? parseInt(fields[5]) : parseInt(fields[4]);
+    graph[name] = graph_components.make_vertex(name, x, y, r, composite_bit&1, composite_bit&2, undefined, mooreOutput);
     vertex_id_to_name.push(name);  // construct the mapping from id to name
   }
 
@@ -131,8 +131,8 @@ export function deserialize(graph_str) {
     const transition    = composite_str.charAt(0);
     const pop_symbol    = composite_str.charAt(1);
     const push_symbol   = composite_str.charAt(2);
-    const mealy_output  = composite_str.charAt(3);
-    const move          = composite_str.charAt(4);
+    const mealy_output  = (composite_str.length == 5) ? composite_str.charAt(3) : consts.DEFAULT_MEALY_OUTPUT;
+    const move          = (composite_str.length == 5) ? composite_str.charAt(4) : composite_str.charAt(3);
     const a1            = parseFloat(fields[3])/10.0;
     const a2            = parseFloat(fields[4])/10.0;
     const angle1        = parseFloat(fields[5])/10.0;
