@@ -216,8 +216,12 @@ function bind_run_input() {
     run_btn.addEventListener('click', () => {
       computations[i] = compute.run_input(graph, menus.machine_type(), textbox.value);  // noninteractive computation
       // eslint-disable-next-line no-unused-vars
-      const { value: accepted, _ } = computations[i].next();  // second value is always true since it is noninteractive
-      alert(accepted ? 'Accepted' : 'Rejected');
+      const { value: output, _ } = computations[i].next();  // second value is always true since it is noninteractive
+      if(menus.machine_type() === consts.MACHINE_TYPES.Moore || menus.machine_type() === consts.MACHINE_TYPES.Mealy) {
+        alert(output);
+      } else {
+        alert(output ? 'Accepted' : 'Rejected');
+      }
       computations[i] = undefined;
     });
 
@@ -229,7 +233,11 @@ function bind_run_input() {
       const { value: accepted, done } = computations[i].next();
       if (done) {
         // whether true or false. We wrap this in timeout to execute after the vertex coloring is done
-        setTimeout(() => alert(accepted ? 'Accepted' : 'Rejected'));
+        if(menus.machine_type() === consts.MACHINE_TYPES.Moore || menus.machine_type() === consts.MACHINE_TYPES.Mealy) {
+          setTimeout(() => alert(accepted));
+        } else {
+          setTimeout(() => alert(accepted ? 'Accepted' : 'Rejected'));
+        }
         computations[i] = undefined;
       }
     });
