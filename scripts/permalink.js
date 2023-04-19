@@ -26,6 +26,10 @@ function char_url_compliance(c) {
  * @returns {string} the string repr of the field
  */
 function to_string_field(field) {
+  // backward compatibility for users who have saved graphs on localstore without mealy or moore outputs
+  if (field == undefined) {
+    return consts.EMPTY_SYMBOL;
+  }
   const field_str = field.toString();
   return Array.from(field_str).reduce((acc, c) => acc + char_url_compliance(c), '');
 }
@@ -113,9 +117,9 @@ export function deserialize(graph_str) {
     const x             = parseFloat(fields[2]);
     const r             = parseFloat(fields[3]);
     // backwards compatibility (in case an older permalink doesn't contain this field)
-    const mooreOutput   = (fields.length == 6) ? fields[4] : consts.DEFAULT_MOORE_OUTPUT;
+    const moore_output  = (fields.length == 6) ? fields[4] : consts.DEFAULT_MOORE_OUTPUT;
     const composite_bit = (fields.length == 6) ? parseInt(fields[5]) : parseInt(fields[4]);
-    graph[name] = graph_components.make_vertex(name, x, y, r, composite_bit&1, composite_bit&2, undefined, mooreOutput);
+    graph[name] = graph_components.make_vertex(name, x, y, r, composite_bit&1, composite_bit&2, undefined, moore_output);
     vertex_id_to_name.push(name);  // construct the mapping from id to name
   }
 
