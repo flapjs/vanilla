@@ -711,7 +711,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line328">line 328</a>
+        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line468">line 468</a>
     </li></ul></dd>
     
 
@@ -893,7 +893,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line345">line 345</a>
+        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line485">line 485</a>
     </li></ul></dd>
     
 
@@ -1162,7 +1162,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line318">line 318</a>
+        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line425">line 425</a>
     </li></ul></dd>
     
 
@@ -1187,6 +1187,211 @@
 
 
 
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".mealy_step"><span class="type-signature">(static) </span>mealy_step<span class="signature">(graph, cur_state, symbol)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    a single step of the NFA running algorithm
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>graph</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the Mealy machine of interest</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>cur_state</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">current state of the machine</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>symbol</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the transition symbol</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line95">line 95</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    the output of the transition and the next state
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -1573,7 +1778,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line301">line 301</a>
+        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line404">line 404</a>
     </li></ul></dd>
     
 
@@ -1823,7 +2028,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line173">line 173</a>
+        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line206">line 206</a>
     </li></ul></dd>
     
 
@@ -1982,7 +2187,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line156">line 156</a>
+        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line189">line 189</a>
     </li></ul></dd>
     
 
@@ -2154,7 +2359,7 @@ Note that we only evaluate all the epsilon transitions once to speed up computat
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line127">line 127</a>
+        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line160">line 160</a>
     </li></ul></dd>
     
 
@@ -2179,6 +2384,211 @@ Note that we only evaluate all the epsilon transitions once to speed up computat
 
 
 
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~run_input_Mealy"><span class="type-signature">(generator, inner) </span>run_input_Mealy<span class="signature">(graph, input, interactive)</span><span class="type-signature"> &rarr; {Iterable}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    check if the input is accepted
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>graph</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">machine graph</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">input string</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>interactive</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">whether to show the computation step by step</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line331">line 331</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    a generator that evaluates to the final output of the machine
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Iterable</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -2314,7 +2724,7 @@ Note that we only evaluate all the epsilon transitions once to speed up computat
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line94">line 94</a>
+        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line127">line 127</a>
     </li></ul></dd>
     
 
@@ -2519,7 +2929,7 @@ Note that we only evaluate all the epsilon transitions once to speed up computat
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line234">line 234</a>
+        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line267">line 267</a>
     </li></ul></dd>
     
 
@@ -2740,7 +3150,7 @@ Note that we only evaluate all the epsilon transitions once to speed up computat
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line247">line 247</a>
+        <a href="compute.js.html">compute.js</a>, <a href="compute.js.html#line280">line 280</a>
     </li></ul></dd>
     
 
@@ -2814,7 +3224,7 @@ Note that we only evaluate all the epsilon transitions once to speed up computat
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Tue Apr 11 2023 06:59:17 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Wed Apr 19 2023 22:05:50 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>
