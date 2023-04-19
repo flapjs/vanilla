@@ -73,6 +73,15 @@ export const EMPTY_SYMBOL = 'ε';
 /** @constant {string} EMPTY_TYPE - symbol for an empty cell of a Turing Machine */
 export const EMPTY_TAPE = '☐';
 
+/** @constant {string} DEFAULT_MOORE_OUTPUT - prepopulate moore output with this */
+export const DEFAULT_MOORE_OUTPUT = '0';
+
+/** @constant {string} DEFAULT_MEALY_OUTPUT - prepopulate mealy output with this */
+export const DEFAULT_MEALY_OUTPUT = '0';
+
+/** @constant {string} DEFAULT_MOORE_MEALY_TRANSITION - prepopulate transitions for Moore / Mealy machines with this */
+export const DEFAULT_MOORE_MEALY_TRANSITION = '0';
+
 /** @constant {string} ARROW_SYMBOL - arrow symbol */
 export const ARROW_SYMBOL = '→';
 
@@ -80,7 +89,9 @@ export const ARROW_SYMBOL = '→';
 export const MACHINE_TYPES = {
   NFA: 'NFA',
   PDA: 'PDA',
-  Turing: 'Turing'
+  Turing: 'Turing',
+  Moore: 'Moore',
+  Mealy: 'Mealy'
 };
 
 /** @constant {string} DEFAULT_MACHINE - choice from ['NFA', 'PDA', 'Turing'] */
@@ -90,21 +101,27 @@ export const DEFAULT_MACHINE = MACHINE_TYPES.NFA;
 export const HIST_KEYS = {
   NFA: '%nfa_history',
   PDA: '%PDA_history',
-  Turing: '%turing_history'
+  Turing: '%turing_history',
+  Moore: '%moore_history',
+  Mealy: '%mealy_history'
 };
 
 /** @constant {Object} HIST_TIP_KEYS - localstore key to pointer to the top of the history stack */
 export const HIST_TIP_KEYS = {
   NFA: '%nfa_hist_tip',
   PDA: '%PDA_hist_tip',
-  Turing: '%turing_hist_tip'
+  Turing: '%turing_hist_tip',
+  Moore: '%moore_hist_tip',
+  Mealy: '%mealy_history_tip'
 };
 
 /** @constant {Object} HIST_PTR_KEYS - localstore key to pointer to the currently displayed graph */
 export const HIST_PTR_KEYS = {
   NFA: '%nfa_hist_ptr',
   PDA: '%PDA_hist_ptr',
-  Turing: '%turing_hist_ptr'
+  Turing: '%turing_hist_ptr',
+  Moore: '%moore_hist_ptr',
+  Mealy: '%mealy_history_ptr'
 };
 
 /** @constant {float} ZOOM_SPEED - final zoom is ZOOM_SPEED*scroll_wheel_ticks */

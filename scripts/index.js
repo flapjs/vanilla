@@ -50,7 +50,7 @@ function drag_scene(e) {
 
 /**
  * builds a drag vertex callback function
- * @param {string} v - name of the vertex to be dragged 
+ * @param {string} v - name of the vertex to be dragged
  * @returns {function} a callback function to handle dragging a vertex
  */
 function higher_order_drag_vertex(v) {
@@ -167,7 +167,7 @@ function bind_drag() {
         canvas.addEventListener('mousemove', drag_vertex);
       } else {  // left drag scene
         canvas.addEventListener('mousemove', drag_scene);
-      } 
+      }
     }
   });
   canvas.addEventListener('mouseup', () => {
@@ -211,16 +211,20 @@ function bind_run_input() {
   const computations = Array(input_divs.length);  // stores generators of the computation half evaluated
   for (let i = 0; i < input_divs.length; i++) {
     const textbox = input_divs[i].querySelector('input');
-    
+
     const run_btn = input_divs[i].querySelector('.run_btn');
     run_btn.addEventListener('click', () => {
       computations[i] = compute.run_input(graph, menus.machine_type(), textbox.value);  // noninteractive computation
       // eslint-disable-next-line no-unused-vars
-      const { value: accepted, _ } = computations[i].next();  // second value is always true since it is noninteractive
-      alert(accepted ? 'Accepted' : 'Rejected');
+      const { value: output, _ } = computations[i].next();  // second value is always true since it is noninteractive
+      if(menus.machine_type() === consts.MACHINE_TYPES.Moore || menus.machine_type() === consts.MACHINE_TYPES.Mealy) {
+        alert(output);
+      } else {
+        alert(output ? 'Accepted' : 'Rejected');
+      }
       computations[i] = undefined;
     });
-    
+
     const step_btn = input_divs[i].querySelector('.step_btn');
     step_btn.addEventListener('click', () => {
       if (!computations[i]) {
@@ -229,7 +233,11 @@ function bind_run_input() {
       const { value: accepted, done } = computations[i].next();
       if (done) {
         // whether true or false. We wrap this in timeout to execute after the vertex coloring is done
-        setTimeout(() => alert(accepted ? 'Accepted' : 'Rejected'));
+        if(menus.machine_type() === consts.MACHINE_TYPES.Moore || menus.machine_type() === consts.MACHINE_TYPES.Mealy) {
+          setTimeout(() => alert(accepted));
+        } else {
+          setTimeout(() => alert(accepted ? 'Accepted' : 'Rejected'));
+        }
         computations[i] = undefined;
       }
     });
@@ -252,9 +260,9 @@ function bind_undo_redo() {
     }
     e.preventDefault();  // prevent input undo
     if (e.ctrlKey && e.shiftKey) {
-      graph = hist.redo(); 
+      graph = hist.redo();
     } else if (e.ctrlKey) {
-      graph = hist.undo(); 
+      graph = hist.undo();
     }
     drawing.draw(graph);
   });

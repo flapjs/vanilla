@@ -18,10 +18,12 @@
   <!-- top bar -->
   <section class="topnav">
 
-    <select id="select_machine">
+    <select id="select_machine">  <!-- value needs to match consts.MACHINE_TYPES -->
       <option value="NFA">Finite Automata</option>
       <option value="PDA">Pushdown Automata</option>
       <option value="Turing">Turing Machine</option>
+      <option value="Moore">Moore</option>
+      <option value="Mealy">Mealy</option>
     </select>
 
     <button class="NFA_specific" id="NFA_2_DFA">NFA to DFA</button>
