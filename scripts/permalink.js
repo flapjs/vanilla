@@ -112,8 +112,8 @@ export function deserialize(graph_str) {
     const y             = parseFloat(fields[1]);
     const x             = parseFloat(fields[2]);
     const r             = parseFloat(fields[3]);
-    const output        = (type === 'Moore') ? parseFloat(fields[4]) : undefined;
-    const composite_bit = (type === 'Moore') ? parseInt(fields[5]) : parseInt(fields[4]);
+    const output        = parseFloat(fields[4]);
+    const composite_bit = parseInt(fields[5]);
     graph[name] = graph_components.make_vertex(name, x, y, r, composite_bit&1, composite_bit&2, undefined, output);
     vertex_id_to_name.push(name);  // construct the mapping from id to name
   }
