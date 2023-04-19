@@ -362,9 +362,17 @@ export function PDA_to_CFG(graph) {
   const alphabet = compute.compute_alphabet(graph);
   //Modify graph to satisfy required conditions for conversion
   const PLACEHOLDER_SYMB = '|'; //TODO: figure out better placeholder
+  const STACK_MARKER = '\\'; //TODO: figure out better placeholder
   let name = find_unused_name(graph);
-  const final_vertex_empty = make_vertex(name,0,0); //vertex used to empty stack after computation
+  const start_vertex = make_vertex(name,0,0); //new start state to push stack marker
+  start_vertex.is_start = true;
+  graph[name] = start_vertex;
+  name = find_unused_name(graph);
+  const final_vertex_empty = make_vertex(name,0,0); //state used to empty stack after computation
   graph[name] = final_vertex_empty;
+  name = find_unused_name(graph);
+  const final_vertex = make_vertex(name,0,0); //unique accept state
+  graph[name] = final_vertex
   for (const vertex of Object.values(graph)) {
     for (const edge of vertex.out) {
       //if edge does nothing to stack, add transition state to push/pop placeholder
@@ -372,22 +380,60 @@ export function PDA_to_CFG(graph) {
         name = find_unused_name(graph);
         const newVertex = make_vertex(name,0,0);
         graph[name] = newVertex;
-        make_edge(vertex, EMPTY_SYMBOL, newVertex, 0.5, 0, 0, 0, EMPTY_SYMBOL, PLACEHOLDER_SYMB);
-        make_edge(newVertex, EMPTY_SYMBOL, edge.to, 0.5, 0, 0, 0, PLACEHOLDER_SYMB, EMPTY_SYMBOL);
+        let e1 = make_edge(vertex, newVertex, edge.transition, 0.5, 0, 0, 0, EMPTY_SYMBOL, PLACEHOLDER_SYMB);
+        vertex.out.push(e1);
+        let e2 = make_edge(newVertex, edge.to, EMPTY_SYMBOL, 0.5, 0, 0, 0, PLACEHOLDER_SYMB, EMPTY_SYMBOL);
+        newVertex.out.push(e2);
+        vertex.out = vertex.out.filter(e => !edge_equal(e, edge)); //TODO: find better algorithm
       }
       //if edge both pushes and pops, add transition state to separate the two
       else if (edge.push_symbol != EMPTY_SYMBOL && edge.pop_symbol != EMPTY_SYMBOL) {
         const name = find_unused_name(graph);
         const newVertex = make_vertex(name,0,0);
         graph[name] = newVertex;
-        make_edge(vertex, EMPTY_SYMBOL, newVertex, 0.5, 0, 0, 0, EMPTY_SYMBOL, edge.push_symbol);
-        make_edge(newVertex, EMPTY_SYMBOL, edge.to, 0.5, 0, 0, 0, edge.pop_symbol, EMPTY_SYMBOL);
+        let e1 = make_edge(vertex, newVertex, edge.transition, 0.5, 0, 0, 0, EMPTY_SYMBOL, edge.push_symbol);
+        vertex.out.push(e1);
+        let e2 = make_edge(newVertex, edge.to, EMPTY_SYMBOL, 0.5, 0, 0, 0, edge.pop_symbol, EMPTY_SYMBOL);
+        vertex.out.push(e2);
+        vertex.out = vertex.out.filter(e => !edge_equal(e, edge));
       }
+    }
+    //change start state + push stack marker
+    if (vertex.is_start && vertex != start_vertex) {
+      let e = make_edge(start_vertex, vertex, EMPTY_SYMBOL, 0.5, 0, 0, 0, EMPTY_SYMBOL, STACK_MARKER);
+      vertex.out.push(e);
+      vertex.is_start = false;
     }
     //Funnel all accept states into one state
     if (vertex.is_final) {
-
+      let e = make_edge(vertex, final_vertex_empty, EMPTY_SYMBOL, 0.5, 0, 0, 0, EMPTY_SYMBOL, PLACEHOLDER_SYMB);
+      vertex.out.push(e);
     }
   }
+  //empty stack
+  final_vertex.is_final = true;
+  for (const c in alphabet) {
+    let e = make_edge(final_vertex_empty, final_vertex_empty, EMPTY_SYMBOL, 0.5, 0, 0, 0, c, EMPTY_SYMBOL);
+    final_vertex_empty.out.push(e);
+  }
+  let e = make_edge(final_vertex_empty, final_vertex_empty, EMPTY_SYMBOL, 0.5, 0, 0, 0, PLACEHOLDER_SYMB, EMPTY_SYMBOL);
+  final_vertex_empty.out.push(e);
+  e = make_edge(final_vertex_empty, final_vertex, EMPTY_SYMBOL, 0.5, 0, 0, 0, STACK_MARKER, EMPTY_SYMBOL);
+  final_vertex_empty.out.push(e);
 
+  //create CFG rule matrix
+  let i = 0;
+  for (const vertex in graph) {
+    i++;
+  }
+  let rule_matrix = [];
+  const NULL = null; //symbol for rule cannot be fully evaluated
+  const EMPTY = "\0"; //symbol for rule that must only contain empty string
+  for (let j = 0; j < i; j++) {
+    let rule_row = [];
+    for (let k = 0; k < i; k++) {
+      //TODO: run BFS; if succeeds, write empty string, otherwise write NULL or EMPTY, depending on whether or not j=k
+    }
+    rule_matrix.push(rule_row);
+  }
 }
