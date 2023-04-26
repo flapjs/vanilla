@@ -354,6 +354,26 @@ export function edge_in_graph(graph, edge) {
 }
 
 /**
+ * Runs a search on a graph starting at a vertex
+ * @param {Object} graph the input graph
+ * @param {Object} vertex the starting vertex
+ * @returns {Object[]} a list of all vertices reachable from the start vertex (excluding start unless there is a loop)
+ */
+export function search(graph, vertex, arr) {
+  arr = arr? arr : [];
+  for (const e of vertex.out) {
+    let vout = e.to;
+    arr.push(vout);
+    //note: this process is slow, could optimize
+    if (arr.indexOf(vout) >= 0) {
+      let arr2 = search(graph, vout, arr);
+      arr = arr.concat(arr2);
+    }
+  }
+  return arr;
+}
+
+/**
  * Derives a CFG with an equivalent language to that of the input PDA
  * @param {Object} graph The PDA to convert
  * @returns {HTMLUlistElement} An equivalent CFG
@@ -421,19 +441,78 @@ export function PDA_to_CFG(graph) {
   e = make_edge(final_vertex_empty, final_vertex, EMPTY_SYMBOL, 0.5, 0, 0, 0, STACK_MARKER, EMPTY_SYMBOL);
   final_vertex_empty.out.push(e);
 
-  //create CFG rule matrix
+  //create CFG rule matrix + array of vertices to index
   let i = 0;
+  let vertex_array = [];
   for (const vertex in graph) {
     i++;
+    vertex_array.push(vertex);
   }
   let rule_matrix = [];
   const NULL = null; //symbol for rule cannot be fully evaluated
   const EMPTY = "\0"; //symbol for rule that must only contain empty string
   for (let j = 0; j < i; j++) {
     let rule_row = [];
+    //find reachable vertices
+    let reachable = search(graph, vertex_array[j]);
     for (let k = 0; k < i; k++) {
-      //TODO: run BFS; if succeeds, write empty string, otherwise write NULL or EMPTY, depending on whether or not j=k
+      //note: inefficient process, should be optimized
+      if (reachable.indexOf(vertex[k]) == -1) {
+        //vertex is unreachable
+        if (j == k) {
+          //rule will only contain empty string in this case
+          rule_row.push(EMPTY);
+        } else {
+          //rule cannot be evaluated
+          rule_row.push(NULL);
+        }
+      } else {
+        rule_row.push("");
+      }
     }
     rule_matrix.push(rule_row);
+  }
+
+  //create reverse graph, helpful for computation
+  let graph_reverse = EMPTY_GRAPH;
+  for (const vertex in graph) {
+    graph_reverse[vertex.name] = vertex;
+  }
+  for (const vertex in graph) {
+    for (const edge in vertex.out) {
+      //copy each edge from the graph, then reverse the direction
+      let e = make_edge(edge.to, edge.from, edge.transition, edge.a1, edge.a2, edge.angle1, edge.angle2, edge.pop_symbol, edge.push_symbol);
+      graph_reverse[vertex].push(e);
+    }
+  }
+
+  //compute rules
+  for (let j = 0; j < i; j++) {
+    for (let k = 0; k < i; k++) {
+      //replace known constants
+      if (rule_matrix[j][k] == NULL || rule_matrix[j][k] == EMPTY) {
+        continue;
+      }
+      //compute rules that split into two rules
+      for (let l = 0; l < i; l++) {
+        //make sure rules can be evaluated
+        if (j != l && k != l && rule_matrix[j][l] != NULL && rule_matrix[l][k] != NULL) {
+          if (rule_matrix[j][k] != "") {
+            rule_matrix[j][k] = rule_matrix[j][k] + " | ";
+          }
+          if (rule_matrix[j][l] != EMPTY) {
+            rule_matrix[j][k] += "(" + j + "," + l + ")";
+          }
+          if (rule_matrix[l][k] != EMPTY) {
+            rule_matrix[j][k] += "(" + l + "," + k + ")";
+          }
+          if (rule_matrix[j][l] == EMPTY && rule_matrix[l][k] == EMPTY) {
+            rule_matrix[j][k] += EMPTY_SYMBOL;
+          }
+        }
+      }
+      //compute rules that add characters
+      
+    }
   }
 }
