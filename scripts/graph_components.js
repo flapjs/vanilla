@@ -69,21 +69,6 @@ export function make_edge(from, to, transition, a1, a2, angle1, angle2, pop_symb
   };
 }
 
-export function cfg_make_edge(from, to, transition, pop_symbol, push_symbol, move) {
-  return {
-    from: from,
-    to: to,
-    transition: transition ? transition : get_empty_symbol(),
-    a1: 0.5,
-    a2: 0,
-    angle1: 10,
-    angle2: 10,
-    pop_symbol: pop_symbol ? pop_symbol : get_empty_symbol(),
-    push_symbol: push_symbol ? push_symbol : get_empty_symbol(),
-    move: move ? move : consts.RIGHT
-  };
-}
-
 /**
  * check if the two edges are equal up to graphical representation
  * @param {Object} e1 - edge 1
