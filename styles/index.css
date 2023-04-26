@@ -105,7 +105,7 @@ input {
   padding: 6px 6px 16px;
   text-decoration: none;
   font-size: 10px;
-  color:#f2f0f0;
+  color:#c7c2c2;
   background-color: #273b7d;
   display: block;
   border-radius: 7px;
@@ -145,26 +145,36 @@ input {
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
   left: 1;
-  background-color: royalblue; /* Black */
+  background-color:#3a468f; /* background */
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 20px;
-  margin-left: 50px;
+  margin-left: 64px;
 }
 
 #secondbar button {
-  padding: 6px 8px 6px 16px;
+  padding: 15px 15px 15px 10px;
+  font-family: 'Source Sans Pro', sans-serif;
+  text-align: left;
   text-decoration: none;
-  font-size: 10px;
-  color: green;
+  font-size: 13px;
+  color:#c7c2c2;
+  background-color: #3a468f;
   display: block;
   border-radius: 5px;
   border-width: 2px;
-  border-color: white;
+  border-color:#3a468f;
   border-style: solid;
   width: 10vw;
   height: 25px;
   margin-bottom: 20px;
   margin-left: 10px;
+}
+
+#secondbar button:hover {
+  background-color:#4e5aa3;
+  transition-duration: 0.4s;
+  border-radius: 5px;
+  padding: 15px 15px 15px 10px;
 }
 
 /* text when hovering */
