@@ -241,7 +241,7 @@ function bind_run_input() {
     });
   }
   // clear the partial computations when user switches machines
-  document.getElementById('select_machine').addEventListener('change', () => computations.fill(undefined));
+  document.getElementById('dropdown-content').addEventListener('change', () => computations.fill(undefined));
 }
 
 /** offers ctrl-z and ctrl-shift-z features */
@@ -309,7 +309,7 @@ function bind_dd() {
 function hash_change_handler() {
   if (window.location.hash.length > 1) {
     const graph_str = window.location.hash.slice(1);
-    const select = document.getElementById('select_machine');
+    const select = document.getElementById('dropdown-content');
     if (permalink.serialize(select.value, graph) === graph_str) {
       // debounce two types of events
       // 1. the permalink generation will trigger a hash change event, which we do not want to handle
@@ -341,7 +341,7 @@ function refresh_graph() {
 
 /** handle switching machine type event */
 function bind_switch_machine() {
-  const select = document.getElementById('select_machine');
+  const select = document.getElementById('dropdown-content');
   select.value = consts.DEFAULT_MACHINE;  // set to default machine here too
   select.addEventListener('change', e => {
     hist.set_history_keys(e.target.value);
@@ -353,7 +353,7 @@ function bind_switch_machine() {
 
 /** handles the NFA to DFA button */
 function bind_machine_transform() {
-  const NFA_2_DFA_btn = document.getElementById('NFA_2_DFA');
+  const NFA_2_DFA_btn = document.getElementById('NFA_to_DFA');
   NFA_2_DFA_btn.addEventListener('click', () => {
     graph = graph_ops.NFA_to_DFA(graph);
     drawing.draw(graph);
@@ -381,7 +381,7 @@ export function bind_elongate_textbox() {
 function bind_permalink() {
   const permalink_btn = document.getElementById('permalink');
   permalink_btn.addEventListener('click', () => {
-    const select = document.getElementById('select_machine');
+    const select = document.getElementById('dropdown-content');
     const graph_str = permalink.serialize(select.value, graph);
     history.replaceState(undefined, undefined, '#'+graph_str);
     navigator.clipboard.writeText(window.location.href)

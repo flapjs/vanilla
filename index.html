@@ -12,6 +12,29 @@
   <link rel="icon" type="image/png" href="assets/favicon-16x16.png" sizes="16x16">
   <link rel="manifest" href="assets/site.webmanifest">
   <meta name="theme-color" content="#ffffff">
+  <style>
+    .NFA_specific{
+      cursor:pointer;
+    }
+    select{
+      position: relative;
+      font-size: 10px;
+      width:10vw;
+      left: 1vw;
+      height: 3vw;
+      padding: 10px 0px 10px 10px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+    }
+    #secondbar #closeButton{
+      padding: 2px 2px 2px 2px;
+      position: relative;
+      width:2vw;
+      top: 0vw;
+      left:10vw;
+      cursor:pointer;
+    }
+  </style>
 </head>
 <body>
 
@@ -24,7 +47,10 @@
       <option value="Turing">Turing Machine</option>
     </select>
 
+    
     <button class="NFA_specific" id="NFA_2_DFA">NFA to DFA</button>
+    
+    
     
     <button id="save_machine">Save as png</button>
 
@@ -43,6 +69,7 @@
     </div>
 
   </section>
+  
 
   <section id="sidebar">
     <!-- Side navigation -->
@@ -53,27 +80,32 @@
     </button>
     <button onclick=
       "document.getElementById('secondbar').hidden = !document.getElementById('secondbar').hidden">
-      click</button>
+      functions</button>
     <a href="#">Services</a>
     <a href="#">Clients</a>
-    <a href="#">Contact</a>
+    <a href="#">Contact</adropdown-content>
     <a href="#" id="five">five</a>
     <a href="#">six</a>
   </div>
   </section>
 
   <section hidden id="secondbar">
-    <button>Button</button>
+    <button id="closeButton"> X </button>
+    <button class = "NFA_specific" id = "NFA_to_DFA" >NFA to DFA</button>
     <!-- dropdown menu activated when button is clicked-->
+      <!--
       <button onclick=
-      "document.getElementById('dropdown-content').hidden = !document.getElementById('dropdown-content').hidden"
+      "document.getElementById('').hidden = !document.getElementById('dropdown-content').hidden"
       >dropdown</button>
-      <section id="dropdown-content">
-        <a href="#">Link 1</a>
-        <a href="#">Link 2</a>
-        <a href="#">Link 3</a>
-      </section>
-    <button>2 Button </button>
+      -->
+      <select id="dropdown-content">
+        <option value="NFA">Finite Automata</option>
+        <option value="PDA">Pushdown Automata</option>
+        <option value="Turing">Turing Machine</option>
+      </select>
+    
+    
+    
 
   </section>
 
@@ -92,6 +124,10 @@
 
 
   <script>
+    const closeButton = document.getElementById('closeButton');
+    closeButton.addEventListener('click',function(){
+      document.getElementById('secondbar').hidden = !document.getElementById('secondbar').hidden;
+    })
   function w3_open() {
     document.getElementById("tutorial_content").style.display = "block";
   }
@@ -99,6 +135,7 @@
   function w3_close() {
     document.getElementById("tutorial_content").style.display = "none";
   }
+  
   </script>
 
 
