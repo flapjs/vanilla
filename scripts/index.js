@@ -254,12 +254,20 @@ function bind_undo_redo() {
       return;
     }
     e.preventDefault();  // prevent input undo
-    if (e.ctrlKey && e.shiftKey) {
-      graph = hist.redo(); 
-    } else if (e.ctrlKey) {
-      graph = hist.undo(); 
+    if (menus.machine_type() === consts.MACHINE_TYPES.CFG){
+      if (e.ctrlKey && e.shiftKey) {
+        cfg.reload(hist.redo(), 1);
+      } else if (e.ctrlKey) {
+        cfg.reload(hist.undo(), 1); 
+      }
+    } else{
+      if (e.ctrlKey && e.shiftKey) {
+        graph = hist.redo(); 
+      } else if (e.ctrlKey) {
+        graph = hist.undo(); 
+      }
+      drawing.draw(graph);
     }
-    drawing.draw(graph);
   });
 }
 
@@ -344,8 +352,7 @@ function refresh_graph() {
 
 /** get the newest rules from history and fill the textbox */
 function reload_rules() {
-  let rules = hist.retrieve_latest_graph();
-  cfg.reload(rules);
+  cfg.reload();
 }
 
 /** handle switching machine type event */
@@ -380,6 +387,18 @@ function bind_machine_transform() {
     graph = graph_ops.NFA_to_DFA(graph);
     drawing.draw(graph);
     hist.push_history(graph);
+  });
+
+  const CFG_2_PDA_btn = document.getElementById('CFG_2_PDA');
+  CFG_2_PDA_btn.addEventListener('click', () => {
+    graph = cfg.get_graph();
+    let pda_permalink = permalink.serialize(consts.MACHINE_TYPES.PDA, graph);
+    document.getElementById("cfg-content").hidden = !document.getElementById("cfg-content").hidden;
+    drawing.get_canvas().hidden = !drawing.get_canvas().hidden;
+    console.log(pda_permalink);
+    window.location.hash = pda_permalink;
+  
+    hash_change_handler();
   });
 }
 
@@ -416,6 +435,37 @@ function bind_permalink() {
   window.addEventListener('hashchange', hash_change_handler);
 }
 
+function bind_cfg_switch(){
+    // Button to create a new symbol and rule
+    var create_btn = document.getElementById("create_new_rule");
+    create_btn.addEventListener('click', () => {
+      cfg.create_rule();
+    });
+  
+    // Button to delete a new rule
+    var delete_btn = document.getElementById("delete_rule");
+    delete_btn.addEventListener('click', () => {
+      cfg.delete_rule();
+    });
+
+    // Button to rule/create the graph
+    var submit = document.getElementById("submit");
+    submit.addEventListener('click', () => {
+      cfg.submit_rules();
+    });
+
+    // Button to clear all the input boxes
+    var clear_all = document.getElementById("clear");
+    clear_all.addEventListener('click', () => {
+      cfg.clear_rules(2); // 2 means to clear everything, clear_everything_mode
+    });
+    
+    // Push starting symbol change to history
+    document.getElementById("starting_symbol").addEventListener("change",function () {
+      cfg.load_rules();
+    })
+}
+
 /** run after all the contents are loaded to hook up callbacks */
 function init() {
   bind_switch_machine();
@@ -424,6 +474,7 @@ function init() {
   bind_context_menu();
   bind_run_input();
   bind_machine_transform();
+  bind_cfg_switch();
   bind_save_drawing();
   bind_undo_redo();
   bind_scroll();

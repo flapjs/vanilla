@@ -4,69 +4,23 @@ import * as consts from './consts.js';
 import * as hist from './history.js';
 import * as graph_components from './graph_components.js';
 
-//Line divider
-let div = document.createElement("DIV");
+let div = document.createElement("DIV"); //Line divider
 
 const list_of_rules = []; // Array that keeps track of symbols and their rules
 const to_push_rules = {}; // Array that keeps track of symbols and their rules to push to history
 let graph = consts.EMPTY_GRAPH;
 
+const clear_to_reload = 0;
+const clear_to_undo_redo = 1;
+const clear_everything_mode = 2;
+
 export function CFG_switch(){
-  // Push starting symbol change to history
-  document.getElementById("starting_symbol").addEventListener("change",function () {
-    //console.log("Starting symbol input Changed");
-  })
-  // Button to create a new symbol and rule
-  var create_btn = document.getElementById("create_new_rule");
-  create_btn.addEventListener('click', () => {
-    create_rule();
-  });
-
-  // Button to delete a new rule
-  var delete_btn = document.getElementById("delete_rule");
-  delete_btn.addEventListener('click', () => {
-    let list = document.querySelector('ul');
-    if(list_of_rules.length > 1){
-      list.removeChild(list.lastChild);
-      list_of_rules.pop();
-    }
-  });
-
-  // Button to rule/create the graph
-  var submit = document.getElementById("submit");
-  submit.addEventListener('click', () => {
-    make_start_and_final_edges();
-    let starting_symbol = document.getElementById("starting_symbol").value;
-    graph["push$"].out.push(graph_components.make_edge("push$", "loop", undefined,
-                            undefined, undefined, undefined, undefined, undefined, starting_symbol));
-    const terminal_symbols = new Set();
-
-    //Invalid input checking.
-    for (let i = 0; i < list_of_rules.length; i++){
-      if(list_of_rules[i].symbol.value.length != 1){
-        alert("One of the terminal symbols input do not have 1 character");
-        return;
-      }
-      terminal_symbols.add(list_of_rules[i].symbol.value);
-    }
-    if(!terminal_symbols.has(starting_symbol)){
-      alert("Starting terminal symbol does not have a rule");
-      return;
-    }
-
-    if(starting_symbol == ""){
-      alert("No starting terminal symbol");
-      return;
-    }
-    load_rules();
-    create_edges(terminal_symbols);
-  });
-  var clear_all = document.getElementById("clear");
-  clear_all.addEventListener('click', () => {
-  });
+  load_rules();
 }
 
-//Initializer for an empty graph
+/**
+ * make the basic vertices for the PDA that checks if the stack is empty by the end of the input
+ */
 function make_start_and_final_edges(){
   graph = consts.EMPTY_GRAPH;
   graph["final"] = graph_components.make_vertex("final", 3*consts.CFG_EDGE_X_DISTANCE + 50, 0, consts.DEFAULT_VERTEX_RADIUS, false, true);
@@ -80,15 +34,41 @@ function make_start_and_final_edges(){
                   undefined, undefined, "$")]);
 }
 
-// Create a textbox for a new rules
-function create_rule(){
-  let [plus, minus, symbol_input, rule_input] = create_text_elements();
+/**
+ * Creates the elements that will be used to create/delete rules
+ * @returns [plus_btn, minus_btn, symbol_input, rule_input] - [Plus button, Minus button, Symbol Input Box, Rule Input Box]
+ */
+function create_text_elements(){
+  let plus_btn = document.createElement("button");
+  plus_btn.id = "Add rule";
+  plus_btn.textContent = " + ";
+
+  let minus_btn = document.createElement("button");
+  minus_btn.id = "Delete rule";
+  minus_btn.textContent = " - ";
+
+  let symbol_input = document.createElement("Input");
+  symbol_input.id = "Symbol" + (list_of_rules.length + 1);
+  symbol_input.addEventListener("change",function () {
+    load_rules();
+  })
+
+  let rule_input = document.createElement("Input");
+  rule_input.id = "Rule " + 1;
+  rule_input.value = consts.EMPTY_SYMBOL;
+  rule_input.addEventListener("change",function () {
+    load_rules();
+  })
+  return [plus_btn, minus_btn, symbol_input, rule_input];
+}
+
+/** 
+ * add the symbol input box, the rule input box, and buttons to add/delete input box
+ */
+export function create_rule(){
+  let [plus_btn, minus_btn, symbol_input, rule_input] = create_text_elements();
   let list = document.querySelector('ul');
   let li = document.createElement('li');
-  let index = (list_of_rules.length + 1);
-  let rule_count = 1;
-  symbol_input.id = "Symbol " + index;
-  rule_input.id = "Rule " + rule_count;
 
   li.appendChild(symbol_input);
   li.append(document.createTextNode("→"));
@@ -96,65 +76,99 @@ function create_rule(){
 
   let rule = {
     symbol : symbol_input,
-    rule_list : [rule_input]
+    rules_list : [rule_input]
   }
   list_of_rules.push(rule);
 
-  // Button to add a rule input textbox
-  plus.addEventListener('click',() => {
-    rule_count++;
+  // Button to add a new rule input textbox
+  plus_btn.addEventListener('click',() => {
     let new_rule_input = document.createElement("Input");
-    new_rule_input.id = "Rule " + rule_count;
+    new_rule_input.id = "Rule " + rule.rules_list.length;
+    new_rule_input.value = consts.EMPTY_SYMBOL;
     new_rule_input.addEventListener("change",function () {
-      //console.log("Rule input Changed");
+      load_rules();
     })
     // Remove "+ / -"
     for(let i = 0; i < 3; i++){li.removeChild(li.lastChild);}
     li.append(document.createTextNode(" | "));
     li.append(new_rule_input);
-    list_of_rules[index-1].rule_list.push(new_rule_input);
-    li.append(plus);
-    li.append(document.createTextNode(" / "));
-    li.append(minus);
+    rule.rules_list.push(new_rule_input);
+    load_rules();
+    add_btns(li, plus_btn, minus_btn);
   });
 
-  // Button to remove a rule input textbox
-  minus.addEventListener('click',() => {
+  // Button to remove last rule input textbox
+  minus_btn.addEventListener('click',() => {
     // Remove "|", last text box, "+ / -"
-    if(rule_count > 1){
+    if(rule.rules_list.length > 1){
       for(let i = 0; i < 5; i++){li.removeChild(li.lastChild);}
-      list_of_rules[index-1].rule_list.pop();
-      rule_count--;
-      li.append(plus);
-      li.append(document.createTextNode(" / "));
-      li.append(minus);
+      rule.rules_list.pop();
+      add_btns(li, plus_btn, minus_btn);
     }
+    load_rules();
   });
-  li.append(plus);
-  li.append(document.createTextNode(" / "));
-  li.append(minus);
+  add_btns(li, plus_btn, minus_btn);
 
   list.append(li);
+  load_rules();
 }
 
+export function delete_rule(){
+  let list = document.querySelector('ul');
+    if(list_of_rules.length > 1){
+      list.removeChild(list.lastChild);
+      list_of_rules.pop();
+    }
+  load_rules();
+}
+
+export function submit_rules(){
+  make_start_and_final_edges();
+  let starting_symbol = document.getElementById("starting_symbol").value;
+  graph["push$"].out.push(graph_components.make_edge("push$", "loop", undefined,
+                          undefined, undefined, undefined, undefined, undefined, starting_symbol));
+  const terminal_symbols = new Set();
+
+  //Invalid input checking.
+  for (let i = 0; i < list_of_rules.length; i++){
+    if(list_of_rules[i].symbol.value.length != 1){
+      alert("One of the terminal symbols input do not have 1 character");
+      return;
+    }
+    terminal_symbols.add(list_of_rules[i].symbol.value);
+  }
+  if(!terminal_symbols.has(starting_symbol)){
+    alert("Starting terminal symbol does not have a rule");
+    return;
+  }
+
+  if(starting_symbol == ""){
+    alert("No starting terminal symbol");
+    return;
+  }
+  load_rules();
+  create_edges(terminal_symbols);
+}
 /**
  * creates a graph using list_of_rules
  * @param {Set} terminal_symbols - keeps track of the symbols alphabet
  */
 function create_edges(terminal_symbols){
-  let index = 0; // Counter used to keep track of the new vertex's name is
+  let index = 0; // Counter used to keep track of the new vertex's name
   let alphabet = new Set();
-  let longest = 0;
+  let longest = 0; // Longest string to base x position of empty vertex
   let row = 0;
+
   for(let i = 0; i < list_of_rules.length; i++){
     let symbol = list_of_rules[i].symbol.value;
-    let rules = list_of_rules[i].rule_list;
+    let rules = list_of_rules[i].rules_list;
     for(let r   = 0; r < rules.length; r++){
       let str = rules[r].value;
       index += str.length - 1;
       if (str.length > longest) {
         longest = str.length;
       }
+
       if(!alphabet.has(str[str.length-1]) && !terminal_symbols.has(str[str.length-1])){
         alphabet.add(str[str.length-1]);
       }
@@ -170,17 +184,20 @@ function create_edges(terminal_symbols){
         // char, and at the end make an edge back to loop vertex.
 
         // Last edge back to loop/First letter
-        graph["q" + index] = graph_components.make_vertex("q" + index, 2*consts.CFG_EDGE_X_DISTANCE + str.length*consts.CFG_EDGE_X_DISTANCE, consts.CFG_EDGE_Y_DISTANCE + row*consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false, 
+        graph["q" + index] = graph_components.make_vertex("q" + index, 2*consts.CFG_EDGE_X_DISTANCE + str.length*consts.CFG_EDGE_X_DISTANCE,
+                              consts.CFG_EDGE_Y_DISTANCE + row*consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false, 
                               [graph_components.make_edge("q" + index, "empty", undefined, undefined, undefined, undefined,
                               undefined, undefined, str[0])]);
         index--;
 
         // Create edges and vertexes until the second character in the string
         for(let i = 1; i < str.length; i++){
-          graph["q" + index] = graph_components.make_vertex("q" + index,  2*consts.CFG_EDGE_X_DISTANCE + consts.CFG_EDGE_Y_DISTANCE*(str.length - i), consts.CFG_EDGE_Y_DISTANCE + row*consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false, 
-                              [graph_components.make_edge("q" + index, "q" + (index + 1), undefined, undefined, undefined, undefined,
+          graph["q" + index] = graph_components.make_vertex("q" + index,  2*consts.CFG_EDGE_X_DISTANCE + consts.CFG_EDGE_X_DISTANCE*(str.length - i),
+                                consts.CFG_EDGE_Y_DISTANCE + row*consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false, 
+                                [graph_components.make_edge("q" + index, "q" + (index + 1), undefined, undefined, undefined, undefined,
                               undefined, undefined, str[i])]);
-          if(!alphabet.has(str[i]) && !terminal_symbols.has(str[i])){ // Differentiate between terminal symbols and alphabet
+          // Differentiate between terminal symbols and alphabet
+          if(!alphabet.has(str[i]) && !terminal_symbols.has(str[i])){
             alphabet.add(str[i]);
           }
           index--;
@@ -198,6 +215,7 @@ function create_edges(terminal_symbols){
     }
   }
   let cnt = 1;
+  // Add self-loops using the alphabet for the qloop vertex
   for(const l of alphabet.keys()){
     graph["loop"].out.push(graph_components.make_edge("loop", "loop", l, cnt*0.1 + 0.3,
                                 -1 - cnt, -2.8, -1.1, l));
@@ -208,43 +226,25 @@ function create_edges(terminal_symbols){
 }
 
 /**
- * Creates the elements that will be used to create/delete rules
- * @returns [plus, minus, symbol_input, rule_input] - [Plus button, Minus button, Symbol, Rule]
+ * returns the PDA based of the CFG that was last submitted 
+ * @returns {object} graph
  */
-function create_text_elements(){
-  let plus = document.createElement("button");
-  plus.id = "Add rule";
-  plus.textContent = " + ";
-  let minus = document.createElement("button");
-  minus.id = "Delete rule";
-  minus.textContent = " - ";
-  let symbol_input = document.createElement("Input");
-  symbol_input.addEventListener("change",function () {
-    //console.log("Symbol input Changed");
-  })
-  let rule_input = document.createElement("Input");
-  rule_input.addEventListener("change",function () {
-    //console.log("Rule input Changed");
-  })
-  return [plus, minus, symbol_input, rule_input];
-}
-
 export function get_graph(){
+  submit_rules();
   return graph;
 }
 
-export function get_rules(){
-  return list_of_rules;
-}
-
+/**
+ * Fill a symbol input with the symbol argument, and rules according to rules_list
+ * @param {String} symbol 
+ * @param {String[]} rules_list 
+ */
 function fill_rules(symbol, rules_list) {
   let list = document.querySelector('ul');
   let li = document.createElement('li');
-  let index = (list_of_rules.length + 1);
   let rule_count = rules_list.length;
 
-  let [plus, minus, symbol_input] = create_text_elements();
-  symbol_input.id = "Symbol " + index;
+  let [plus_btn, minus_btn, symbol_input] = create_text_elements();
   symbol_input.value = symbol;
 
   li.appendChild(symbol_input);
@@ -252,59 +252,70 @@ function fill_rules(symbol, rules_list) {
 
   let rule = {
     symbol : symbol_input,
-    rule_list : []
+    rules_list : []
   }
-  list_of_rules.push(rule);
 
   for (let i = 1; i < rule_count + 1; i++) {
     let rule_input = document.createElement("Input");
     rule_input.id = "Rule " + i;
     rule_input.value = rules_list[i - 1];
+    rule_input.addEventListener("change",function () {
+      load_rules();
+    })
     li.append(rule_input);
-    list_of_rules[index-1].rule_list.push(rule_input);
+    rule.rules_list.push(rule_input);
     li.append(document.createTextNode(" | "));
   }
+  list_of_rules.push(rule);
   li.removeChild(li.lastChild);
 
   // Button to add a rule input textbox
-  plus.addEventListener('click',() => {
-    rule_count++;
+  plus_btn.addEventListener('click',() => {
     let new_rule_input = document.createElement("Input");
-    new_rule_input.id = "Rule " + rule_count;
+    new_rule_input.id = "Rule " + rule.rules_list.length;
+    new_rule_input.value = consts.EMPTY_SYMBOL;
     new_rule_input.addEventListener("change",function () {
-      //console.log("Rule input Changed");
+      load_rules();
     })
     // Remove "+ / -"
     for(let i = 0; i < 3; i++){li.removeChild(li.lastChild);}
     li.append(document.createTextNode(" | "));
     li.append(new_rule_input);
-    list_of_rules[index-1].rule_list.push(new_rule_input);
-    li.append(plus);
-    li.append(document.createTextNode(" / "));
-    li.append(minus);
+    rule.rules_list.push(new_rule_input);
+    load_rules();
+    add_btns(li, plus_btn, minus_btn);
   });
 
   // Button to remove a rule input textbox
-  minus.addEventListener('click',() => {
+  minus_btn.addEventListener('click',() => {
     // Remove "|", last text box, "+ / -"
-    if(rule_count > 1){
+    if(rule.rules_list.length > 1){
       for(let i = 0; i < 5; i++){li.removeChild(li.lastChild);}
-      list_of_rules[index-1].rule_list.pop();
-      rule_count--;
-      li.append(plus);
-      li.append(document.createTextNode(" / "));
-      li.append(minus);
+      list_of_rules[list_of_rules.length - 1].rules_list.pop();
+      add_btns(li, plus_btn, minus_btn);
     }
+    load_rules();
   });
-  li.append(plus);
-  li.append(document.createTextNode(" / "));
-  li.append(minus);
+  add_btns(li, plus_btn, minus_btn);
 
   list.append(li);
 }
 
-export function reload(rules) {
+// hist_change = 1 when undo/redo, otherwise hist_change = 0 when switching to cfg
+/**
+ * loads all the input boxes with their original values
+ * @param {Object} rules    starting symbol, symbols and their rules
+ * @param {int} hist_change know what is calling the clear, 
+ *                          = 0 means that it is a switching from a machine to cfg
+ *                          = 1 means that it is undo/redo
+ *                          = 2 means that it is clear button.
+ * @returns 
+ */
+export function reload(hist_change = clear_to_reload) {
   graph = consts.EMPTY_GRAPH;
+  clear_rules(hist_change);
+  hist.set_history_keys(consts.MACHINE_TYPES.CFG);
+  let rules = hist.retrieve_latest_graph();
   //First open CFG section
   if (rules["start"] == undefined) {
     create_rule();
@@ -315,23 +326,53 @@ export function reload(rules) {
   }
   let symbols_list = (rules["symbols"] == null) ? [] : rules["symbols"];
   for (let r = 0; r < symbols_list.length; r++){
-    fill_rules(symbols_list[r], rules[symbols_list[r]]);
+    fill_rules(symbols_list[r], rules["Symbol"+(r+1)]);
   }
   document.body.appendChild(div);
 }
 
-function load_rules(){
+/**
+ * load to_push_rules with the values of the input boxes. and push to history
+ */
+export function load_rules(){
   to_push_rules["start"] = document.getElementById("starting_symbol").value;
   to_push_rules["symbols"] = [];
   for(let i = 0; i < list_of_rules.length; i++){
     let symbol = list_of_rules[i].symbol.value;
     to_push_rules["symbols"].push(symbol);
-    const rules = list_of_rules[i].rule_list;
-    to_push_rules[symbol] = [];
+    const rules = list_of_rules[i].rules_list;
+    to_push_rules["Symbol"+(i+1)] = [];
     for(let r   = 0; r < rules.length; r++){
-      to_push_rules[symbol].push(rules[r].value);
+      to_push_rules["Symbol"+(i+1)].push(rules[r].value);
     }
   }
   hist.set_history_keys(consts.MACHINE_TYPES.CFG);
   hist.push_history(to_push_rules);
+}
+/**
+ * clear all the rules
+ * @param {int} hist_change know what is calling the clear, 
+ *                          = 0 means that it is a switching from a machine to cfg
+ *                          = 1 means that it is undo/redo
+ *                          = 2 means that it is clear button.
+ */
+export function clear_rules(hist_change = clear_to_reload){
+  let list = document.querySelector('ul');
+  while (list_of_rules.length > 0) {
+    list.removeChild(list.lastChild);
+    list_of_rules.pop();
+  }
+  document.getElementById("starting_symbol").value = "";
+  if (hist_change == clear_everything_mode) {
+    create_rule();
+    load_rules();
+    hist.set_history_keys(consts.MACHINE_TYPES.CFG);
+    hist.push_history(to_push_rules);
+  }
+}
+
+function add_btns(li, plus_btn, minus_btn) {
+  li.append(plus_btn);
+  li.append(document.createTextNode(" / "));
+  li.append(minus_btn);
 }
