@@ -44,6 +44,39 @@
 
   </section>
 
+  <section id="sidebar">
+    <!-- Side navigation -->
+  <div class="sidenav">
+    <button onclick=
+      "document.getElementById('tutorial-content').hidden = !document.getElementById('tutorial-content').hidden">
+      Toggle Tutorial
+    </button>
+    <button onclick=
+      "document.getElementById('secondbar').hidden = !document.getElementById('secondbar').hidden">
+      click</button>
+    <a href="#">Services</a>
+    <a href="#">Clients</a>
+    <a href="#">Contact</a>
+    <a href="#" id="five">five</a>
+    <a href="#">six</a>
+  </div>
+  </section>
+
+  <section hidden id="secondbar">
+    <button>Button</button>
+    <!-- dropdown menu activated when button is clicked-->
+      <button onclick=
+      "document.getElementById('dropdown-content').hidden = !document.getElementById('dropdown-content').hidden"
+      >dropdown</button>
+      <section id="dropdown-content">
+        <a href="#">Link 1</a>
+        <a href="#">Link 2</a>
+        <a href="#">Link 3</a>
+      </section>
+    <button>2 Button </button>
+
+  </section>
+
   <!-- user guide content -->
   <section hidden id="tutorial-content">
     <a href="https://github.com/flapjs/vanilla/blob/master/usage.md">
@@ -56,6 +89,19 @@
       <div>dd to delete</div>
     </a>
   </section>
+
+
+  <script>
+  function w3_open() {
+    document.getElementById("tutorial_content").style.display = "block";
+  }
+  
+  function w3_close() {
+    document.getElementById("tutorial_content").style.display = "none";
+  }
+  </script>
+
+
 
   <!-- the big canvas that we draw on -->
   <canvas id='machine_drawing'>Your browser does not support canvas</canvas>

@@ -26,11 +26,6 @@ input {
   border: 1px solid rgb(128, 128, 16);
 }
 
-/* all buttons */
-button {
-  background-color: Transparent;
-  color: rgb(0, 144, 255);
-}
 
 .topnav {
   overflow: hidden;
@@ -71,4 +66,111 @@ button {
 #tutorial-content {
   font-size: 12px;
   padding-top: 8px;
+}
+
+
+/* The sidebar menu */
+.sidenav {
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  width: 10vw; /* Set the width of the sidebar */
+  min-width: 4px;
+  max-width: 50px;
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  left: 0;
+  background-color: blue; /* Black */
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 20px;
+}
+
+/* The navigation menu links */
+.sidenav a{
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 10px;
+  color: yellow;
+  display: block;
+  border-radius: 5px;
+  border-width: 2px;
+  border-color: white;
+  border-style: solid;
+  width: 25px;
+  height: 25px;
+  margin-bottom: 20px;
+  margin-left: 10px;
+  padding: 0 0 0 0;
+}
+
+.sidenav button {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 10px;
+  color: green;
+  display: block;
+  border-radius: 5px;
+  border-width: 2px;
+  border-color: white;
+  border-style: solid;
+  width: 25px;
+  height: 25px;
+  margin-bottom: 20px;
+  margin-left: 10px;
+}
+
+#one{
+  margin-top: 100px;
+  width: 50px;
+  height: 50px;
+  padding: 0 0 0 0;
+}
+
+.sidenav #five {
+  margin-top: 50vh;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover, .sidenav button:hover {
+  color: #f1f1f1;
+}
+
+#secondbar {
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  width: 12vw; /* Set the width of the sidebar */
+  min-width: 175px;
+  max-width: 200px;
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  left: 1;
+  background-color: royalblue; /* Black */
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 20px;
+  margin-left: 50px;
+}
+
+#secondbar button {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 10px;
+  color: green;
+  display: block;
+  border-radius: 5px;
+  border-width: 2px;
+  border-color: white;
+  border-style: solid;
+  width: 10vw;
+  height: 25px;
+  margin-bottom: 20px;
+  margin-left: 10px;
+}
+
+canvas {
+  background-color: lightgoldenrodyellow;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
 }
