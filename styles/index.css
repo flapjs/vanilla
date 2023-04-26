@@ -73,14 +73,14 @@ input {
 /* The sidebar menu */
 .sidenav {
   height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 20vw; /* Set the width of the sidebar */
-  min-width: 4px;
+  width: 5%; /* Set the width of the sidebar */
+  min-width: 5%;
   max-width: 50px;
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
   left: 0;
-  background-color: blue; /* Black */
+  background-color:#273b7d; /* Black */
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 20px;
 }
@@ -90,33 +90,30 @@ input {
   padding: 6px 8px 6px 16px;
   text-decoration: none;
   font-size: 10px;
-  color: yellow;
+  color:#f2f0f0;
   display: block;
-  border-radius: 5px;
-  border-width: 2px;
-  border-color: white;
-  border-style: solid;
-  width: 25px;
-  height: 25px;
+  border-radius: 7px;
+  width: 43px;
+  height: 43px;
   margin-bottom: 20px;
-  margin-left: 10px;
+  margin-left: 9.5px;
   padding: 0 0 0 0;
+  position: relative;
 }
 
 .sidenav button {
-  padding: 6px 8px 6px 16px;
+  padding: 6px 6px 16px;
   text-decoration: none;
   font-size: 10px;
-  color: green;
+  color:#f2f0f0;
+  background-color: #273b7d;
   display: block;
-  border-radius: 5px;
-  border-width: 2px;
-  border-color: white;
-  border-style: solid;
-  width: 25px;
-  height: 25px;
+  border-radius: 7px;
+  width: 43px;
+  height: 43px;
   margin-bottom: 20px;
-  margin-left: 10px;
+  margin-left: 9.5px;
+
 }
 
 #one{
@@ -132,7 +129,11 @@ input {
 
 /* When you mouse over the navigation links, change their color */
 .sidenav a:hover, .sidenav button:hover {
-  color: #f1f1f1;
+  color: #f2f0f0;
+  background-color: #4e5aa3;
+  width:43px;
+  height:43px;
+  transition-duration: 0.4s;
 }
 
 #secondbar {
@@ -166,6 +167,34 @@ input {
   margin-left: 10px;
 }
 
+/* text when hovering */
+.button .tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width:max-content;
+  background-color:#f2f0f0;
+  color:#000000;
+  text-align: center;
+  padding: 10px 10px;
+  border-radius: 6px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  /*move tooltip left away from icons */
+  left: 64px;
+  position: fixed;
+  z-index: 1;
+  transform: translate3d(0,-5px,0);
+  transition: all .15s ease-in-out;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  transform: translate3d(0,0,0);
+}
+
 canvas {
   background-color: lightgoldenrodyellow;
 }
@@ -175,3 +204,4 @@ canvas {
   .sidenav {padding-top: 15px;}
   .sidenav a {font-size: 18px;}
 }
+
