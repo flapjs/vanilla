@@ -149,6 +149,7 @@ input {
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 20px;
   margin-left: 64px;
+  transition: 0.3s;
 }
 
 #secondbar button {
@@ -172,6 +173,7 @@ input {
 
 #secondbar button:hover {
   background-color:#4e5aa3;
+  color:#f2f0f0;
   transition-duration: 0.4s;
   border-radius: 5px;
   padding: 15px 15px 15px 10px;
@@ -192,9 +194,8 @@ input {
   padding: 10px 10px;
   border-radius: 6px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
-  /*move tooltip left away from icons */
-  left: 64px;
-  position: fixed;
+  left: 65px; /*move tooltip left away from icons */
+  position: fixed; /* appears above all other elments */
   z-index: 1;
   transform: translate3d(0,-5px,0);
   transition: all .15s ease-in-out;
