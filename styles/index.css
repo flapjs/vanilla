@@ -153,7 +153,7 @@ input {
 }
 
 #secondbar button {
-  padding: 15px 15px 15px 10px;
+  padding: 10px 15px 20px 10px;
   font-family: 'Source Sans Pro', sans-serif;
   text-align: left;
   text-decoration: none;
@@ -176,7 +176,7 @@ input {
   color:#f2f0f0;
   transition-duration: 0.4s;
   border-radius: 5px;
-  padding: 15px 15px 15px 10px;
+  padding: 10px 15px 20px 10px;
 }
 
 /* text when hovering */
