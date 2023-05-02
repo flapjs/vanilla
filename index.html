@@ -91,7 +91,7 @@
       </div>
     </button>
     <button class="Machine" onclick=
-      "document.getElementById('secondbar').hidden = !document.getElementById('secondbar').hidden">
+      "togglesidebar('settings')">
       <div class="tooltip">
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
@@ -107,7 +107,7 @@
         <span class="tooltiptext">Machine</span>
       </div>
     </button>
-    <button class="Save">
+    <button class="Save" onclick="togglesidebar('save')">
       <div class="tooltip">
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
@@ -177,6 +177,7 @@
 
   <section hidden id="secondbar">
     <button id="closeButton"> X </button>
+    <div class = "dropdown settings">
     <button class = "NFA_specific" id = "NFA_to_DFA" >NFA to DFA</button>
     <!-- dropdown menu activated when button is clicked-->
       <!--
@@ -189,8 +190,12 @@
         <option value="PDA">Pushdown Automata</option>
         <option value="Turing">Turing Machine</option>
       </select>
+    </div>
     
-    
+    <div hidden class="dropdown save">
+      <button id="save_machine">Save as png</button>
+      <button id="permalink">Permalink</button>
+    </div>
     
 
   </section>
@@ -212,7 +217,7 @@
   <script>
     const closeButton = document.getElementById('closeButton');
     closeButton.addEventListener('click',function(){
-      document.getElementById('secondbar').hidden = !document.getElementById('secondbar').hidden;
+      closetheButton();
     })
   function w3_open() {
     document.getElementById("tutorial_content").style.display = "block";
@@ -220,6 +225,28 @@
   
   function w3_close() {
     document.getElementById("tutorial_content").style.display = "none";
+  }
+
+  function closetheButton() {
+    document.getElementById('secondbar').hidden = true;
+    var i;
+    var x = document.getElementsByClassName('dropdown');
+    for (i = 0; i < x.length; i++) {  
+      x[i].hidden = true;
+    }
+  }
+
+  function togglesidebar(classname) {
+    const isHidden = document.getElementById('secondbar').hidden;
+    if (!isHidden) { 
+      closetheButton();
+    }
+    document.getElementById('secondbar').hidden = false;
+    var i;
+    var x = document.getElementsByClassName(classname);
+    for (i = 0; i < x.length; i++) {
+      x[i].hidden = false;
+    }
   }
   
   </script>
