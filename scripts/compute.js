@@ -4,6 +4,25 @@ import * as consts from './consts.js';
 import * as drawing from './drawing.js';
 import { edge_equal } from './graph_components.js';
 
+/** given a graph and its input, compute the input alphabet */
+export function compute_alphabet(graph, input) {
+  const alphabet = new Set();
+  for(const vertex of Object.values(graph)) {
+    for(const e of vertex.out) {
+      alphabet.add(e.transition);
+    }
+  }
+
+  if(input) {
+    for(let i = 0; i < input.length; i++) {
+      alphabet.add(input.charAt(i));
+    }
+  }
+
+  alphabet.delete(consts.EMPTY_SYMBOL);
+  return alphabet;
+}
+
 /**
  * finds the start vertex
  * @param {Object} graph - the graph whose starting vertex is to be computed
@@ -405,22 +424,6 @@ export function run_input(graph, machine_type, input, interactive=false) {
   }
 }
 
-/** given a graph and its input, compute the input alphabet */
-export function compute_alphabet(graph, input) {
-  let alphabet = new Set();
-  for(const vertex of Object.values(graph)) {
-    for(const e of vertex.out) {
-      alphabet.add(e.transition);
-    }
-  }
-
-  for(let i = 0; i < input.length; i++) {
-    alphabet.add(input.charAt(i));
-  }
-
-  return alphabet;
-}
-
 /** given an NFA, check if it is in fact deterministic */
 export function is_DFA(NFA, input) {
   let alphabet = compute_alphabet(NFA, input);
@@ -432,8 +435,6 @@ export function is_DFA(NFA, input) {
     for(const e of vertex.out) {
       outgoing.push(e.transition);
     }
-
-    console.log(outgoing);
 
     if(outgoing.length < alphabet.size) {
       let missing_transitions = '';
@@ -455,21 +456,13 @@ export function is_DFA(NFA, input) {
       }
 
       alert("Extra transitions " + extra_transitions.substring(0, extra_transitions.length - 2) + " for " + vertex.name);
+      return false;
     }
   }
 
   return true;
 }
 
-/*
-export function NFA_to_DFA(NFA, input) {
-  if(is_DFA(NFA, input)) {
-    return;             // nothing to do
-  }
-
-
-}
-*/
 /**
  * computes if the edge is the same as another one already in graph up to graphical representation
  * @param {Object} graph 
