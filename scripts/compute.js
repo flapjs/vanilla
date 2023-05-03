@@ -428,8 +428,6 @@ export function run_input(graph, machine_type, input, interactive=false) {
 export function is_DFA(NFA, input) {
   let alphabet = compute_alphabet(NFA, input);
 
-  console.log(alphabet);
-
   for(const vertex of Object.values(NFA)) {
     let outgoing = [];
     for(const e of vertex.out) {
