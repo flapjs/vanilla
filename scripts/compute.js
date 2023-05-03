@@ -5,22 +5,6 @@ import * as drawing from './drawing.js';
 import { edge_equal } from './graph_components.js';
 
 /**
- * finds all letters used in the transitions
- * @param {Object} graph - the graph whose alphebet is to be computed
- * @returns {Set<string>} a set of letters used in the transitions
- */
-export function compute_alphabet(graph) {
-  const alphabet = new Set();
-  for (const vertex of Object.values(graph)) {
-    for (const edge of vertex.out) {
-      alphabet.add(edge.transition);
-    }
-  }
-  alphabet.delete(consts.EMPTY_SYMBOL);  // exclude epsilon
-  return alphabet;
-}
-
-/**
  * finds the start vertex
  * @param {Object} graph - the graph whose starting vertex is to be computed
  * @returns {string} the start of the graph, null of graph empty
@@ -421,10 +405,10 @@ export function run_input(graph, machine_type, input, interactive=false) {
   }
 }
 
-/** given an NFA, check if it is in fact deterministic */
-export function is_DFA(NFA, input) {
+/** given a graph and its input, compute the input alphabet */
+export function compute_alphabet(graph, input) {
   let alphabet = new Set();
-  for(const vertex of Object.values(NFA)) {
+  for(const vertex of Object.values(graph)) {
     for(const e of vertex.out) {
       alphabet.add(e.transition);
     }
@@ -434,31 +418,58 @@ export function is_DFA(NFA, input) {
     alphabet.add(input.charAt(i));
   }
 
+  return alphabet;
+}
+
+/** given an NFA, check if it is in fact deterministic */
+export function is_DFA(NFA, input) {
+  let alphabet = compute_alphabet(NFA, input);
+
+  console.log(alphabet);
+
   for(const vertex of Object.values(NFA)) {
-    let outgoing = new Set();
+    let outgoing = [];
     for(const e of vertex.out) {
-      outgoing.add(e.transition);
+      outgoing.push(e.transition);
     }
 
-    if(outgoing.size < alphabet.size) {
+    console.log(outgoing);
+
+    if(outgoing.length < alphabet.size) {
       let missing_transitions = '';
       let alpha_array = Array.from(alphabet);
       for(let i = 0; i < alpha_array.length; i++) {
-        if(!outgoing.has(alpha_array[i])) {
+        if(!outgoing.includes(alpha_array[i])) {
           missing_transitions += alpha_array[i] + ', ';
         }
       }
 
-      console.log(missing_transitions);
-
       alert("Missing transitions " + missing_transitions.substring(0, missing_transitions.length - 2) + " for " + vertex.name);
       return false;
+    } else if(outgoing.length > alphabet.size) {
+      let extra_transitions = '';
+      for(let i = 0; i < outgoing; i++) {
+        if(!alphabet.has(outgoing[i])) {
+          extra_transitions += outgoing[i] + ', ';
+        }
+      }
+
+      alert("Extra transitions " + extra_transitions.substring(0, extra_transitions.length - 2) + " for " + vertex.name);
     }
   }
 
   return true;
 }
 
+/*
+export function NFA_to_DFA(NFA, input) {
+  if(is_DFA(NFA, input)) {
+    return;             // nothing to do
+  }
+
+
+}
+*/
 /**
  * computes if the edge is the same as another one already in graph up to graphical representation
  * @param {Object} graph 
