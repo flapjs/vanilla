@@ -1,8 +1,9 @@
 /** @module compute */
 
 import * as consts from './consts.js';
+import * as graph_ops from './graph_ops.js';
 import * as drawing from './drawing.js';
-import { edge_equal } from './graph_components.js';
+import * as graph_components from './graph_components.js';
 
 /**
  * finds all letters used in the transitions
@@ -328,7 +329,7 @@ export function is_DFA(NFA) {
 export function edge_has_equiv_edge_in_graph(graph, edge) {
   for (const vertex of Object.values(graph)) {
     for (const e of vertex.out) {
-      if (edge_equal(e, edge)) {
+      if (graph_components.edge_equal(e, edge)) {
         return true;
       }
     }
@@ -361,6 +362,9 @@ export function edge_in_graph(graph, edge) {
  */
 export function search(graph, vertex, arr) {
   arr = arr? arr : [];
+  if (vertex.out == undefined) {
+    return arr;
+  }
   for (const e of vertex.out) {
     let vout = e.to;
     arr.push(vout);
@@ -379,66 +383,67 @@ export function search(graph, vertex, arr) {
  * @returns {HTMLUlistElement} An equivalent CFG
  */
 export function PDA_to_CFG(graph) {
-  const alphabet = compute.compute_alphabet(graph);
+  const alphabet = compute_alphabet(graph);
   //Modify graph to satisfy required conditions for conversion
   const PLACEHOLDER_SYMB = '|'; //TODO: figure out better placeholder
   const STACK_MARKER = '\\'; //TODO: figure out better placeholder
-  let name = find_unused_name(graph);
-  const start_vertex = make_vertex(name,0,0); //new start state to push stack marker
+  const EMPTY_SYMBOL = consts.EMPTY_SYMBOL;
+  let name = graph_ops.find_unused_name(graph);
+  const start_vertex = graph_components.make_vertex(name,0,0); //new start state to push stack marker
   start_vertex.is_start = true;
   graph[name] = start_vertex;
-  name = find_unused_name(graph);
-  const final_vertex_empty = make_vertex(name,0,0); //state used to empty stack after computation
+  name = graph_ops.find_unused_name(graph);
+  const final_vertex_empty = graph_components.make_vertex(name,0,0); //state used to empty stack after computation
   graph[name] = final_vertex_empty;
-  name = find_unused_name(graph);
-  const final_vertex = make_vertex(name,0,0); //unique accept state
+  name = graph_ops.find_unused_name(graph);
+  const final_vertex = graph_components.make_vertex(name,0,0); //unique accept state
   graph[name] = final_vertex
   for (const vertex of Object.values(graph)) {
     for (const edge of vertex.out) {
       //if edge does nothing to stack, add transition state to push/pop placeholder
-      if (edge.push_symbol == EMPTY_SYMBOL && edge.pop_symbol == EMPTY_SYMBOL) {
-        name = find_unused_name(graph);
-        const newVertex = make_vertex(name,0,0);
+      if (edge.push_symbol == consts.EMPTY_SYMBOL && edge.pop_symbol == consts.EMPTY_SYMBOL) {
+        name = graph_ops.find_unused_name(graph);
+        const newVertex = graph_components.make_vertex(name,0,0);
         graph[name] = newVertex;
-        let e1 = make_edge(vertex, newVertex, edge.transition, 0.5, 0, 0, 0, EMPTY_SYMBOL, PLACEHOLDER_SYMB);
+        let e1 = graph_components.make_edge(vertex, newVertex, edge.transition, 0.5, 0, 0, 0, EMPTY_SYMBOL, PLACEHOLDER_SYMB);
         vertex.out.push(e1);
-        let e2 = make_edge(newVertex, edge.to, EMPTY_SYMBOL, 0.5, 0, 0, 0, PLACEHOLDER_SYMB, EMPTY_SYMBOL);
+        let e2 = graph_components.make_edge(newVertex, edge.to, consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, PLACEHOLDER_SYMB, EMPTY_SYMBOL);
         newVertex.out.push(e2);
-        vertex.out = vertex.out.filter(e => !edge_equal(e, edge)); //TODO: find better algorithm
+        vertex.out = vertex.out.filter(e => !graph_components.edge_equal(e, edge)); //TODO: find better algorithm
       }
       //if edge both pushes and pops, add transition state to separate the two
-      else if (edge.push_symbol != EMPTY_SYMBOL && edge.pop_symbol != EMPTY_SYMBOL) {
-        const name = find_unused_name(graph);
-        const newVertex = make_vertex(name,0,0);
+      else if (edge.push_symbol != consts.EMPTY_SYMBOL && edge.pop_symbol != consts.EMPTY_SYMBOL) {
+        const name = graph_ops.find_unused_name(graph);
+        const newVertex = graph_components.make_vertex(name,0,0);
         graph[name] = newVertex;
-        let e1 = make_edge(vertex, newVertex, edge.transition, 0.5, 0, 0, 0, EMPTY_SYMBOL, edge.push_symbol);
+        let e1 = graph_components.make_edge(vertex, newVertex, edge.transition, 0.5, 0, 0, 0, consts.EMPTY_SYMBOL, edge.push_symbol);
         vertex.out.push(e1);
-        let e2 = make_edge(newVertex, edge.to, EMPTY_SYMBOL, 0.5, 0, 0, 0, edge.pop_symbol, EMPTY_SYMBOL);
+        let e2 = graph_components.make_edge(newVertex, edge.to, consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, edge.pop_symbol, consts.EMPTY_SYMBOL);
         vertex.out.push(e2);
-        vertex.out = vertex.out.filter(e => !edge_equal(e, edge));
+        vertex.out = vertex.out.filter(e => !graph_components.edge_equal(e, edge));
       }
     }
     //change start state + push stack marker
     if (vertex.is_start && vertex != start_vertex) {
-      let e = make_edge(start_vertex, vertex, EMPTY_SYMBOL, 0.5, 0, 0, 0, EMPTY_SYMBOL, STACK_MARKER);
+      let e = graph_components.make_edge(start_vertex, vertex, consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, consts.EMPTY_SYMBOL, STACK_MARKER);
       vertex.out.push(e);
       vertex.is_start = false;
     }
     //Funnel all accept states into one state
     if (vertex.is_final) {
-      let e = make_edge(vertex, final_vertex_empty, EMPTY_SYMBOL, 0.5, 0, 0, 0, EMPTY_SYMBOL, PLACEHOLDER_SYMB);
+      let e = graph_components.make_edge(vertex, final_vertex_empty, consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, consts.EMPTY_SYMBOL, PLACEHOLDER_SYMB);
       vertex.out.push(e);
     }
   }
   //empty stack
   final_vertex.is_final = true;
   for (const c in alphabet) {
-    let e = make_edge(final_vertex_empty, final_vertex_empty, EMPTY_SYMBOL, 0.5, 0, 0, 0, c, EMPTY_SYMBOL);
+    let e = graph_components.make_edge(final_vertex_empty, final_vertex_empty, EMPTY_SYMBOL, 0.5, 0, 0, 0, c, EMPTY_SYMBOL);
     final_vertex_empty.out.push(e);
   }
-  let e = make_edge(final_vertex_empty, final_vertex_empty, EMPTY_SYMBOL, 0.5, 0, 0, 0, PLACEHOLDER_SYMB, EMPTY_SYMBOL);
+  let e = graph_components.make_edge(final_vertex_empty, final_vertex_empty, EMPTY_SYMBOL, 0.5, 0, 0, 0, PLACEHOLDER_SYMB, EMPTY_SYMBOL);
   final_vertex_empty.out.push(e);
-  e = make_edge(final_vertex_empty, final_vertex, EMPTY_SYMBOL, 0.5, 0, 0, 0, STACK_MARKER, EMPTY_SYMBOL);
+  e = graph_components.make_edge(final_vertex_empty, final_vertex, EMPTY_SYMBOL, 0.5, 0, 0, 0, STACK_MARKER, EMPTY_SYMBOL);
   final_vertex_empty.out.push(e);
 
   //create CFG rule matrix + array of vertices to index
@@ -457,7 +462,7 @@ export function PDA_to_CFG(graph) {
     let reachable = search(graph, vertex_array[j]);
     for (let k = 0; k < i; k++) {
       //note: inefficient process, should be optimized
-      if (reachable.indexOf(vertex[k]) == -1) {
+      if (reachable.indexOf(vertex_array[k]) == -1) {
         //vertex is unreachable
         if (j == k) {
           //rule will only contain empty string in this case
@@ -474,15 +479,15 @@ export function PDA_to_CFG(graph) {
   }
 
   //create reverse graph, helpful for computation
-  let graph_reverse = EMPTY_GRAPH;
+  let graph_reverse = consts.EMPTY_GRAPH;
   for (const vertex in graph) {
-    graph_reverse[vertex.name] = vertex;
+    graph_reverse[vertex.name] = graph_components.make_vertex(vertex.name, 0, 0);
   }
   for (const vertex in graph) {
     for (const edge in vertex.out) {
       //copy each edge from the graph, then reverse the direction
-      let e = make_edge(edge.to, edge.from, edge.transition, edge.a1, edge.a2, edge.angle1, edge.angle2, edge.pop_symbol, edge.push_symbol);
-      graph_reverse[vertex].push(e);
+      let e = graph_components.make_edge(graph_reverse[edge.to.name], graph_reverse[edge.from.name], edge.transition, edge.a1, edge.a2, edge.angle1, edge.angle2, edge.pop_symbol, edge.push_symbol);
+      graph_reverse[edge.to.name].out.push(e);
     }
   }
 
@@ -512,7 +517,36 @@ export function PDA_to_CFG(graph) {
         }
       }
       //compute rules that add characters
-      
+      for (const e1 in vertex_array[j].out) {
+        //make sure it's a push edge
+        if (e1.push_symbol = EMPTY_SYMBOL) {
+          continue;
+        }
+        let c = e1.push_symbol;
+        //check output for incoming edges with same pop symbol (outgoing in reverse graph)
+        for (const e2 in graph_reverse[vertex_array[k].name].out) {
+          if (e2.pop_symbol == c) {
+            //get intermediate rule, evaluate known cases
+            let mid_rule = rule_matrix[e1.to][e2.to];
+            if (mid_rule == NULL) {
+              continue;
+            }
+            if (mid_rule == EMPTY) {
+              if (rule_matrix[j][k] != "") {
+                rule_matrix[j][k] = rule_matrix[j][k] + " | ";
+              }
+              rule_matrix[j][k] += e1.transition;
+              rule_matrix[j][k] += e2.transition;
+            } else {
+              if (rule_matrix[j][k] != "") {
+                rule_matrix[j][k] = rule_matrix[j][k] + " | ";
+              }
+              rule_matrix[j][k] += e1.transition + "(" + e1.to + "," + e2.to + ")" + e2.transition;
+            }
+          }
+        }
+      }
     }
   }
+  console.log(rule_matrix);
 }
