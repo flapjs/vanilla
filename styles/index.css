@@ -73,9 +73,7 @@ input {
 /* The sidebar menu */
 .sidenav {
   height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 5%; /* Set the width of the sidebar */
-  min-width: 5%;
-  max-width: 50px;
+  width: 64px;
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
@@ -138,9 +136,7 @@ input {
 
 #secondbar {
   height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 12vw; /* Set the width of the sidebar */
-  min-width: 175px;
-  max-width: 200px;
+  width: 200px; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
@@ -165,7 +161,7 @@ input {
   border-width: 2px;
   border-color:#3a468f;
   border-style: solid;
-  width: 10vw;
+  width: 125px;
   height: 25px;
   margin-bottom: 20px;
   margin-left: 10px;
