@@ -434,6 +434,10 @@ export function is_DFA(NFA, input) {
       outgoing.push(e.transition);
     }
 
+    if(outgoing.has(consts.EMPTY_SYMBOL)) {
+      return false;
+    }
+
     if(outgoing.length < alphabet.size) {
       let missing_transitions = '';
       let alpha_array = Array.from(alphabet);
