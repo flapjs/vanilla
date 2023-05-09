@@ -335,10 +335,6 @@ function* run_input_Mealy(graph, input, interactive) {
   let cur_state = find_start(graph);  // find closure of start
   let output_string = '';
 
-  if(!is_DFA(graph, input)) {
-    return;
-  }
-
   if (interactive) {
     drawing.highlight_states(graph, [cur_state]);
     drawing.viz_NFA_input(input, 0);
@@ -366,10 +362,6 @@ function* run_input_Mealy(graph, input, interactive) {
 function* run_input_Moore(graph, input, interactive) {
   let cur_state = find_start(graph);
   let output_string = graph[cur_state].moore_output;
-
-  if(!is_DFA(graph, input)) {
-    return;
-  }
 
   if (interactive) {
     drawing.highlight_states(graph, [cur_state]);
@@ -417,9 +409,9 @@ export function run_input(graph, machine_type, input, interactive=false) {
     return run_input_PDA(graph, input, interactive);
   } else if (machine_type === consts.MACHINE_TYPES.Turing) {
     return run_input_Turing(graph, input, interactive);
-  } else if (machine_type === consts.MACHINE_TYPES.Mealy) {
+  } else if (machine_type === consts.MACHINE_TYPES.Mealy && is_DFA(graph, input)) {
     return run_input_Mealy(graph, input, interactive);
-  } else if (machine_type === consts.MACHINE_TYPES.Moore) {
+  } else if (machine_type === consts.MACHINE_TYPES.Moore && is_DFA(graph, input)) {
     return run_input_Moore(graph, input, interactive);
   }
 }
