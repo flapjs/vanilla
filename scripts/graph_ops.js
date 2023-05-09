@@ -231,14 +231,7 @@ export function rename_edge(graph, edge, new_transition, new_pop, new_push, new_
  */
 function combine_state_labels(states) {
   // convert to array and sort
-  states = [...states].sort((u, v) => {
-    // u, v of the form qn, qm where n, m integers
-    if (u.substring(0, 1) === v.substring(0, 1) && !isNaN(u.substring(1)) && !isNaN(v.substring(1))) {
-      return parseInt(u.substring(1)) - parseInt(v.substring(1));  // return the numeric comparison
-    } else {
-      return u < v;  // use the string comparisn
-    }
-  });
+  states = [...states].sort();
   return '{'+ states.join(',') +'}';
 }
 
