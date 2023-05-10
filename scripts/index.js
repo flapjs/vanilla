@@ -400,7 +400,10 @@ function bind_permalink() {
 
 
 function bind_rearrange_graph() {
-  console.log("i am very sleep deprived");
+  const rearrange_menu = document.getElementById('rearrange_graph_menu');
+  rearrange_menu.addEventListener('change', () => {
+    console.log('FUUUUUCK');
+  });
 }
 
 /** run after all the contents are loaded to hook up callbacks */

@@ -14,7 +14,7 @@ export function get_canvas() {
 
 /**
  * get the position of the mouseclick event wrt canvas
- * @param {Object} e 
+ * @param {Object} e
  * @returns {Array<float>} x and y position of the mouseclick wrt canvas
  */
 export function event_position_on_canvas(e) {
@@ -26,7 +26,7 @@ export function event_position_on_canvas(e) {
 
 /**
  * get the position of the mouseclick event wrt canvas
- * @param {Array<float>} canvas_pt - the [x, y] position wrt canvas 
+ * @param {Array<float>} canvas_pt - the [x, y] position wrt canvas
  * @returns {Array<float>} x and y position wrt window
  */
 export function canvas_px_to_window_px(canvas_pt) {
@@ -37,7 +37,7 @@ export function canvas_px_to_window_px(canvas_pt) {
 /**
  * computes an appropriate text size to display the label
  * @param {int} textbox_width - width of textbox in pxiels
- * @param {string} text - the text message to display 
+ * @param {string} text - the text message to display
  * @returns {int} fontsize in pixels
  */
 function text_size_huristic(textbox_width, text) {
@@ -112,7 +112,7 @@ export function draw_vertex(vertex) {
     text += ` / ${vertex.moore_output}`;
   }
   // find an appropriate text size and draw the text inside the vertex
-  const text_size = text_size_huristic(vertex.r, text)
+  const text_size = text_size_huristic(vertex.r, text);
   draw_text(text, [vertex.x, vertex.y], text_size);
   if (vertex.is_start) {  // it is the starting vertex
     const tip1 = [vertex.x-vertex.r, vertex.y],
@@ -127,9 +127,9 @@ export function draw_vertex(vertex) {
 
 /**
  * draw a triangle with three tips provided
- * @param {Array<float>} tip1 
- * @param {Array<float>} tip2 
- * @param {Array<float>} tip3 
+ * @param {Array<float>} tip1
+ * @param {Array<float>} tip2
+ * @param {Array<float>} tip3
  */
 export function draw_triangle(tip1, tip2, tip3) {
   const ctx = get_canvas().getContext('2d');
@@ -159,7 +159,7 @@ export function draw_arrow(start, end, mid) {
   // we boost the curve by the orthogonal component of v1 wrt v2
   ctx.quadraticCurveTo(...linalg.add(mid, ortho_comp), ...end);
   ctx.stroke();
-  const arrow_tip = linalg.normalize(linalg.sub(mid_to_end, ortho_comp), consts.ARROW_LENGTH);  
+  const arrow_tip = linalg.normalize(linalg.sub(mid_to_end, ortho_comp), consts.ARROW_LENGTH);
   const normal_to_tip = linalg.normalize(linalg.normal_vec(arrow_tip), consts.ARROW_WIDTH/2);  // half the total width
   const tip1 = end,
     tip2 = linalg.add(linalg.sub(end, arrow_tip), normal_to_tip),
@@ -172,7 +172,7 @@ export function draw_arrow(start, end, mid) {
  * @param {Object} graph - the graph of interest
  * @param {float} x - x position
  * @param {float} y - y position
- * @param {string} v - name of the vertex 
+ * @param {string} v - name of the vertex
  * @returns {boolean} whether (x, y) is in v
  */
 export function in_vertex(graph, x, y, v) {
@@ -184,7 +184,7 @@ export function in_vertex(graph, x, y, v) {
 /**
  * detects if the current click is inside a vertex
  * @param {Object} graph - the graph of interest
- * @param {float} x - x position wrt canvas 
+ * @param {float} x - x position wrt canvas
  * @param {float} y - y position wrt canvas
  * @returns {string} returns the first vertex in the graph that contains (x, y), null otherwise
  */
@@ -200,7 +200,7 @@ export function in_any_vertex(graph, x, y) {
 /**
  * detects if the current click is inside edge text
  * @param {Object} graph - the graph of interest
- * @param {float} x - x position wrt canvas 
+ * @param {float} x - x position wrt canvas
  * @param {float} y - y position wrt canvas
  * @returns {Object} returns the first edge in the graph that contains (x, y), null otherwise
  */
@@ -280,7 +280,7 @@ export function draw_edge(graph, edge, text_size) {
   } else if (menus.is_Turing()) {  // append push and left/right if we have turing
     edge_text += consts.ARROW_SYMBOL+push_symbol+','+move;
   } else if (menus.is_Mealy()) {
-    edge_text += " / " + mealy_output;
+    edge_text += ' / ' + mealy_output;
   }
   draw_text(edge_text, mid, text_size);
 }
@@ -329,7 +329,7 @@ function compute_machine_drawing_size(graph) {
   return [[min_x, min_y], [max_x, max_y]];
 }
 
-/** 
+/**
  * grab the current graph and download onto user's computer
  * @param {Object} graph - the graph object whose drawing is to be downloaded
  */
@@ -354,7 +354,7 @@ export function save_as_png(graph) {
 
 /**
  * remove old highlited vertexes and mark current vertexes as highlited
- * @param {Object} graph 
+ * @param {Object} graph
  * @param {Iterable<string>} cur_states - vertex names
  */
 export function highlight_states(graph, cur_states) {
