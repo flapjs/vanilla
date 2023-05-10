@@ -398,6 +398,11 @@ function bind_permalink() {
   window.addEventListener('hashchange', hash_change_handler);
 }
 
+
+function bind_rearrange_graph() {
+  console.log("i am very sleep deprived");
+}
+
 /** run after all the contents are loaded to hook up callbacks */
 function init() {
   bind_switch_machine();
@@ -412,5 +417,6 @@ function init() {
   bind_dd();
   bind_elongate_textbox();
   bind_permalink();
+  bind_rearrange_graph();
   init_graph();  // leave this last since we want it to override some of the above
 }
