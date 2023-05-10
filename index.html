@@ -66,6 +66,11 @@
       padding: 0.5vw;
       margin: 3px;
     }
+    .popup-content #tutorial_close_btn{
+      position: fixed;
+      top:5px;
+      right:5px;
+    }
     .popup-content-pg1{
       display: block;
     }
@@ -261,6 +266,7 @@
   <!-- for pop up tutorial-->
   <div class="popup">
     <div class="popup-content">
+      <button id="tutorial_close_btn" onclick="closePopup()">Close</button>
       <div class = "popup-pages">
         <div class = "popup-content-pg1" id = 'pg1'>
           <h2>The Basics</h2>
@@ -292,7 +298,7 @@
        </div>
 
       </div>
-      <button onclick="closePopup()">Close</button>
+      
     </div>
   </div>
 
