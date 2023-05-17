@@ -27,7 +27,7 @@
       border-radius: 10px;
     }
     #secondbar #closeButton{
-      padding: 2px 2px 2px 2px;
+      padding: 5px 30px 28px 5px;
       position: relative;
       width:2vw;
       top: 0vw;
@@ -65,11 +65,25 @@
       border-color: rgb(4, 4, 4);
       padding: 0.5vw;
       margin: 3px;
+      background-color: #273b7d;
+      color:#ccc
+    }
+
+    .popup-content button:hover {
+      color: #f2f0f0;
+      background-color: #4e5aa3;
+      transition-duration: 0.4s;
     }
     .popup-content #tutorial_close_btn{
       position: fixed;
       top:5px;
       right:5px;
+    }
+
+    .popup-content #tutorial_close_btn:hover{
+      color: #f2f0f0;
+      background-color: #4e5aa3;
+      transition-duration: 0.4s;
     }
     .popup-content-pg1{
       display: block;
@@ -154,14 +168,7 @@
     </button>
     <button class="Save" onclick="togglesidebar('save')">
       <div class="tooltip">
-        <svg xmlns="http://www.w3.org/2000/svg" 
-          width="30" 
-          height="30" 
-          viewBox="0 0 24 24"
-        >
-          <path fill="currentColor" 
-            d="M19 13v5c0 .55-.45 1-1 1H6c-.55 0-1-.45-1-1v-5c0-.55-.45-1-1-1s-1 .45-1 1v6c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-6c0-.55-.45-1-1-1s-1 .45-1 1zm-6-.33l1.88-1.88a.996.996 0 1 1 1.41 1.41l-3.59 3.59a.996.996 0 0 1-1.41 0L7.7 12.2a.996.996 0 1 1 1.41-1.41L11 12.67V4c0-.55.45-1 1-1s1 .45 1 1v8.67z"
-        /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 32 32"><path fill="currentColor" d="m27.71 9.29l-5-5A1 1 0 0 0 22 4H6a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V10a1 1 0 0 0-.29-.71ZM12 6h8v4h-8Zm8 20h-8v-8h8Zm2 0v-8a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8H6V6h4v4a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6.41l4 4V26Z"/></svg>
         <span class="tooltiptext">Save</span>
       </div>
     </button>
@@ -240,15 +247,10 @@
       <button id="save_machine">Save as png</button>
       <button id="permalink">Permalink</button>
     </div>
-    
-
   </section>
 
-  <section id="trash">
-    <div onmouseover="delete_vertex()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 448 512"><path fill="currentColor" d="m170.5 51.6l-19 28.4h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6h-93.7c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6l36.7 55H424c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8v304c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128h-8c-13.3 0-24-10.7-24-24s10.7-24 24-24h69.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128v304c0 17.7 14.3 32 32 32h224c17.7 0 32-14.3 32-32V128H80zm80 64v208c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0v208c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0v208c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z"/></svg>
-    </div>
-  </section>
+  <div id="trash" onmouseover="delete_event()">
+  </div>
 
   <!-- user guide content -->
   <section hidden id="tutorial-content">
@@ -266,7 +268,9 @@
   <!-- for pop up tutorial-->
   <div class="popup">
     <div class="popup-content">
-      <button id="tutorial_close_btn" onclick="closePopup()">Close</button>
+      <button id="tutorial_close_btn" onclick="closePopup()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 256 256"><path fill="currentColor" d="M208.49 191.51a12 12 0 0 1-17 17L128 145l-63.51 63.49a12 12 0 0 1-17-17L111 128L47.51 64.49a12 12 0 0 1 17-17L128 111l63.51-63.52a12 12 0 0 1 17 17L145 128Z"/></svg>
+      </button>
       <div class = "popup-pages">
         <div class = "popup-content-pg1" id = 'pg1'>
           <h2>The Basics</h2>
@@ -277,28 +281,28 @@
           <p>  A shortcut to making a vertex final is to double click on it.</p>
           <img src = "basics.gif" style = "width:20vw;height:15vw;position:relative;">
           <p></p> 
-          <button class ='next-btn' onclick="pgAtoB(1,2)">next</button>
+          <button class ='next-btn' onclick="pgAtoB(1,2)">Next >></button>
        </div>
        <div class = "popup-content-pg2" id = 'pg2'>
           <h2>Running Input</h2>
           <p>Enter the input string and press run. You can also step through the computation one character at a time.</p>  
-          <button class ='prev-btn' onclick="pgAtoB(2,1)">prev</button>
-          <button class ='next-btn' onclick="pgAtoB(2,3)">next</button>
+          <button class ='prev-btn' onclick="pgAtoB(2,1)">&lt;&lt; Prev</button>
+          <button class ='next-btn' onclick="pgAtoB(2,3)">Next>></button>
        </div>
        <div class = "popup-content-pg3" id = 'pg3'>
           <h2>Download PNG</h2>
           <p>After you finish drawing your automaton, you can download a PNG of the drawing by clicking "Save as png" on the toolbar.</p>  
-          <button class ='prev-btn' onclick="pgAtoB(3,2)">prev</button>
-          <button class ='next-btn' onclick="pgAtoB(3,4)">next</button>
+          <button class ='prev-btn' onclick="pgAtoB(3,2)">&lt;&lt; Prev</button>
+          <button class ='next-btn' onclick="pgAtoB(3,4)">Next>></button>
        </div>
        <div class = "popup-content-pg4" id = 'pg4'>
         <h2>Permalink</h2>
         <p>This feature enables sharing machine drawings. Permalink stands for permanent link, meaning once you have created a link to share with your others, that link can uniquely decode back to a machine.</p>  
-        <button class ='prev-btn' onclick="pgAtoB(4,3)">prev</button>
+        <button class ='prev-btn' onclick="pgAtoB(4,3)">&lt;&lt; Prev</button>
        </div>
 
       </div>
-      
+
     </div>
   </div>
 
@@ -342,10 +346,24 @@
       x[i].hidden = false;
     }
   }
+  const trash = document.getElementById('trash');
+  function delete_event() {
+    trash.addEventListener('mouseup', e => {
+      //trash.style.color = "blue";
+      e.preventDefault();
+      const [x, y] = drawing.event_position_on_canvas(e);
+      const edge = drawing.in_edge_text(graph, x, y);
+      const vx = drawing.in_any_vertex(graph, x, y);
+      if (edge) { //edge dropped over to trash
+        graph_ops.delete_edge(graph, edge);
+      }
+      else if (vx) { //vertex dropped over trash
+        menus.display_vertex_menu(graph,vx,x,y);
+        graph_ops.delete_vertex(graph, vx);
+      }
+    })
+  }
   
-  // function togglesidebar(classname) {
-  //   document.getElementById('secondbar').style.transform = "translate(0px)";
-  // }
 
   // first time pop up implementation
     // Check if the user is a first-time visitor
@@ -386,8 +404,6 @@
       var popup = document.querySelector('.popup');
       popup.style.display = 'none';
     }
-
-  
   </script>
 
 

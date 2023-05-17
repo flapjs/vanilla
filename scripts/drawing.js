@@ -292,6 +292,7 @@ export function draw(graph) {
       draw_edge(graph, edge, consts.EDGE_TEXT_SACALING*vertex.r);
     }
   }
+  canvas.getContext('2d').drawImage(new Image('../assets/trash.svg'), 500, 500);
 }
 
 /**
