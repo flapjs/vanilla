@@ -4,6 +4,7 @@ import * as util from './util.js';
 import * as permalink from './permalink.js';
 import * as consts from './consts.js';
 import * as graph_components from './graph_components.js';
+import * as graph_ops from './graph_ops.js';
 
 /**
  * inserts omitted concatenation symbols in regular expression
@@ -104,9 +105,6 @@ export function union(graph1, graph2) {
   let graph = {};
   graph["q0"] = graph_components.make_vertex("q0", 300, 300, consts.DEFAULT_VERTEX_RADIUS, true, false, []);
 
-  let copy1 = {};
-  let copy2 = {};
-
   let graph1start = "";
   let graph2start = "";
 
@@ -118,26 +116,12 @@ export function union(graph1, graph2) {
       new_name = new_name + ",n";
     }
 
-    copy1[new_name] = graph1[node];
-    copy1[new_name].name = new_name;
-    // delete graph1[node];
-
-    // rename edges
-    for (const inner of Object.values(copy1)) {
-      for (const edge of inner.out) {
-        if (edge.from === node) {
-          edge.from = new_name;
-        }
-        if (edge.to === node) {
-          edge.to = new_name;
-        }
-      }
-    }
+    graph_ops.rename_vertex(graph1, node, new_name, true);
 
     // check if current node is graph1's start node
-    if (copy1[new_name].is_start) {
+    if (graph1[new_name].is_start) {
       graph1start = new_name;
-      copy1[new_name].is_start = false;
+      graph1[new_name].is_start = false;
     }
   }
 
@@ -148,35 +132,21 @@ export function union(graph1, graph2) {
       new_name = new_name + ",n";
     }
 
-    copy2[new_name] = graph2[node];
-    copy2[new_name].name = new_name;
-    delete graph2[node];
-
-    // rename all edges
-    for (const inner of Object.values(copy2)) {
-      for (const edge of inner.out) {
-        if (edge.from === node) {
-          edge.from = new_name;
-        }
-        if (edge.to === node) {
-          edge.to = new_name;
-        }
-      }
-    }
+    graph_ops.rename_vertex(graph2, node, new_name, true);
 
     // check if current node is graph2's start node
-    if (copy2[new_name].is_start) {
+    if (graph2[new_name].is_start) {
       graph2start = new_name;
-      copy2[new_name].is_start = false;
+      graph2[new_name].is_start = false;
     }
   }
 
   // add all nodes to new graph
-  for (let node of Object.keys(copy1)) {
-    graph[node] = copy1[node];
+  for (let node of Object.keys(graph1)) {
+    graph[node] = structuredClone(graph1[node]);
   }
-  for (let node of Object.keys(copy2)) {
-    graph[node] = copy2[node];
+  for (let node of Object.keys(graph2)) {
+    graph[node] = structuredClone(graph2[node]);
   }
 
   // add epsilon transitions from new start to old starts
@@ -192,9 +162,6 @@ export function concat(graph1, graph2) {
   let graph1accept = [];
   let graph2start = "";
 
-  let copy1 = {};
-  let copy2 = {};
-
   // modify names of all nodes in graph1
   for (let node of Object.keys(graph1)) {
     let new_name = node + ",1";
@@ -202,26 +169,12 @@ export function concat(graph1, graph2) {
       new_name = new_name + ",n";
     }
 
-    copy1[new_name] = graph1[node];
-    copy1[new_name].name = new_name;
-    // delete graph1[node];
-
-    // rename all edges
-    for (const inner of Object.values(copy1)) {
-      for (const edge of inner.out) {
-        if (edge.from === node) {
-          edge.from = new_name;
-        }
-        if (edge.to === node) {
-          edge.to = new_name;
-        }
-      }
-    }
+    graph_ops.rename_vertex(graph1, node, new_name, true);
 
     // check if current node is an accept node for graph1
-    if (copy1[new_name].is_final) {
+    if (graph1[new_name].is_final) {
       graph1accept.push(new_name);
-      copy1[new_name].is_final = false;
+      graph1[new_name].is_final = false;
     }
   }
 
@@ -232,36 +185,22 @@ export function concat(graph1, graph2) {
       new_name = new_name + ",n";
     }
 
-    copy2[new_name] = graph2[node];
-    copy2[new_name].name = new_name;
-    // delete graph2[node];
-
-    // rename all edges
-    for (const inner of Object.values(copy2)) {
-      for (const edge of inner.out) {
-        if (edge.from === node) {
-          edge.from = new_name;
-        }
-        if (edge.to === node) {
-          edge.to = new_name;
-        }
-      }
-    }
+    graph_ops.rename_vertex(graph2, node, new_name, true);
 
     // check if current node is graph2's start node
-    if (copy2[new_name].is_start) {
+    if (graph2[new_name].is_start) {
       graph2start = new_name;
-      copy2[new_name].is_start = false;
+      graph2[new_name].is_start = false;
     }
   }
 
   // add all nodes from graph1 and graph2 to a new graph
   let graph = {};
-  for (let node of Object.keys(copy1)) {
-    graph[node] = copy1[node];
+  for (let node of Object.keys(graph1)) {
+    graph[node] = structuredClone(graph1[node]);
   }
-  for (let node of Object.keys(copy2)) {
-    graph[node] = copy2[node];
+  for (let node of Object.keys(graph2)) {
+    graph[node] = structuredClone(graph2[node]);
   }
 
   // create edges from all accept nodes in graph1 to the start node in graph2
@@ -333,7 +272,7 @@ export function thompson(regex) {
       let g2 = stack.pop();
       let g1 = stack.pop();
 
-      let res = concat(g1, g2);
+      let res = concat(g1, g2);      
 
       stack.push(res);
     }
@@ -348,44 +287,19 @@ export function thompson(regex) {
   return stack.pop();
 }
 
-function test() {
-  let graph1 = permalink.deserialize('NFAq0:321:500:40:1;q1:319:902:40:2;q2:539:934:40:2;0:1:aεεR:5:0:-1:29~0:2:bεεR:5:0:2:29~');
-  let graph2 = permalink.deserialize('NFAq0:309:584:40:1;q1:363:1056:40:0;q2:381:1450:40:2;0:1:cεεR:5:0:2:27~1:2:dεεR:5:0:-4:-28~');
-
-  // const kleene_result = kleene(graph1[1]);
-  // const union_result = union(graph1[1], graph2[1]);
-  // const concat_result = concat(graph1[1], graph2[1]);
-
-  // console.log(kleene_result);
-  // console.log(union_result);
-  // console.log(concat_result);
-
-  let graph3 = permalink.deserialize("NFAq0:300:300:40:1;q0,1:321:500:40:0;q1,1:319:902:40:2;q2,1:539:934:40:2;q0,2:309:584:40:0;q1,2:363:1056:40:0;q2,2:381:1450:40:2;0:1:εεεε:0:0:0:0~0:4:εεεε:0:0:0:0~1:2:aεεR:5:0:-1:29~1:3:bεεR:5:0:2:29~4:5:cεεR:5:0:2:27~5:6:dεεR:5:0:-4:-28~");
-  const asdf = concat(graph3[1], graph1[1]);
-  console.log(JSON.stringify(asdf));
-  console.log(permalink.serialize(graph3[0], asdf));
-}
-
-//test();
-
 function regexTest(regex) {
   let injectedConcat = injectConcatSymbols(regex);
-  console.log(injectedConcat);
+  // console.log(injectedConcat);
   let postfix = shunting_yard(injectedConcat);
-  console.log(postfix);
+  // console.log(postfix);
   let finalGraph = thompson(postfix);
 
-  console.log(JSON.stringify(finalGraph));
-  // console.log(permalink.serialize('NFA', finalGraph))
-
+  // console.log(JSON.stringify(finalGraph));
+  console.log(permalink.serialize('NFA', finalGraph))
 }
 
 //regexTest("a(a+b)*b")
+// last concat for the last b is broken still, no edge connecting it to the class
 regexTest("a"+consts.OPEN+"a"+consts.UNION+"b"+consts.CLOSE+consts.KLEENE+"b");
 
-function scratchTest() {
-  let a = union(single_transition('a'), single_transition('b'));
-  console.log(permalink.serialize('NFA', a));
-}
-
-// scratchTest();
+// regexTest("ab");
