@@ -271,6 +271,17 @@ function bind_undo_redo() {
   });
 }
 
+/** create rule when enter is pressed */
+function bind_enter() {
+  document.addEventListener('keydown', e => {
+    if (menus.machine_type() === consts.MACHINE_TYPES.CFG){
+      if (e.code === 'Enter' || e.code === 'NumpadEnter') {
+        cfg.create_rule();
+      }
+    }
+  });
+}
+
 /** zooming in and out */
 function bind_scroll() {
   drawing.get_canvas().addEventListener('wheel', e => {
@@ -352,7 +363,7 @@ function refresh_graph() {
 
 /** get the newest rules from history and fill the textbox */
 function reload_rules() {
-  cfg.reload();
+  cfg.reload(hist.retrieve_latest_graph());
 }
 
 /** handle switching machine type event */
@@ -393,7 +404,7 @@ function bind_machine_transform() {
   CFG_2_PDA_btn.addEventListener('click', () => {
     graph = cfg.get_graph();
     let pda_permalink = permalink.serialize(consts.MACHINE_TYPES.PDA, graph);
-    document.getElementById("cfg-content").hidden = !document.getElementById("cfg-content").hidden;
+    document.getElementById('cfg-content').hidden = !document.getElementById('cfg-content').hidden;
     drawing.get_canvas().hidden = !drawing.get_canvas().hidden;
     console.log(pda_permalink);
     window.location.hash = pda_permalink;
@@ -436,34 +447,28 @@ function bind_permalink() {
 }
 
 function bind_cfg_switch(){
-    // Button to create a new symbol and rule
-    var create_btn = document.getElementById("create_new_rule");
-    create_btn.addEventListener('click', () => {
-      cfg.create_rule();
-    });
+  // Button to create a new symbol and rule
+  var create_btn = document.getElementById('create_new_rule');
+  create_btn.addEventListener('click', () => {
+    cfg.create_rule();
+  });
   
-    // Button to delete a new rule
-    var delete_btn = document.getElementById("delete_rule");
-    delete_btn.addEventListener('click', () => {
-      cfg.delete_rule();
-    });
+  // Button to delete a new rule
+  var delete_btn = document.getElementById('delete_rule');
+  delete_btn.addEventListener('click', () => {
+    cfg.delete_rule();
+  });
 
-    // Button to rule/create the graph
-    var submit = document.getElementById("submit");
-    submit.addEventListener('click', () => {
-      cfg.submit_rules();
-    });
-
-    // Button to clear all the input boxes
-    var clear_all = document.getElementById("clear");
-    clear_all.addEventListener('click', () => {
-      cfg.clear_rules(2); // 2 means to clear everything, clear_everything_mode
-    });
+  // Button to clear all the input boxes
+  var clear_all = document.getElementById('reset_rules');
+  clear_all.addEventListener('click', () => {
+    cfg.clear_rules(2); // 2 means to clear everything, clear_everything_mode
+  });
     
-    // Push starting symbol change to history
-    document.getElementById("starting_symbol").addEventListener("change",function () {
-      cfg.load_rules();
-    })
+  // Push starting symbol change to history
+  document.getElementById('starting_symbol').addEventListener('change',function () {
+    cfg.load_rules();
+  });
 }
 
 /** run after all the contents are loaded to hook up callbacks */
@@ -481,5 +486,6 @@ function init() {
   bind_dd();
   bind_elongate_textbox();
   bind_permalink();
+  bind_enter();
   init_graph();  // leave this last since we want it to override some of the above
 }

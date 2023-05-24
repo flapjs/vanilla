@@ -4,7 +4,7 @@ import * as consts from './consts.js';
 import * as hist from './history.js';
 import * as graph_components from './graph_components.js';
 
-let div = document.createElement("DIV"); //Line divider
+let div = document.createElement('DIV'); //Line divider
 
 const list_of_rules = []; // Array that keeps track of symbols and their rules
 const to_push_rules = {}; // Array that keeps track of symbols and their rules to push to history
@@ -23,15 +23,15 @@ export function CFG_switch(){
  */
 function make_start_and_final_edges(){
   graph = consts.EMPTY_GRAPH;
-  graph["final"] = graph_components.make_vertex("final", 3*consts.CFG_EDGE_X_DISTANCE + 50, 0, consts.DEFAULT_VERTEX_RADIUS, false, true);
-  graph["loop"] = graph_components.make_vertex("loop", 2*consts.CFG_EDGE_X_DISTANCE + 50, 0, consts.DEFAULT_VERTEX_RADIUS, false, false, 
-                  [graph_components.make_edge("loop", "final", undefined, undefined, undefined, undefined,
-                  undefined, "$", undefined, undefined)]);
+  graph['final'] = graph_components.make_vertex('final', 3*consts.CFG_EDGE_X_DISTANCE + 50, 0, consts.DEFAULT_VERTEX_RADIUS, false, true);
+  graph['loop'] = graph_components.make_vertex('loop', 2*consts.CFG_EDGE_X_DISTANCE + 50, 0, consts.DEFAULT_VERTEX_RADIUS, false, false, 
+    [graph_components.make_edge('loop', 'final', undefined, undefined, undefined, undefined,
+      undefined, '$', undefined, undefined)]);
 
-  graph["push$"] = graph_components.make_vertex("push$", consts.CFG_EDGE_X_DISTANCE + 50, 0, consts.DEFAULT_VERTEX_RADIUS, false, false);
-  graph["start"] = graph_components.make_vertex("start", 50, 0, consts.DEFAULT_VERTEX_RADIUS, true, false, 
-                  [graph_components.make_edge("start", "push$", undefined, undefined, undefined, undefined,
-                  undefined, undefined, "$")]);
+  graph['push$'] = graph_components.make_vertex('push$', consts.CFG_EDGE_X_DISTANCE + 50, 0, consts.DEFAULT_VERTEX_RADIUS, false, false);
+  graph['start'] = graph_components.make_vertex('start', 50, 0, consts.DEFAULT_VERTEX_RADIUS, true, false, 
+    [graph_components.make_edge('start', 'push$', undefined, undefined, undefined, undefined,
+      undefined, undefined, '$')]);
 }
 
 /**
@@ -39,26 +39,27 @@ function make_start_and_final_edges(){
  * @returns [plus_btn, minus_btn, symbol_input, rule_input] - [Plus button, Minus button, Symbol Input Box, Rule Input Box]
  */
 function create_text_elements(){
-  let plus_btn = document.createElement("button");
-  plus_btn.id = "Add rule";
-  plus_btn.textContent = " + ";
+  let plus_btn = document.createElement('button');
+  plus_btn.id = 'Add rule';
+  plus_btn.textContent = ' + ';
 
-  let minus_btn = document.createElement("button");
-  minus_btn.id = "Delete rule";
-  minus_btn.textContent = " - ";
+  let minus_btn = document.createElement('button');
+  minus_btn.id = 'Delete rule';
+  minus_btn.textContent = ' - ';
 
-  let symbol_input = document.createElement("Input");
-  symbol_input.id = "Symbol" + (list_of_rules.length + 1);
-  symbol_input.addEventListener("change",function () {
+  let symbol_input = document.createElement('Input');
+  symbol_input.id = 'Symbol' + (list_of_rules.length + 1);
+  symbol_input.maxLength = 1;
+  symbol_input.addEventListener('change', function () {
     load_rules();
-  })
+  });
 
-  let rule_input = document.createElement("Input");
-  rule_input.id = "Rule " + 1;
+  let rule_input = document.createElement('Input');
+  rule_input.id = 'Rule ' + 1;
   rule_input.value = consts.EMPTY_SYMBOL;
-  rule_input.addEventListener("change",function () {
+  rule_input.addEventListener('change', function () {
     load_rules();
-  })
+  });
   return [plus_btn, minus_btn, symbol_input, rule_input];
 }
 
@@ -71,26 +72,28 @@ export function create_rule(){
   let li = document.createElement('li');
 
   li.appendChild(symbol_input);
-  li.append(document.createTextNode("→"));
+  li.append(document.createTextNode('→'));
   li.append(rule_input);
 
   let rule = {
     symbol : symbol_input,
     rules_list : [rule_input]
-  }
+  };
   list_of_rules.push(rule);
 
   // Button to add a new rule input textbox
   plus_btn.addEventListener('click',() => {
-    let new_rule_input = document.createElement("Input");
-    new_rule_input.id = "Rule " + rule.rules_list.length;
+    let new_rule_input = document.createElement('Input');
+    new_rule_input.id = 'Rule ' + rule.rules_list.length;
     new_rule_input.value = consts.EMPTY_SYMBOL;
-    new_rule_input.addEventListener("change",function () {
+    new_rule_input.addEventListener('change', function () {
       load_rules();
-    })
+    });
     // Remove "+ / -"
-    for(let i = 0; i < 3; i++){li.removeChild(li.lastChild);}
-    li.append(document.createTextNode(" | "));
+    for(let i = 0; i < 3; i++){
+      li.removeChild(li.lastChild);
+    }
+    li.append(document.createTextNode(' | '));
     li.append(new_rule_input);
     rule.rules_list.push(new_rule_input);
     load_rules();
@@ -101,7 +104,9 @@ export function create_rule(){
   minus_btn.addEventListener('click',() => {
     // Remove "|", last text box, "+ / -"
     if(rule.rules_list.length > 1){
-      for(let i = 0; i < 5; i++){li.removeChild(li.lastChild);}
+      for(let i = 0; i < 5; i++){
+        li.removeChild(li.lastChild);
+      }
       rule.rules_list.pop();
       add_btns(li, plus_btn, minus_btn);
     }
@@ -113,42 +118,49 @@ export function create_rule(){
   load_rules();
 }
 
+/**
+ * Delete the last rule
+ */
 export function delete_rule(){
   let list = document.querySelector('ul');
-    if(list_of_rules.length > 1){
-      list.removeChild(list.lastChild);
-      list_of_rules.pop();
-    }
+  if(list_of_rules.length > 1){
+    list.removeChild(list.lastChild);
+    list_of_rules.pop();
+  }
   load_rules();
 }
 
+/**
+ * Create a graph object
+ */
 export function submit_rules(){
   make_start_and_final_edges();
-  let starting_symbol = document.getElementById("starting_symbol").value;
-  graph["push$"].out.push(graph_components.make_edge("push$", "loop", undefined,
-                          undefined, undefined, undefined, undefined, undefined, starting_symbol));
+  let starting_symbol = document.getElementById('starting_symbol').value;
+  graph['push$'].out.push(graph_components.make_edge('push$', 'loop', undefined,
+    undefined, undefined, undefined, undefined, undefined, starting_symbol));
   const terminal_symbols = new Set();
 
   //Invalid input checking.
   for (let i = 0; i < list_of_rules.length; i++){
     if(list_of_rules[i].symbol.value.length != 1){
-      alert("One of the terminal symbols input do not have 1 character");
+      alert('One of the terminal symbols input do not have 1 character');
       return;
     }
     terminal_symbols.add(list_of_rules[i].symbol.value);
   }
   if(!terminal_symbols.has(starting_symbol)){
-    alert("Starting terminal symbol does not have a rule");
+    alert('Starting terminal symbol does not have a rule');
     return;
   }
 
-  if(starting_symbol == ""){
-    alert("No starting terminal symbol");
+  if(starting_symbol == ''){
+    alert('No starting terminal symbol');
     return;
   }
   load_rules();
   create_edges(terminal_symbols);
 }
+
 /**
  * creates a graph using list_of_rules
  * @param {Set} terminal_symbols - keeps track of the symbols alphabet
@@ -177,34 +189,34 @@ function create_edges(terminal_symbols){
         continue;
       }else if (str.length == 1){
         // Case where string is length 1: self-loop
-        graph["loop"].out.push(graph_components.make_edge("loop", "loop", undefined, undefined,
-                                undefined, undefined, undefined, symbol, str[0], undefined));
+        graph['loop'].out.push(graph_components.make_edge('loop', 'loop', undefined, undefined,
+          undefined, undefined, undefined, symbol, str[0], undefined));
       }else{
         // Case where string is greater than 1: create new vertexes and edges for every
         // char, and at the end make an edge back to loop vertex.
 
         // Last edge back to loop/First letter
-        graph["q" + index] = graph_components.make_vertex("q" + index, 2*consts.CFG_EDGE_X_DISTANCE + str.length*consts.CFG_EDGE_X_DISTANCE,
-                              consts.CFG_EDGE_Y_DISTANCE + row*consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false, 
-                              [graph_components.make_edge("q" + index, "empty", undefined, undefined, undefined, undefined,
-                              undefined, undefined, str[0])]);
+        graph['q' + index] = graph_components.make_vertex('q' + index, 2*consts.CFG_EDGE_X_DISTANCE + str.length*consts.CFG_EDGE_X_DISTANCE,
+          consts.CFG_EDGE_Y_DISTANCE + row*consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false, 
+          [graph_components.make_edge('q' + index, 'empty', undefined, undefined, undefined, undefined,
+            undefined, undefined, str[0])]);
         index--;
 
         // Create edges and vertexes until the second character in the string
         for(let i = 1; i < str.length; i++){
-          graph["q" + index] = graph_components.make_vertex("q" + index,  2*consts.CFG_EDGE_X_DISTANCE + consts.CFG_EDGE_X_DISTANCE*(str.length - i),
-                                consts.CFG_EDGE_Y_DISTANCE + row*consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false, 
-                                [graph_components.make_edge("q" + index, "q" + (index + 1), undefined, undefined, undefined, undefined,
-                              undefined, undefined, str[i])]);
+          graph['q' + index] = graph_components.make_vertex('q' + index,  2*consts.CFG_EDGE_X_DISTANCE + consts.CFG_EDGE_X_DISTANCE*(str.length - i),
+            consts.CFG_EDGE_Y_DISTANCE + row*consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false, 
+            [graph_components.make_edge('q' + index, 'q' + (index + 1), undefined, undefined, undefined, undefined,
+              undefined, undefined, str[i])]);
           // Differentiate between terminal symbols and alphabet
           if(!alphabet.has(str[i]) && !terminal_symbols.has(str[i])){
             alphabet.add(str[i]);
           }
           index--;
         }
-         // First edge back from loop/Last letter
-        graph["loop"].out.push(graph_components.make_edge("loop", "q" + (index + 1), undefined, 0.5 + row*0.1, 1.7 + row*0.5,
-                                undefined, undefined, symbol));
+        // First edge back from loop/Last letter
+        graph['loop'].out.push(graph_components.make_edge('loop', 'q' + (index + 1), undefined, 0.5 + row*0.1, 1.7 + row*0.5,
+          undefined, undefined, symbol));
 
         if(!alphabet.has(str[0]) && !terminal_symbols.has(str[0])){
           alphabet.add(str[0]);
@@ -217,12 +229,12 @@ function create_edges(terminal_symbols){
   let cnt = 1;
   // Add self-loops using the alphabet for the qloop vertex
   for(const l of alphabet.keys()){
-    graph["loop"].out.push(graph_components.make_edge("loop", "loop", l, cnt*0.1 + 0.3,
-                                -1 - cnt, -2.8, -1.1, l));
+    graph['loop'].out.push(graph_components.make_edge('loop', 'loop', l, cnt*0.1 + 0.3,
+      -1 - cnt, -2.8, -1.1, l));
     cnt++;
   }
-  graph["empty"] = graph_components.make_vertex("empty", (longest + 3)*consts.CFG_EDGE_X_DISTANCE, row/2 *consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false,
-                                                [graph_components.make_edge("empty", "loop", undefined, 0.5, 8.55)]);
+  graph['empty'] = graph_components.make_vertex('empty', (longest + 3)*consts.CFG_EDGE_X_DISTANCE, row/2 *consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false,
+    [graph_components.make_edge('empty', 'loop', undefined, 0.5, 8.55)]);
 }
 
 /**
@@ -248,38 +260,40 @@ function fill_rules(symbol, rules_list) {
   symbol_input.value = symbol;
 
   li.appendChild(symbol_input);
-  li.append(document.createTextNode("→"));
+  li.append(document.createTextNode('→'));
 
   let rule = {
     symbol : symbol_input,
     rules_list : []
-  }
+  };
 
   for (let i = 1; i < rule_count + 1; i++) {
-    let rule_input = document.createElement("Input");
-    rule_input.id = "Rule " + i;
+    let rule_input = document.createElement('Input');
+    rule_input.id = 'Rule ' + i;
     rule_input.value = rules_list[i - 1];
-    rule_input.addEventListener("change",function () {
+    rule_input.addEventListener('change', function () {
       load_rules();
-    })
+    });
     li.append(rule_input);
     rule.rules_list.push(rule_input);
-    li.append(document.createTextNode(" | "));
+    li.append(document.createTextNode(' | '));
   }
   list_of_rules.push(rule);
   li.removeChild(li.lastChild);
 
   // Button to add a rule input textbox
   plus_btn.addEventListener('click',() => {
-    let new_rule_input = document.createElement("Input");
-    new_rule_input.id = "Rule " + rule.rules_list.length;
+    let new_rule_input = document.createElement('Input');
+    new_rule_input.id = 'Rule ' + rule.rules_list.length;
     new_rule_input.value = consts.EMPTY_SYMBOL;
-    new_rule_input.addEventListener("change",function () {
+    new_rule_input.addEventListener('change', function () {
       load_rules();
-    })
+    });
     // Remove "+ / -"
-    for(let i = 0; i < 3; i++){li.removeChild(li.lastChild);}
-    li.append(document.createTextNode(" | "));
+    for(let i = 0; i < 3; i++){
+      li.removeChild(li.lastChild);
+    }
+    li.append(document.createTextNode(' | '));
     li.append(new_rule_input);
     rule.rules_list.push(new_rule_input);
     load_rules();
@@ -290,7 +304,9 @@ function fill_rules(symbol, rules_list) {
   minus_btn.addEventListener('click',() => {
     // Remove "|", last text box, "+ / -"
     if(rule.rules_list.length > 1){
-      for(let i = 0; i < 5; i++){li.removeChild(li.lastChild);}
+      for(let i = 0; i < 5; i++){
+        li.removeChild(li.lastChild);
+      }
       list_of_rules[list_of_rules.length - 1].rules_list.pop();
       add_btns(li, plus_btn, minus_btn);
     }
@@ -311,22 +327,22 @@ function fill_rules(symbol, rules_list) {
  *                          = 2 means that it is clear button.
  * @returns 
  */
-export function reload(hist_change = clear_to_reload) {
+export function reload(rules, hist_change = clear_to_reload) {
   graph = consts.EMPTY_GRAPH;
+  console.log(rules);
   clear_rules(hist_change);
   hist.set_history_keys(consts.MACHINE_TYPES.CFG);
-  let rules = hist.retrieve_latest_graph();
   //First open CFG section
-  if (rules["start"] == undefined) {
+  if (rules === undefined || rules['start'] === undefined || rules['symbols'].length === 0) {
     create_rule();
-    console.log("undefined");
+    console.log('undefined');
     return;
   }else{
-    document.getElementById("starting_symbol").value = rules["start"];
+    document.getElementById('starting_symbol').value = rules['start'];
   }
-  let symbols_list = (rules["symbols"] == null) ? [] : rules["symbols"];
+  let symbols_list = (rules['symbols'] == null) ? [] : rules['symbols'];
   for (let r = 0; r < symbols_list.length; r++){
-    fill_rules(symbols_list[r], rules["Symbol"+(r+1)]);
+    fill_rules(symbols_list[r], rules['Symbol'+(r+1)]);
   }
   document.body.appendChild(div);
 }
@@ -335,15 +351,15 @@ export function reload(hist_change = clear_to_reload) {
  * load to_push_rules with the values of the input boxes. and push to history
  */
 export function load_rules(){
-  to_push_rules["start"] = document.getElementById("starting_symbol").value;
-  to_push_rules["symbols"] = [];
+  to_push_rules['start'] = document.getElementById('starting_symbol').value;
+  to_push_rules['symbols'] = [];
   for(let i = 0; i < list_of_rules.length; i++){
     let symbol = list_of_rules[i].symbol.value;
-    to_push_rules["symbols"].push(symbol);
+    to_push_rules['symbols'].push(symbol);
     const rules = list_of_rules[i].rules_list;
-    to_push_rules["Symbol"+(i+1)] = [];
+    to_push_rules['Symbol'+(i+1)] = [];
     for(let r   = 0; r < rules.length; r++){
-      to_push_rules["Symbol"+(i+1)].push(rules[r].value);
+      to_push_rules['Symbol'+(i+1)].push(rules[r].value);
     }
   }
   hist.set_history_keys(consts.MACHINE_TYPES.CFG);
@@ -362,8 +378,8 @@ export function clear_rules(hist_change = clear_to_reload){
     list.removeChild(list.lastChild);
     list_of_rules.pop();
   }
-  document.getElementById("starting_symbol").value = "";
-  if (hist_change == clear_everything_mode) {
+  document.getElementById('starting_symbol').value = '';
+  if (hist_change === clear_everything_mode) {
     create_rule();
     load_rules();
     hist.set_history_keys(consts.MACHINE_TYPES.CFG);
@@ -373,6 +389,6 @@ export function clear_rules(hist_change = clear_to_reload){
 
 function add_btns(li, plus_btn, minus_btn) {
   li.append(plus_btn);
-  li.append(document.createTextNode(" / "));
+  li.append(document.createTextNode(' / '));
   li.append(minus_btn);
 }
