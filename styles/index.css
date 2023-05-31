@@ -236,3 +236,77 @@ canvas {
   .sidenav a {font-size: 18px;}
 }
 
+/* moved from html file*/
+.NFA_specific{
+  cursor:pointer;
+}
+select{
+  position: relative;
+  font-size: 10px;
+  width:10vw;
+  left: 1vw;
+  height: 3vw;
+  padding: 10px 0px 10px 10px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+}
+#secondbar #closeButton{
+  padding: 5px 30px 28px 5px;
+  position: relative;
+  width:2vw;
+  top: 0vw;
+  left:10vw;
+  cursor:pointer;
+}
+/* Styling for the pop-up */
+.popup {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+}
+
+.popup-content {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50vw;
+  padding: 20px;
+  background-color: #273b7d;
+  color: lightgoldenrodyellow;
+  text-align: center;
+}
+.popup-content button{
+  position: relative;
+  border-radius: 1vw;
+  padding: 0.5vw;
+  cursor: pointer;
+  border: 0,5vw;
+  border-color: rgb(4, 4, 4);
+  padding: 0.5vw;
+  margin: 3px;
+}
+.popup-content #tutorial_close_btn{
+  position: fixed;
+  top:5px;
+  right:5px;
+}
+.popup-content-pg1{
+  display: block;
+}
+
+.secondBarHeader{
+  position: absolute;
+  padding: 3px;
+  top: 30px;
+  left: 18px;
+  width: 100px;
+  text-align: left;
+  color: lightgoldenrodyellow;
+  font-size: x-large;
+}
+

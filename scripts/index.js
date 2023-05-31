@@ -406,3 +406,151 @@ function init() {
   bind_permalink();
   init_graph();  // leave this last since we want it to override some of the above
 }
+
+/*
+// moved from html file
+function w3_open() {
+  document.getElementById("tutorial_content").style.display = "block";
+}
+
+function w3_close() {
+  document.getElementById("tutorial_content").style.display = "none";
+}
+
+function closetheButton() {
+  let secondbar = document.getElementById('secondbar');
+  secondbar.style.transform = "translate(-20vw)";
+  var i;
+  var x = document.getElementsByClassName('dropdown');
+  for (i = 0; i < x.length; i++) {  
+    x[i].hidden = true;
+  }
+  var icons = document.getElementsByClassName('sidenavBtn');
+  var j;
+  for (j = 0; j < icons.length; j++) {  
+    icons[j].style.color = '#c7c2c2';
+    icons[j].style.backgroundColor = '#273b7d';
+  }
+  
+  
+  secondbar.hidden = false;
+}
+
+function togglesidebar(classname) {
+  let secondbar = document.getElementById('secondbar');
+  secondbar.style.transform = "translate(0vw)";   
+  if (secondbar.hidden == true) { 
+    closetheButton();
+  }
+  document.getElementById('secondbar').hidden = false;
+  var i;
+  var x = document.getElementsByClassName(classname);
+  for (i = 0; i < x.length; i++) {
+    x[i].hidden = false;
+  }
+}
+
+// first time pop up implementation
+    // Check if the user is a first-time visitor
+    if (!localStorage.getItem('visitedBefore')) {
+      // User is a first-time visitor
+      openPopup();
+  
+      // Set flag to indicate the user has visited before
+      localStorage.setItem('visitedBefore', true);
+      } 
+
+// Function to open the pop-up
+function openPopup() {
+  currentPg = 4;
+  var popup = document.querySelector('.popup');
+  popup.style.display = 'block';
+  for(let i=currentPg; i>1 ; i--){
+    pgAtoB(i,i-1);
+  }
+}
+
+// Function to close the pop-up
+function closePopup() {
+  pgAtoB(currentPg,1);
+var popup = document.querySelector('.popup');
+popup.style.display = 'none';
+}
+
+function pgAtoB(a,b){
+  var pgName = 'pg';
+  var nameA = pgName + a;
+  var nameB = pgName + b;
+  const pgA = document.getElementById(nameA);
+  const pgB = document.getElementById(nameB);
+  pgA.style.display = "none";
+  pgB.style.display = "block";
+  currentPg = b;
+}
+
+//updated on funciton when clicking on an icon 5/16/2023
+function expandIcon(nameOfClass){
+  closetheButton();
+  togglesidebar(nameOfClass);
+  var headerName = 'none';
+  var currIcon;
+  switch(nameOfClass){
+    case 'home':
+      headerName = 'Home';
+      currIcon = document.getElementById("homeIcon");
+      break;
+    case 'settings':
+      headerName = 'Machines';
+      currIcon = document.getElementById('machineIcon');
+      break;
+    case 'save':
+      headerName = 'Save';
+      currIcon = document.getElementById('saveIcon');
+      break;
+    case 'bug':
+      headerName = 'Bug';
+      currIcon = document.getElementById('bugIcon');
+      break;
+  }
+  var header = document.getElementById('secondBarHeader');
+  header.innerHTML = headerName;
+
+  currIcon.style.color = '#f2f0f0';
+  currIcon.style.backgroundColor = '#4e5aa3';
+  currIcon.style.transitionDuration = '0.4s';
+
+}
+
+function redirectToBugReport() {
+  window.open('https://github.com/flapjs/vanilla/issues', '_blank');
+  //below is code for opening bug report in current tab of browser
+  //window.location.href = 'https://github.com/flapjs/vanilla/issues';
+}
+
+
+var currentPg = 1;
+let secondbar = document.getElementById('secondbar');
+var isOpen = secondbar.hidden;
+isOpen = false;
+const closeButton = document.getElementById('closeButton');
+closeButton.addEventListener('click',function(){
+  closetheButton();
+})
+
+const homeIcon = document.getElementById('homeIcon');
+const machineIcon = document.getElementById('machineIcon');
+const saveIcon = document.getElementById('saveIcon');
+const bugIcon = document.getElementById('bugIcon');
+const helpIcon = document.getElementById('helpIcon');
+
+homeIcon.addEventListener("click", expandIcon('home'));
+machineIcon.addEventListener("click", expandIcon('settings'));
+saveIcon.addEventListener("click", expandIcon('save'));
+bugIcon.addEventListener("click", redirectToBugReport());
+helpIcon.addEventListener("click", function(){
+  openPopup();
+  closetheButton();
+});
+*/
+
+

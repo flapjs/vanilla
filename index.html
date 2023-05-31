@@ -12,69 +12,7 @@
   <link rel="icon" type="image/png" href="assets/favicon-16x16.png" sizes="16x16">
   <link rel="manifest" href="assets/site.webmanifest">
   <meta name="theme-color" content="#ffffff">
-  <style>
-    .NFA_specific{
-      cursor:pointer;
-    }
-    select{
-      position: relative;
-      font-size: 10px;
-      width:10vw;
-      left: 1vw;
-      height: 3vw;
-      padding: 10px 0px 10px 10px;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-    }
-    #secondbar #closeButton{
-      padding: 2px 2px 2px 2px;
-      position: relative;
-      width:2vw;
-      top: 0vw;
-      left:10vw;
-      cursor:pointer;
-    }
-    /* Styling for the pop-up */
-    .popup {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 9999;
-    }
 
-    .popup-content {
-      position: relative;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 50vw;
-      padding: 20px;
-      background-color: #273b7d;
-      color: lightgoldenrodyellow;
-      text-align: center;
-    }
-    .popup-content button{
-      position: relative;
-      border-radius: 1vw;
-      padding: 0.5vw;
-      cursor: pointer;
-      border: 0,5vw;
-      border-color: rgb(4, 4, 4);
-      padding: 0.5vw;
-      margin: 3px;
-    }
-    .popup-content #tutorial_close_btn{
-      position: fixed;
-      top:5px;
-      right:5px;
-    }
-    .popup-content-pg1{
-      display: block;
-    }
-  </style>
 </head>
 <body>
 
@@ -92,9 +30,9 @@
     
     
     
-    <button id="save_machine">Save as png</button>
+    <button id="old_save_machine">Save as png</button>
 
-    <button id="permalink">Permalink</button>
+    <button id="old_permalink">Permalink</button>
     
     <button onclick=
       "document.getElementById('tutorial-content').hidden = !document.getElementById('tutorial-content').hidden">
@@ -119,7 +57,7 @@
         <i class="icon-home"></i>
       </a></li>
     </ul> -->
-    <button class="Home" onclick="togglesidebar('home')">
+    <button class="Home" onclick="expandIcon('home')">
       <div class="tooltip">
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
@@ -136,7 +74,7 @@
       </div>
     </button>
     <button class="Machine" onclick=
-      "togglesidebar('settings')">
+      "expandIcon('settings')">
       <div class="tooltip">
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
@@ -152,7 +90,7 @@
         <span class="tooltiptext">Machine</span>
       </div>
     </button>
-    <button class="Save" onclick="togglesidebar('save')">
+    <button class="Save" onclick="expandIcon('save')">
       <div class="tooltip">
         <svg xmlns="http://www.w3.org/2000/svg" 
           width="30" 
@@ -165,7 +103,7 @@
         <span class="tooltiptext">Save</span>
       </div>
     </button>
-    <button class="Bug">
+    <button class="Bug" onclick = "redirectToBugReport()">
       <div class="tooltip">
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
@@ -221,6 +159,10 @@
     <button id="closeButton">
       <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 256 256"><path fill="currentColor" d="M208.49 191.51a12 12 0 0 1-17 17L128 145l-63.51 63.49a12 12 0 0 1-17-17L111 128L47.51 64.49a12 12 0 0 1 17-17L128 111l63.51-63.52a12 12 0 0 1 17 17L145 128Z"/></svg>
     </button>
+    <div class = "secondBarHeader" id = 'secondBarHeader'>Header</div>
+    <div class = "dropdown home">
+      <!-- placeholder for now-->
+    </div>
     <div class = "dropdown settings">
     <button class = "NFA_specific" id = "NFA_to_DFA" >NFA to DFA</button>
     <!-- dropdown menu activated when button is clicked-->
@@ -328,6 +270,12 @@
       x[i].hidden = true;
     }
     open = false;
+    var icons = document.getElementsByClassName('sidenavBtn');
+    var j;
+    for (j = 0; j < icons.length; j++) {  
+      icons[j].style.color = '#c7c2c2';
+      icons[j].style.backgroundColor = '#273b7d';
+    }
   }
 
   function togglesidebar(classname) {
@@ -368,6 +316,11 @@
         pgAtoB(i,i-1);
       }
     }
+    function closePopup() {
+      pgAtoB(currentPg,1);
+      var popup = document.querySelector('.popup');
+      popup.style.display = 'none';
+    }   
 
     function pgAtoB(a,b){
         var pgName = 'pg';
@@ -386,6 +339,48 @@
       var popup = document.querySelector('.popup');
       popup.style.display = 'none';
     }
+    //updated on funciton when clicking on an icon 5/16/2023
+    function expandIcon(nameOfClass){
+      closetheButton();
+      togglesidebar(nameOfClass);
+      var headerName = 'none';
+      var currIcon;
+      switch(nameOfClass){
+        case 'home':
+          headerName = 'Home';
+          currIcon = document.getElementById("homeIcon");
+          break;
+        case 'settings':
+          headerName = 'Machines';
+          currIcon = document.getElementById('machineIcon');
+          break;
+        case 'save':
+          headerName = 'Save';
+          currIcon = document.getElementById('saveIcon');
+          break;
+        case 'bug':
+          headerName = 'Bug';
+          currIcon = document.getElementById('bugIcon');
+          break;
+      }
+      var header = document.getElementById('secondBarHeader');
+      header.innerHTML = headerName;
+
+      currIcon.style.color = '#f2f0f0';
+      currIcon.style.backgroundColor = '#4e5aa3';
+      currIcon.style.transitionDuration = '0.4s';
+    }
+    function redirectToBugReport() {
+      window.open('https://github.com/flapjs/vanilla/issues', '_blank');
+      //below is code for opening bug report in current tab of browser
+      //window.location.href = 'https://github.com/flapjs/vanilla/issues';
+    }
+    var currentPg = 1;
+    var isOpen = secondbar.hidden;
+    isOpen = false;
+    closeButton.addEventListener('click',function(){
+      closetheButton();
+    })
 
   
   </script>
