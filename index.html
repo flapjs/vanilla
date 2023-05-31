@@ -66,6 +66,11 @@
       padding: 0.5vw;
       margin: 3px;
     }
+    .popup-content #tutorial_close_btn{
+      position: fixed;
+      top:5px;
+      right:5px;
+    }
     .popup-content-pg1{
       display: block;
     }
@@ -109,7 +114,12 @@
   <section id="sidebar">
     <!-- Side navigation -->
   <div class="sidenav">
-    <button class="Home" onclick=
+    <!-- <ul>
+      <li><a href="#">
+        <i class="icon-home"></i>
+      </a></li>
+    </ul> -->
+    <button class="Home" onclick="togglesidebar('home')" onclick=
     "togglesidebar('home')">
       <div class="tooltip">
         <svg 
@@ -145,16 +155,14 @@
     </button>
     <button class="Save" onclick="togglesidebar('save')">
       <div class="tooltip">
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          width="28" 
-          height="28" 
-          viewBox="0 0 1024 1024">
-          <path 
-            fill="currentColor" 
-            d="M560 0H208c-35.344 0-64 28.656-64 64v896c0 35.344 28.656 64 64 64h608c35.344 0 64-28.656 64-64V320.016zm256 346.528V352H528V64h5.504zM208 960V64h256v352h352v544H208z"
-          />
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" 
+          width="30" 
+          height="30" 
+          viewBox="0 0 24 24"
+        >
+          <path fill="currentColor" 
+            d="M19 13v5c0 .55-.45 1-1 1H6c-.55 0-1-.45-1-1v-5c0-.55-.45-1-1-1s-1 .45-1 1v6c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-6c0-.55-.45-1-1-1s-1 .45-1 1zm-6-.33l1.88-1.88a.996.996 0 1 1 1.41 1.41l-3.59 3.59a.996.996 0 0 1-1.41 0L7.7 12.2a.996.996 0 1 1 1.41-1.41L11 12.67V4c0-.55.45-1 1-1s1 .45 1 1v8.67z"
+        /></svg>
         <span class="tooltiptext">Save</span>
       </div>
     </button>
@@ -210,25 +218,9 @@
     </button>
   </section>
 
-  <section id="secondbar">
+  <section hidden id="secondbar">
     <button id="closeButton"> X </button>
-    <div class = "dropdown home">
-      <div class = machine_inputs>
-      </div>
-      <button class="plus_btn pmbtn" id="plus_button">+</button>
-      <button class="minus_btn pmbtn" id="minus_button">-</button>
-      <h3>
-        Key: 
-      </h3>
-      <p>
-        R - Run Input on Machine
-      </p><p>
-        S - Step Input on Machine
-      </p><p>
-        X - Reset Step Function
-      </p>
-    </div>
-    <div hidden class = "dropdown settings">
+    <div class = "dropdown settings">
     <button class = "NFA_specific" id = "NFA_to_DFA" >NFA to DFA</button>
     <!-- dropdown menu activated when button is clicked-->
       <!--
@@ -251,6 +243,12 @@
 
   </section>
 
+  <section id="trash">
+    <div onmouseover="delete_vertex()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 448 512"><path fill="currentColor" d="m170.5 51.6l-19 28.4h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6h-93.7c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6l36.7 55H424c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8v304c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128h-8c-13.3 0-24-10.7-24-24s10.7-24 24-24h69.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128v304c0 17.7 14.3 32 32 32h224c17.7 0 32-14.3 32-32V128H80zm80 64v208c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0v208c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0v208c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z"/></svg>
+    </div>
+  </section>
+
   <!-- user guide content -->
   <section hidden id="tutorial-content">
     <a href="https://github.com/flapjs/vanilla/blob/master/usage.md">
@@ -267,6 +265,7 @@
   <!-- for pop up tutorial-->
   <div class="popup">
     <div class="popup-content">
+      <button id="tutorial_close_btn" onclick="closePopup()">Close</button>
       <div class = "popup-pages">
         <div class = "popup-content-pg1" id = 'pg1'>
           <h2>The Basics</h2>
@@ -298,7 +297,7 @@
        </div>
 
       </div>
-      <button onclick="closePopup()">Close</button>
+      
     </div>
   </div>
 
@@ -315,19 +314,23 @@
   function w3_close() {
     document.getElementById("tutorial_content").style.display = "none";
   }
-
+  let secondbar = document.getElementById('secondbar');
+  let open = secondbar.hidden;
+  open = false;
+  
   function closetheButton() {
-    document.getElementById('secondbar').hidden = true;
+    secondbar.style.transform = "translate(-20vw)";
     var i;
     var x = document.getElementsByClassName('dropdown');
     for (i = 0; i < x.length; i++) {  
       x[i].hidden = true;
     }
+    open = false;
   }
 
   function togglesidebar(classname) {
-    const isHidden = document.getElementById('secondbar').hidden;
-    if (!isHidden) { 
+    secondbar.style.transform = "translate(0vw)";    
+    if (open) { 
       closetheButton();
     }
     document.getElementById('secondbar').hidden = false;
@@ -337,7 +340,10 @@
       x[i].hidden = false;
     }
   }
-
+  
+  // function togglesidebar(classname) {
+  //   document.getElementById('secondbar').style.transform = "translate(0px)";
+  // }
 
   // first time pop up implementation
     // Check if the user is a first-time visitor
