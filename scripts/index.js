@@ -141,7 +141,7 @@ function higher_order_drag_edge(edge) {
   };
 }
 
-/** binds callback functions to the mouse dragging behavior */
+/** binds callback functions to the mouse dragging behavior and deletes if event is dropped over trash*/
 function bind_drag() {
   let mutex = false;  // drag lock not activiated
   // declare the callbacks as empty function so that intellisense recognizes them as function
@@ -160,22 +160,48 @@ function bind_drag() {
       canvas.addEventListener('mousemove', edge_animation);
     } else if (e.button === consts.LEFT_BTN) {  // left drag
       if (clicked_edge) {  // left drag edge
-        drag_edge = higher_order_drag_edge(clicked_edge);
+        drag_edge = higher_order_drag_edge(clicked_edge);        
         canvas.addEventListener('mousemove', drag_edge);
+        trash_color();  // change color if edge is over trash
       } else if (clicked_vertex) {  // vertex has lower priority than edge
         drag_vertex = higher_order_drag_vertex(clicked_vertex);  // create the function
         canvas.addEventListener('mousemove', drag_vertex);
+        trash_color();  // change color if vertex is over trash
       } else {  // left drag scene
         canvas.addEventListener('mousemove', drag_scene);
       } 
     }
   });
-  canvas.addEventListener('mouseup', () => {
-    canvas.removeEventListener('mousemove', drag_scene);
-    canvas.removeEventListener('mousemove', drag_vertex);
-    canvas.removeEventListener('mousemove', drag_edge);
-    canvas.removeEventListener('mousemove', edge_animation);
-    mutex = false;  // release the resource
+  canvas.addEventListener('mouseup', e => {
+    const [x, y] = drawing.event_position_on_canvas(e);
+    const drop_vertex = drawing.in_any_vertex(graph, x, y);
+    const drop_edge = drawing.in_edge_text(graph, x, y);
+    if (drop_vertex && drawing.over_trash(e)) { // if we release a vertex over the trash
+      graph_ops.delete_vertex(graph, drop_vertex);
+    }
+    else if (drop_edge && drawing.over_trash(e)) { // if we release an edge over the trash
+      graph_ops.delete_edge(graph, drop_edge);
+    }
+    else { // not dropped over trash can and release drag
+      drawing.recolor_trash(false);
+      canvas.removeEventListener('mousemove', drag_scene);
+      canvas.removeEventListener('mousemove', drag_vertex);
+      canvas.removeEventListener('mousemove', drag_edge);
+      canvas.removeEventListener('mousemove', edge_animation);
+      mutex = false;  // release the resource
+    }
+  });
+}
+
+function trash_color() {
+  const canvas = drawing.get_canvas();
+  canvas.addEventListener('mousemove', e => {
+    if (drawing.over_trash(e)) {
+      drawing.recolor_trash(true);
+    }
+    else {
+      drawing.recolor_trash(false);
+    }
   });
 }
 
@@ -404,5 +430,6 @@ function init() {
   bind_dd();
   bind_elongate_textbox();
   bind_permalink();
+  trash_color(); // new
   init_graph();  // leave this last since we want it to override some of the above
 }

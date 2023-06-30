@@ -213,24 +213,8 @@ input {
 }
 
 canvas {
-  background-color:#f2f0f0
-}
-
-#trash {
-  position: fixed;
-  right: 10px; bottom: 10px;
-  padding:10px 10px 10px 10px;
-  color:#2d2d2e;
-  z-index: 1000;
-  cursor: pointer;
-}
-
-#trash:hover {
-  color:#e01e1e;
-  transition: .05s ease-in-out;
-  right: 10px; bottom: 10px;
-  z-index: 0;
-  cursor: pointer;
+  background-color:#f2f0f0;
+  z-index: 100;
 }
 
 /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */

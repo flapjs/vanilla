@@ -3,6 +3,7 @@
 import * as consts from './consts.js';
 import * as linalg from './linalg.js';
 import * as menus from './menus.js';
+import { make_vertex } from './graph_components.js';
 
 /**
  * get the machine drawing canvas
@@ -22,6 +23,25 @@ export function event_position_on_canvas(e) {
   const x = (e.clientX - rect.left)*window.devicePixelRatio;
   const y = (e.clientY - rect.top)*window.devicePixelRatio;
   return [x, y];
+}
+
+const hover_trash = new Image();
+hover_trash.src = '../assets/icon-hover-trash.svg';
+export function over_trash(e) {
+  const rect = get_canvas().getBoundingClientRect();
+  const x = (e.clientX - rect.left)*window.devicePixelRatio;
+  const y = (e.clientY - rect.top)*window.devicePixelRatio;
+  const trash_dims = { X: 1830, Y: 740, Width: 80, Height: 100 };
+  if (
+    x >= trash_dims.X &&
+    x <= trash_dims.X + trash_dims.Width &&
+    y >= trash_dims.Y &&
+    y <= trash_dims.Y + trash_dims.Height
+  ) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 /**
@@ -278,6 +298,10 @@ export function draw_edge(graph, edge, text_size) {
   draw_text(edge_text, mid, text_size);
 }
 
+/* load the asset before it is drawn */
+const trash = new Image();
+trash.src = '../assets/icon-trash.svg';
+let trash_init = false;
 /**
  * draw the entire graph on the canvas
  * @param {Object} graph - the graph object to draw on the canvas
@@ -292,7 +316,39 @@ export function draw(graph) {
       draw_edge(graph, edge, consts.EDGE_TEXT_SACALING*vertex.r);
     }
   }
-  canvas.getContext('2d').drawImage(new Image('../assets/trash.svg'), 500, 500);
+  const ctx = canvas.getContext('2d');
+  if (!trash_init) { // upon initializing canvas, draw trash icon
+    trash.onload = () => {
+      ctx.drawImage(trash, 1840, 770);
+    };
+    trash_init = true;
+  } else { // otherwise, just draw the trash
+    recolor_trash(false);
+  }
+  return trash;
+}
+
+export function recolor_trash(status) {
+  const canvas = get_canvas();
+  const ctx = canvas.getContext('2d');
+  if (status) { // color red if hovering over trash
+    // trash.onload = () => {
+    //   ctx.drawImage(trash, 1840,770);
+    //   const trashData = ctx.getImageData(1840,770, trash.width, trash.height);
+    //   const data = trashData.data;
+    //   for (let i = 0; i < data.length; i += 4) {
+    //     data[i] = 255;     // Red
+    //     data[i + 1] = 44; // Green
+    //     data[i + 2] = 44; // Blue
+    //   }
+    //   ctx.putImageData(trashData, 1840, 770);
+    // }
+    ctx.drawImage(hover_trash, 1840,770);
+    
+  }
+  else { // color dark gray normally
+    ctx.drawImage(trash, 1840,770);
+  }
 }
 
 /**

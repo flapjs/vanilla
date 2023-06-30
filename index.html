@@ -128,11 +128,6 @@
   <section id="sidebar">
     <!-- Side navigation -->
   <div class="sidenav">
-    <!-- <ul>
-      <li><a href="#">
-        <i class="icon-home"></i>
-      </a></li>
-    </ul> -->
     <button class="Home" onclick="togglesidebar('home')">
       <div class="tooltip">
         <svg 
@@ -250,6 +245,7 @@
   </section>
 
   <div id="trash" onmouseover="delete_event()">
+    <!-- <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 448 512"><path fill="currentColor" d="m170.5 51.6l-19 28.4h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6h-93.7c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6l36.7 55H424c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8v304c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128h-8c-13.3 0-24-10.7-24-24s10.7-24 24-24h69.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128v304c0 17.7 14.3 32 32 32h224c17.7 0 32-14.3 32-32V128H80zm80 64v208c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0v208c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0v208c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z"/></svg> -->
   </div>
 
   <!-- user guide content -->
@@ -274,11 +270,13 @@
       <div class = "popup-pages">
         <div class = "popup-content-pg1" id = 'pg1'>
           <h2>The Basics</h2>
-          <p>TLDR: double click to create vertices and right click drag to make edges.</p>  
-
-          <p> Additionally, dragging vertices and edges are supported and if you want to edit anything, simply right click on a vertex or the text on an edge. You will be prompted with a floating menu. After editing, press enter to confirm the change.</p>  
-              
-          <p>  A shortcut to making a vertex final is to double click on it.</p>
+            <div>Double click to create vertices, additional double clicks to toggle final</div>
+            <div>Right click on vertices (or ctrl) drag to create edges</div>
+            <div>Right click on vertices or edge texts to inspect</div>
+            <div>Left click drag on vertices or edge texts to drag</div>
+            <div>Left click drag on empty space to pan, use scroll wheel to zoom</div>
+            <div>ctrl+z to undo, ctrl+shift+z to redo</div>
+            <div>dd to delete</div>
           <img src = "basics.gif" style = "width:20vw;height:15vw;position:relative;">
           <p></p> 
           <button class ='next-btn' onclick="pgAtoB(1,2)">Next >></button>
@@ -346,24 +344,6 @@
       x[i].hidden = false;
     }
   }
-  const trash = document.getElementById('trash');
-  function delete_event() {
-    trash.addEventListener('mouseup', e => {
-      //trash.style.color = "blue";
-      e.preventDefault();
-      const [x, y] = drawing.event_position_on_canvas(e);
-      const edge = drawing.in_edge_text(graph, x, y);
-      const vx = drawing.in_any_vertex(graph, x, y);
-      if (edge) { //edge dropped over to trash
-        graph_ops.delete_edge(graph, edge);
-      }
-      else if (vx) { //vertex dropped over trash
-        menus.display_vertex_menu(graph,vx,x,y);
-        graph_ops.delete_vertex(graph, vx);
-      }
-    })
-  }
-  
 
   // first time pop up implementation
     // Check if the user is a first-time visitor
