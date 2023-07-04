@@ -38,8 +38,10 @@ export function over_trash(e) {
     y >= trash_dims.Y &&
     y <= trash_dims.Y + trash_dims.Height
   ) {
+    get_canvas().style.cursor = 'pointer';
     return true;
   } else {
+    get_canvas().style.cursor = 'auto';
     return false;
   }
 }
@@ -332,19 +334,7 @@ export function recolor_trash(status) {
   const canvas = get_canvas();
   const ctx = canvas.getContext('2d');
   if (status) { // color red if hovering over trash
-    // trash.onload = () => {
-    //   ctx.drawImage(trash, 1840,770);
-    //   const trashData = ctx.getImageData(1840,770, trash.width, trash.height);
-    //   const data = trashData.data;
-    //   for (let i = 0; i < data.length; i += 4) {
-    //     data[i] = 255;     // Red
-    //     data[i + 1] = 44; // Green
-    //     data[i + 2] = 44; // Blue
-    //   }
-    //   ctx.putImageData(trashData, 1840, 770);
-    // }
-    ctx.drawImage(hover_trash, 1840,770);
-    
+    ctx.drawImage(hover_trash, 1840,770);  
   }
   else { // color dark gray normally
     ctx.drawImage(trash, 1840,770);

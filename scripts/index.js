@@ -183,7 +183,6 @@ function bind_drag() {
       graph_ops.delete_edge(graph, drop_edge);
     }
     else { // not dropped over trash can and release drag
-      drawing.recolor_trash(false);
       canvas.removeEventListener('mousemove', drag_scene);
       canvas.removeEventListener('mousemove', drag_vertex);
       canvas.removeEventListener('mousemove', drag_edge);
@@ -416,6 +415,25 @@ function bind_permalink() {
   window.addEventListener('hashchange', hash_change_handler);
 }
 
+const closeButton = document.getElementById('closeButton');
+closeButton.addEventListener('click',function(){
+  closetheButton();
+});
+
+let secondbar = document.getElementById('secondbar');
+let open = secondbar.hidden;
+open = false;
+
+function closetheButton() {
+  secondbar.style.transform = "translate(-20vw)";
+  var i;
+  var x = document.getElementsByClassName('dropdown');
+  for (i = 0; i < x.length; i++) {  
+    x[i].hidden = true;
+  }
+  open = false;
+}
+
 /** run after all the contents are loaded to hook up callbacks */
 function init() {
   bind_switch_machine();
@@ -431,5 +449,6 @@ function init() {
   bind_elongate_textbox();
   bind_permalink();
   trash_color(); // new
+  closetheButton();
   init_graph();  // leave this last since we want it to override some of the above
 }

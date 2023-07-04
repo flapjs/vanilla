@@ -12,83 +12,8 @@
   <link rel="icon" type="image/png" href="assets/favicon-16x16.png" sizes="16x16">
   <link rel="manifest" href="assets/site.webmanifest">
   <meta name="theme-color" content="#ffffff">
-  <style>
-    .NFA_specific{
-      cursor:pointer;
-    }
-    select{
-      position: relative;
-      font-size: 10px;
-      width:10vw;
-      left: 1vw;
-      height: 3vw;
-      padding: 10px 0px 10px 10px;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-    }
-    #secondbar #closeButton{
-      padding: 5px 30px 28px 5px;
-      position: relative;
-      width:2vw;
-      top: 0vw;
-      left:10vw;
-      cursor:pointer;
-    }
-    /* Styling for the pop-up */
-    .popup {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 9999;
-    }
 
-    .popup-content {
-      position: relative;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 50vw;
-      padding: 20px;
-      background-color: #273b7d;
-      color: lightgoldenrodyellow;
-      text-align: center;
-    }
-    .popup-content button{
-      position: relative;
-      border-radius: 1vw;
-      padding: 0.5vw;
-      cursor: pointer;
-      border: 0,5vw;
-      border-color: rgb(4, 4, 4);
-      padding: 0.5vw;
-      margin: 3px;
-      background-color: #273b7d;
-      color:#ccc
-    }
-
-    .popup-content button:hover {
-      color: #f2f0f0;
-      background-color: #4e5aa3;
-      transition-duration: 0.4s;
-    }
-    .popup-content #tutorial_close_btn{
-      position: fixed;
-      top:5px;
-      right:5px;
-    }
-
-    .popup-content #tutorial_close_btn:hover{
-      color: #f2f0f0;
-      background-color: #4e5aa3;
-      transition-duration: 0.4s;
-    }
-    .popup-content-pg1{
-      display: block;
-    }
-  </style>
+  <script src="scripts/index.js" type="module"></script>
 </head>
 <body>
 
@@ -103,8 +28,6 @@
 
     
     <button class="NFA_specific" id="NFA_2_DFA">NFA to DFA</button>
-    
-    
     
     <button id="save_machine">Save as png</button>
 
@@ -124,44 +47,38 @@
 
   </section>
   
-
-  <section id="sidebar">
-    <!-- Side navigation -->
+  <!-- Side navigation -->
   <div class="sidenav">
-    <button class="Home" onclick="togglesidebar('home')">
+    <button class="menuBtn" onclick="togglesidebar('home')">
       <div class="tooltip">
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
           width="30" 
           height="30" 
-          viewBox="0 0 256 256"
-        >
+          viewBox="0 0 256 256">
           <path 
             fill="currentColor" 
-            d="m218.83 103.77l-80-75.48a1.14 1.14 0 0 1-.11-.11a16 16 0 0 0-21.53 0l-.11.11l-79.91 75.48A16 16 0 0 0 32 115.55V208a16 16 0 0 0 16 16h48a16 16 0 0 0 16-16v-48h32v48a16 16 0 0 0 16 16h48a16 16 0 0 0 16-16v-92.45a16 16 0 0 0-5.17-11.78ZM208 208h-48v-48a16 16 0 0 0-16-16h-32a16 16 0 0 0-16 16v48H48v-92.45l.11-.1L128 40l79.9 75.43l.11.1Z"
-          />
+            d="m218.83 103.77l-80-75.48a1.14 1.14 0 0 1-.11-.11a16 16 0 0 0-21.53 0l-.11.11l-79.91 75.48A16 16 0 0 0 32 115.55V208a16 16 0 0 0 16 16h48a16 16 0 0 0 16-16v-48h32v48a16 16 0 0 0 16 16h48a16 16 0 0 0 16-16v-92.45a16 16 0 0 0-5.17-11.78ZM208 208h-48v-48a16 16 0 0 0-16-16h-32a16 16 0 0 0-16 16v48H48v-92.45l.11-.1L128 40l79.9 75.43l.11.1Z"/>
         </svg>
         <span class="tooltiptext">Home</span>
       </div>
     </button>
-    <button class="Machine" onclick=
+    <button class="menuBtn" onclick=
       "togglesidebar('settings')">
       <div class="tooltip">
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
           width="30" 
           height="30" 
-          viewBox="0 0 256 256"
-        >
+          viewBox="0 0 256 256">
           <path 
             fill="currentColor" 
-            d="M128 80a48 48 0 1 0 48 48a48.05 48.05 0 0 0-48-48Zm0 80a32 32 0 1 1 32-32a32 32 0 0 1-32 32Zm88-29.84q.06-2.16 0-4.32l14.92-18.64a8 8 0 0 0 1.48-7.06a107.21 107.21 0 0 0-10.88-26.25a8 8 0 0 0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186 40.54a8 8 0 0 0-3.94-6a107.71 107.71 0 0 0-26.25-10.87a8 8 0 0 0-7.06 1.49L130.16 40h-4.32L107.2 25.11a8 8 0 0 0-7.06-1.48a107.6 107.6 0 0 0-26.25 10.88a8 8 0 0 0-3.93 6l-2.64 23.76q-1.56 1.49-3 3L40.54 70a8 8 0 0 0-6 3.94a107.71 107.71 0 0 0-10.87 26.25a8 8 0 0 0 1.49 7.06L40 125.84v4.32L25.11 148.8a8 8 0 0 0-1.48 7.06a107.21 107.21 0 0 0 10.88 26.25a8 8 0 0 0 6 3.93l23.72 2.64q1.49 1.56 3 3L70 215.46a8 8 0 0 0 3.94 6a107.71 107.71 0 0 0 26.25 10.87a8 8 0 0 0 7.06-1.49L125.84 216q2.16.06 4.32 0l18.64 14.92a8 8 0 0 0 7.06 1.48a107.21 107.21 0 0 0 26.25-10.88a8 8 0 0 0 3.93-6l2.64-23.72q1.56-1.48 3-3l23.78-2.8a8 8 0 0 0 6-3.94a107.71 107.71 0 0 0 10.87-26.25a8 8 0 0 0-1.49-7.06Zm-16.1-6.5a73.93 73.93 0 0 1 0 8.68a8 8 0 0 0 1.74 5.48l14.19 17.73a91.57 91.57 0 0 1-6.23 15l-22.6 2.56a8 8 0 0 0-5.1 2.64a74.11 74.11 0 0 1-6.14 6.14a8 8 0 0 0-2.64 5.1l-2.51 22.58a91.32 91.32 0 0 1-15 6.23l-17.74-14.19a8 8 0 0 0-5-1.75h-.48a73.93 73.93 0 0 1-8.68 0a8 8 0 0 0-5.48 1.74l-17.78 14.2a91.57 91.57 0 0 1-15-6.23L82.89 187a8 8 0 0 0-2.64-5.1a74.11 74.11 0 0 1-6.14-6.14a8 8 0 0 0-5.1-2.64l-22.58-2.52a91.32 91.32 0 0 1-6.23-15l14.19-17.74a8 8 0 0 0 1.74-5.48a73.93 73.93 0 0 1 0-8.68a8 8 0 0 0-1.74-5.48L40.2 100.45a91.57 91.57 0 0 1 6.23-15L69 82.89a8 8 0 0 0 5.1-2.64a74.11 74.11 0 0 1 6.14-6.14A8 8 0 0 0 82.89 69l2.51-22.57a91.32 91.32 0 0 1 15-6.23l17.74 14.19a8 8 0 0 0 5.48 1.74a73.93 73.93 0 0 1 8.68 0a8 8 0 0 0 5.48-1.74l17.77-14.19a91.57 91.57 0 0 1 15 6.23L173.11 69a8 8 0 0 0 2.64 5.1a74.11 74.11 0 0 1 6.14 6.14a8 8 0 0 0 5.1 2.64l22.58 2.51a91.32 91.32 0 0 1 6.23 15l-14.19 17.74a8 8 0 0 0-1.74 5.53Z"
-          />
+            d="M128 80a48 48 0 1 0 48 48a48.05 48.05 0 0 0-48-48Zm0 80a32 32 0 1 1 32-32a32 32 0 0 1-32 32Zm88-29.84q.06-2.16 0-4.32l14.92-18.64a8 8 0 0 0 1.48-7.06a107.21 107.21 0 0 0-10.88-26.25a8 8 0 0 0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186 40.54a8 8 0 0 0-3.94-6a107.71 107.71 0 0 0-26.25-10.87a8 8 0 0 0-7.06 1.49L130.16 40h-4.32L107.2 25.11a8 8 0 0 0-7.06-1.48a107.6 107.6 0 0 0-26.25 10.88a8 8 0 0 0-3.93 6l-2.64 23.76q-1.56 1.49-3 3L40.54 70a8 8 0 0 0-6 3.94a107.71 107.71 0 0 0-10.87 26.25a8 8 0 0 0 1.49 7.06L40 125.84v4.32L25.11 148.8a8 8 0 0 0-1.48 7.06a107.21 107.21 0 0 0 10.88 26.25a8 8 0 0 0 6 3.93l23.72 2.64q1.49 1.56 3 3L70 215.46a8 8 0 0 0 3.94 6a107.71 107.71 0 0 0 26.25 10.87a8 8 0 0 0 7.06-1.49L125.84 216q2.16.06 4.32 0l18.64 14.92a8 8 0 0 0 7.06 1.48a107.21 107.21 0 0 0 26.25-10.88a8 8 0 0 0 3.93-6l2.64-23.72q1.56-1.48 3-3l23.78-2.8a8 8 0 0 0 6-3.94a107.71 107.71 0 0 0 10.87-26.25a8 8 0 0 0-1.49-7.06Zm-16.1-6.5a73.93 73.93 0 0 1 0 8.68a8 8 0 0 0 1.74 5.48l14.19 17.73a91.57 91.57 0 0 1-6.23 15l-22.6 2.56a8 8 0 0 0-5.1 2.64a74.11 74.11 0 0 1-6.14 6.14a8 8 0 0 0-2.64 5.1l-2.51 22.58a91.32 91.32 0 0 1-15 6.23l-17.74-14.19a8 8 0 0 0-5-1.75h-.48a73.93 73.93 0 0 1-8.68 0a8 8 0 0 0-5.48 1.74l-17.78 14.2a91.57 91.57 0 0 1-15-6.23L82.89 187a8 8 0 0 0-2.64-5.1a74.11 74.11 0 0 1-6.14-6.14a8 8 0 0 0-5.1-2.64l-22.58-2.52a91.32 91.32 0 0 1-6.23-15l14.19-17.74a8 8 0 0 0 1.74-5.48a73.93 73.93 0 0 1 0-8.68a8 8 0 0 0-1.74-5.48L40.2 100.45a91.57 91.57 0 0 1 6.23-15L69 82.89a8 8 0 0 0 5.1-2.64a74.11 74.11 0 0 1 6.14-6.14A8 8 0 0 0 82.89 69l2.51-22.57a91.32 91.32 0 0 1 15-6.23l17.74 14.19a8 8 0 0 0 5.48 1.74a73.93 73.93 0 0 1 8.68 0a8 8 0 0 0 5.48-1.74l17.77-14.19a91.57 91.57 0 0 1 15 6.23L173.11 69a8 8 0 0 0 2.64 5.1a74.11 74.11 0 0 1 6.14 6.14a8 8 0 0 0 5.1 2.64l22.58 2.51a91.32 91.32 0 0 1 6.23 15l-14.19 17.74a8 8 0 0 0-1.74 5.53Z"/>
         </svg>
         <span class="tooltiptext">Machine</span>
       </div>
     </button>
-    <button class="Save" onclick="togglesidebar('save')">
+    <button class="menuBtn" onclick="togglesidebar('save')">
       <div class="tooltip">
         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 32 32"><path fill="currentColor" d="m27.71 9.29l-5-5A1 1 0 0 0 22 4H6a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V10a1 1 0 0 0-.29-.71ZM12 6h8v4h-8Zm8 20h-8v-8h8Zm2 0v-8a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8H6V6h4v4a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6.41l4 4V26Z"/></svg>
         <span class="tooltiptext">Save</span>
@@ -179,13 +96,12 @@
             stroke="currentColor" 
             stroke-linecap="round" 
             stroke-width="1.5" 
-            d="M5 22v-8m0 0V4m0 10l2.47-.494a8.676 8.676 0 0 1 4.925.452a8.677 8.677 0 0 0 5.327.361l.214-.053A1.404 1.404 0 0 0 19 12.904V5.537a1.2 1.2 0 0 0-1.49-1.164a7.999 7.999 0 0 1-4.911-.334l-.204-.081a8.677 8.677 0 0 0-4.924-.452L5 4m0 0V2"
-          />
+            d="M5 22v-8m0 0V4m0 10l2.47-.494a8.676 8.676 0 0 1 4.925.452a8.677 8.677 0 0 0 5.327.361l.214-.053A1.404 1.404 0 0 0 19 12.904V5.537a1.2 1.2 0 0 0-1.49-1.164a7.999 7.999 0 0 1-4.911-.334l-.204-.081a8.677 8.677 0 0 0-4.924-.452L5 4m0 0V2"/>
         </svg>
         <span class="tooltiptext">Report A Bug</span>
       </div>
     </button>
-    <button class="Help" onclick= "openPopup()">
+    <button class="menuBtn" onclick= "openPopup()">
       <div class="tooltip">
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
@@ -198,26 +114,23 @@
               cy="12" 
               r="10" 
               stroke="currentColor" 
-              stroke-width="1.5"
-            />
+              stroke-width="1.5"/>
             <path 
               stroke="currentColor" 
               stroke-linecap="round" 
               stroke-width="1.5" 
-              d="M10.125 8.875a1.875 1.875 0 1 1 2.828 1.615c-.475.281-.953.708-.953 1.26V13"
-            />
+              d="M10.125 8.875a1.875 1.875 0 1 1 2.828 1.615c-.475.281-.953.708-.953 1.26V13"/>
             <circle 
               cx="12" 
               cy="16" 
               r="1" 
-              fill="currentColor"
-            />
+              fill="currentColor"/>
           </g>
         </svg>
         <span class="tooltiptext">Help</span>
       </div>
     </button>
-  </section>
+  </div>
 
   <section hidden id="secondbar">
     <button id="closeButton">
@@ -244,24 +157,7 @@
     </div>
   </section>
 
-  <div id="trash" onmouseover="delete_event()">
-    <!-- <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 448 512"><path fill="currentColor" d="m170.5 51.6l-19 28.4h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6h-93.7c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6l36.7 55H424c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8v304c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128h-8c-13.3 0-24-10.7-24-24s10.7-24 24-24h69.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128v304c0 17.7 14.3 32 32 32h224c17.7 0 32-14.3 32-32V128H80zm80 64v208c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0v208c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0v208c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z"/></svg> -->
-  </div>
-
-  <!-- user guide content -->
-  <section hidden id="tutorial-content">
-    <a href="https://github.com/flapjs/vanilla/blob/master/usage.md">
-      <div>double click to create vertices, additional double clicks to toggle final</div>
-      <div>right click on vertices (or ctrl) drag to create edges</div>
-      <div>right click on vertices or edge texts to inspect</div>
-      <div>left click drag on vertices or edge texts to drag</div>
-      <div>left click drag on empty space to pan, use scroll wheel to zoom</div>
-      <div>ctrl+z to undo, ctrl+shift+z to redo</div>
-      <div>dd to delete</div>
-    </a>
-  </section>
-
-  <!-- for pop up tutorial-->
+  <!-- Tutorial Popup -->
   <div class="popup">
     <div class="popup-content">
       <button id="tutorial_close_btn" onclick="closePopup()">
@@ -298,61 +194,52 @@
         <p>This feature enables sharing machine drawings. Permalink stands for permanent link, meaning once you have created a link to share with your others, that link can uniquely decode back to a machine.</p>  
         <button class ='prev-btn' onclick="pgAtoB(4,3)">&lt;&lt; Prev</button>
        </div>
-
       </div>
-
     </div>
   </div>
 
 
   <script>
-    const closeButton = document.getElementById('closeButton');
-    closeButton.addEventListener('click',function(){
-      closetheButton();
-    })
-  function w3_open() {
-    document.getElementById("tutorial_content").style.display = "block";
-  }
-  
-  function w3_close() {
-    document.getElementById("tutorial_content").style.display = "none";
-  }
+    // const closeButton = document.getElementById('closeButton');
+    // closeButton.addEventListener('click',function(){
+    //   closetheButton();
+    // })
 
-  let secondbar = document.getElementById('secondbar');
-  let open = secondbar.hidden;
-  open = false;
-  
-  function closetheButton() {
-    secondbar.style.transform = "translate(-20vw)";
-    var i;
-    var x = document.getElementsByClassName('dropdown');
-    for (i = 0; i < x.length; i++) {  
-      x[i].hidden = true;
+    // let secondbar = document.getElementById('secondbar');
+    // let open = secondbar.hidden;
+    // open = false;
+    
+    function closetheButton() {
+      secondbar.style.transform = 'translate(-20vw)';
+      var i;
+      var x = document.getElementsByClassName('dropdown');
+      for (i = 0; i < x.length; i++) {  
+        x[i].hidden = true;
+      }
+      open = false;
     }
-    open = false;
-  }
 
-  function togglesidebar(classname) {
-    secondbar.style.transform = "translate(0vw)";    
-    if (open) { 
-      closetheButton();
+    function togglesidebar(classname) {
+      secondbar.style.transform = "translate(0vw)";    
+      if (open) { 
+        closetheButton();
+      }
+      document.getElementById('secondbar').hidden = false;
+      var i;
+      var x = document.getElementsByClassName(classname);
+      for (i = 0; i < x.length; i++) {
+        x[i].hidden = false;
+      }
     }
-    document.getElementById('secondbar').hidden = false;
-    var i;
-    var x = document.getElementsByClassName(classname);
-    for (i = 0; i < x.length; i++) {
-      x[i].hidden = false;
-    }
-  }
 
-  // first time pop up implementation
+    // first time pop up implementation
     // Check if the user is a first-time visitor
     if (!localStorage.getItem('visitedBefore')) {
-    // User is a first-time visitor
-    openPopup();
+      // User is a first-time visitor
+      openPopup();
 
-    // Set flag to indicate the user has visited before
-    localStorage.setItem('visitedBefore', true);
+      // Set flag to indicate the user has visited before
+      localStorage.setItem('visitedBefore', true);
     } 
     // User has visited before then do nothing
 
@@ -386,11 +273,7 @@
     }
   </script>
 
-
-
   <!-- the big canvas that we draw on -->
   <canvas id='machine_drawing'>Your browser does not support canvas</canvas>
-
 </body>
-<script src="scripts/index.js" type="module"></script>
 </html>
