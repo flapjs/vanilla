@@ -26,6 +26,18 @@ input {
   border: 1px solid rgb(128, 128, 16);
 }
 
+.cfg_symbol {
+  max-width: 2ch;
+  text-align: center;
+  border: 0.5px solid black;
+}
+
+.cfg_rule {
+  border: 0.5px solid black;
+  min-width: 6ch;
+  max-width: 20ch;
+}
+
 /* all buttons */
 button {
   background-color: Transparent;

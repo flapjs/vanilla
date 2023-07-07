@@ -64,7 +64,12 @@ export function push_history(graph, history = null) {
   if (!history) {
     history = get_history(); 
   }
-  history[++hist_ptr] = remove_ignores(graph);
+   // If machine is cfg
+   if (hist_key === consts.HIST_KEYS.CFG){
+    history[++hist_ptr] = graph;
+  }else{
+    history[++hist_ptr] = remove_ignores(graph);
+  }
   hist_tip = hist_ptr;  // we just pushed, so that is the new tip
   const hist_str = JSON.stringify(history);
   localStorage.setItem(hist_key, hist_str);

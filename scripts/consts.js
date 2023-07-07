@@ -91,7 +91,8 @@ export const MACHINE_TYPES = {
   PDA: 'PDA',
   Turing: 'Turing',
   Moore: 'Moore',
-  Mealy: 'Mealy'
+  Mealy: 'Mealy',
+  CFG: 'CFG'
 };
 
 /** @constant {string} DEFAULT_MACHINE - choice from ['NFA', 'PDA', 'Turing'] */
@@ -103,7 +104,8 @@ export const HIST_KEYS = {
   PDA: '%PDA_history',
   Turing: '%turing_history',
   Moore: '%moore_history',
-  Mealy: '%mealy_history'
+  Mealy: '%mealy_history',
+  CFG: '%cfg_history'
 };
 
 /** @constant {Object} HIST_TIP_KEYS - localstore key to pointer to the top of the history stack */
@@ -112,7 +114,8 @@ export const HIST_TIP_KEYS = {
   PDA: '%PDA_hist_tip',
   Turing: '%turing_hist_tip',
   Moore: '%moore_hist_tip',
-  Mealy: '%mealy_history_tip'
+  Mealy: '%mealy_history_tip',
+  CFG: '%cfg_history_tip'
 };
 
 /** @constant {Object} HIST_PTR_KEYS - localstore key to pointer to the currently displayed graph */
@@ -121,7 +124,8 @@ export const HIST_PTR_KEYS = {
   PDA: '%PDA_hist_ptr',
   Turing: '%turing_hist_ptr',
   Moore: '%moore_hist_ptr',
-  Mealy: '%mealy_history_ptr'
+  Mealy: '%mealy_history_ptr',
+  CFG: '%cfg_history_ptr'
 };
 
 /** @constant {float} ZOOM_SPEED - final zoom is ZOOM_SPEED*scroll_wheel_ticks */
@@ -160,3 +164,10 @@ export const VERTEX_DELIM = ';';
 
 /** @constant {string} EDGE_DELIM - delimiter for edges in a permalink  */
 export const EDGE_DELIM = '~';
+
+// CFG Constants
+/** @constant {int} CFG_EDGE_X_DISTANCE - horizontal distance between nodes in the PDA created from a CFG*/
+export const CFG_EDGE_X_DISTANCE = 300;
+
+/** @constant {int} CFG_EDGE_Y_DISTANCE - vertical distance between nodes in the PDA created from a CFG*/
+export const CFG_EDGE_Y_DISTANCE = 200;

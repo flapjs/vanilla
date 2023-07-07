@@ -8,6 +8,7 @@ import * as compute from './compute.js';
 import * as graph_ops from './graph_ops.js';
 import * as menus from './menus.js';
 import * as permalink from './permalink.js';
+import * as cfg from './cfg_components.js';
 
 // if not in browser, don't run
 if (typeof document !== 'undefined') {
@@ -214,6 +215,9 @@ function bind_run_input() {
 
     const run_btn = input_divs[i].querySelector('.run_btn');
     run_btn.addEventListener('click', () => {
+      if (menus.machine_type() === consts.MACHINE_TYPES.CFG) {
+        graph = cfg.CFG_to_PDA();
+      }
       computations[i] = compute.run_input(graph, menus.machine_type(), textbox.value);  // noninteractive computation
       // eslint-disable-next-line no-unused-vars
       const { value: output, _ } = computations[i].next();  // second value is always true since it is noninteractive
@@ -344,7 +348,9 @@ function init_graph() {
 /** get the newest graph from history and draw it */
 function refresh_graph() {
   graph = hist.retrieve_latest_graph();
-  drawing.draw(graph);
+  if (menus.machine_type() != consts.MACHINE_TYPES.CFG) {
+    drawing.draw(graph);
+  }
 }
 
 /** handle switching machine type event */
@@ -353,8 +359,17 @@ function bind_switch_machine() {
   select.value = consts.DEFAULT_MACHINE;  // set to default machine here too
   select.addEventListener('change', e => {
     hist.set_history_keys(e.target.value);
-    refresh_graph();  // switching graph
     menus.display_UI_for(e.target.value);
+    if (e.target.value == consts.MACHINE_TYPES.CFG) {
+      cfg.CFG_switch();
+      drawing.get_canvas().hidden = true;
+    } else {
+      cfg.clear_rules(true);
+      document.getElementsByClassName("step_btn")[0].hidden = false;
+      document.getElementsByClassName("reset_btn")[0].hidden = false;
+      drawing.get_canvas().hidden = false;
+    }
+    refresh_graph();  // switching graph
     history.replaceState(undefined, undefined, '#');  // clear the permalink
   });
 }
@@ -366,6 +381,52 @@ function bind_machine_transform() {
     graph = graph_ops.NFA_to_DFA(graph);
     drawing.draw(graph);
     hist.push_history(graph);
+  });
+}
+
+/**
+ * 
+ */
+function bind_cfg_buttons() {
+  const CFG_2_PDA_btn = document.getElementById('CFG_2_PDA');
+  CFG_2_PDA_btn.addEventListener('click', () => {
+    graph = cfg.CFG_to_PDA(graph);
+    drawing.draw(graph);
+    document.getElementsByClassName("step_btn")[0].hidden = false;
+    document.getElementsByClassName("reset_btn")[0].hidden = false;
+    drawing.get_canvas().hidden = false;
+    const select = document.getElementById('select_machine');
+    select.value = consts.MACHINE_TYPES.PDA;
+    hist.set_history_keys(consts.MACHINE_TYPES.PDA);
+    menus.display_UI_for(consts.MACHINE_TYPES.PDA);
+    hist.push_history(graph);
+    refresh_graph();  // switching graph
+    cfg.clear_rules(true);
+    history.replaceState(undefined, undefined, '#');  // clear the permalink
+  });
+
+  const CREATE_RULE = document.getElementById('CFG_CREATE');
+  CREATE_RULE.addEventListener('click', () => {
+    cfg.create_new_rule(false);
+  });
+
+  const DELETE_BTN = document.getElementById('CFG_DELETE');
+  DELETE_BTN.addEventListener('click', () => {
+    cfg.delete_rule();
+  });
+
+  const CLEAR_BTN = document.getElementById('CFG_CLEAR');
+  CLEAR_BTN.addEventListener('click', () => {
+    document.getElementById("starting_symbol").value = "";
+    cfg.clear_rules();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (menus.machine_type() === consts.MACHINE_TYPES.CFG){
+      if (e.code === 'Enter' || e.code === 'NumpadEnter') {
+        cfg.create_new_rule(true);
+      }
+    }
   });
 }
 
@@ -390,6 +451,9 @@ function bind_permalink() {
   const permalink_btn = document.getElementById('permalink');
   permalink_btn.addEventListener('click', () => {
     const select = document.getElementById('select_machine');
+    if (menus.machine_type() === consts.MACHINE_TYPES.CFG) {
+      graph = cfg.CFG_to_PDA();
+    }
     const graph_str = permalink.serialize(select.value, graph);
     history.replaceState(undefined, undefined, '#'+graph_str);
     navigator.clipboard.writeText(window.location.href)
@@ -406,6 +470,7 @@ function init() {
   bind_context_menu();
   bind_run_input();
   bind_machine_transform();
+  bind_cfg_buttons();
   bind_save_drawing();
   bind_undo_redo();
   bind_scroll();

@@ -269,6 +269,7 @@ function* BFS_step(graph, v, remaining_input, interactive=false, allowed_depth=6
  */
 function run_input_PDA(graph, input, interactive) {
   const v = find_start(graph);
+  console.log(input);
   const remaining_input = input.split('').reverse();
   return BFS_step(graph, v, remaining_input, interactive);
 }
@@ -405,7 +406,7 @@ export function run_input(graph, machine_type, input, interactive=false) {
     return 'The graph is empty; nothing to do...';
   } else if (machine_type === consts.MACHINE_TYPES.NFA) {
     return run_input_NFA(graph, input, interactive);
-  } else if (machine_type === consts.MACHINE_TYPES.PDA) {
+  } else if (machine_type === consts.MACHINE_TYPES.PDA || machine_type === consts.MACHINE_TYPES.CFG) {
     return run_input_PDA(graph, input, interactive);
   } else if (machine_type === consts.MACHINE_TYPES.Turing) {
     return run_input_Turing(graph, input, interactive);
