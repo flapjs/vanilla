@@ -56,10 +56,12 @@ export function display_vertex_menu(graph, v, x, y) {
   rename.value = v;  // prepopulate vertex name
   rename_div.appendChild(rename);
   const start_btn = document.createElement('button');
-  start_btn.innerText = 'make start';
+  start_btn.innerText = 'make Start';
+  start_btn.className = 'start';
   start_btn.addEventListener('click', () => graph_ops.set_start(graph, v));
   const final_btn = document.createElement('button');
-  final_btn.innerText = 'toggle final';
+  final_btn.innerText = 'toggle Final';
+  final_btn.className = 'final';
   final_btn.addEventListener('click', () => graph_ops.toggle_final(graph, v));
   buttons_div.appendChild(start_btn);
   buttons_div.appendChild(final_btn);

@@ -422,7 +422,6 @@ closeButton.addEventListener('click',function(){
 
 let secondbar = document.getElementById('secondbar');
 let open = secondbar.hidden;
-open = false;
 
 function closetheButton() {
   secondbar.style.transform = "translate(-20vw)";
@@ -433,6 +432,29 @@ function closetheButton() {
   }
   open = false;
 }
+
+// Function to open the pop-up
+function openPopup() {
+  currentPg = 4;
+  var popup = document.querySelector('.popup');
+  popup.style.display = 'block';
+  for(let i=currentPg; i>1 ; i--){
+    pgAtoB(i,i-1);
+  }
+  document.getElementById('overlay').style.display = 'block';
+}
+
+function pgAtoB(a,b){
+    var pgName = 'pg';
+    var nameA = pgName + a;
+    var nameB = pgName + b;
+    const pgA = document.getElementById(nameA);
+    const pgB = document.getElementById(nameB);
+    pgA.style.display = "none";
+    pgB.style.display = "block";
+    currentPg = b;
+}
+
 
 /** run after all the contents are loaded to hook up callbacks */
 function init() {
@@ -450,5 +472,6 @@ function init() {
   bind_permalink();
   trash_color(); // new
   closetheButton();
+  openPopup();
   init_graph();  // leave this last since we want it to override some of the above
 }
