@@ -220,7 +220,6 @@
 
   <section hidden id="secondbar">
     <button id="closeButton"> X </button>
-    <button id="closeButton"> X </button>
     <div class = "dropdown home">
       <div class = machine_inputs>
       </div>
@@ -332,22 +331,19 @@
     document.getElementById("tutorial_content").style.display = "none";
   }
   let secondbar = document.getElementById('secondbar');
-  let open = secondbar.hidden;
-  open = false;
   
   function closetheButton() {
-    secondbar.style.transform = "translate(-20vw)";
+    secondbar.hidden = true;
     var i;
     var x = document.getElementsByClassName('dropdown');
     for (i = 0; i < x.length; i++) {  
       x[i].hidden = true;
     }
-    open = false;
   }
 
   function togglesidebar(classname) {
-    secondbar.style.transform = "translate(0vw)";    
-    if (open) { 
+    const isHidden = document.getElementById('secondbar').hidden;
+    if (!isHidden) {  
       closetheButton();
     }
     document.getElementById('secondbar').hidden = false;
