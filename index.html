@@ -274,10 +274,10 @@
 
 
   <script>
-    // const closeButton = document.getElementById('closeButton');
-    // closeButton.addEventListener('click',function(){
-    //   closetheButton();
-    // })
+    const closeButton = document.getElementById('closeButton');
+    closeButton.addEventListener('click',function(){
+      closetheButton();
+    })
 
     let secondbar = document.getElementById('secondbar');
     let open = secondbar.hidden;
@@ -297,7 +297,7 @@
         closetheButton();
       }
       secondbar.hidden = false;
-      secondbar.style.transform = "translate(0vw)";
+      secondbar.style.transform = 'translate(0vw)';
       var i;
       var x = document.getElementsByClassName(classname);
       for (i = 0; i < x.length; i++) {

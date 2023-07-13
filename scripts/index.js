@@ -415,47 +415,6 @@ function bind_permalink() {
   window.addEventListener('hashchange', hash_change_handler);
 }
 
-const closeButton = document.getElementById('closeButton');
-closeButton.addEventListener('click',function(){
-  closetheButton();
-});
-
-let secondbar = document.getElementById('secondbar');
-let open = secondbar.hidden;
-
-function closetheButton() {
-  secondbar.style.transform = "translate(-20vw)";
-  var i;
-  var x = document.getElementsByClassName('dropdown');
-  for (i = 0; i < x.length; i++) {  
-    x[i].hidden = true;
-  }
-  open = false;
-}
-
-// Function to open the pop-up
-function openPopup() {
-  currentPg = 4;
-  var popup = document.querySelector('.popup');
-  popup.style.display = 'block';
-  for(let i=currentPg; i>1 ; i--){
-    pgAtoB(i,i-1);
-  }
-  document.getElementById('overlay').style.display = 'block';
-}
-
-function pgAtoB(a,b){
-    var pgName = 'pg';
-    var nameA = pgName + a;
-    var nameB = pgName + b;
-    const pgA = document.getElementById(nameA);
-    const pgB = document.getElementById(nameB);
-    pgA.style.display = "none";
-    pgB.style.display = "block";
-    currentPg = b;
-}
-
-
 /** run after all the contents are loaded to hook up callbacks */
 function init() {
   bind_switch_machine();
@@ -471,7 +430,5 @@ function init() {
   bind_elongate_textbox();
   bind_permalink();
   trash_color(); // new
-  closetheButton();
-  openPopup();
   init_graph();  // leave this last since we want it to override some of the above
 }
