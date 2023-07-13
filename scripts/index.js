@@ -404,10 +404,63 @@ function init() {
   bind_dd();
   bind_elongate_textbox();
   bind_permalink();
+  htmlSetUp()
   init_graph();  // leave this last since we want it to override some of the above
 }
 
-/*
+
+/** moved basic set up from index.html and combined into one function */
+function htmlSetUp(){
+  // first time pop up implementation
+    // Check if the user is a first-time visitor
+    if (!localStorage.getItem('visitedBefore')) {
+      // User is a first-time visitor
+      openPopup();
+  
+      // Set flag to indicate the user has visited before
+      localStorage.setItem('visitedBefore', true);
+      } 
+
+      let secondbar = document.getElementById('secondbar');
+      var isOpen = secondbar.hidden;
+      isOpen = false;
+      const closeButton = document.getElementById('closeButton');
+      closeButton.addEventListener('click',function(){
+        closetheButton();
+      })
+
+      const homeIcon = document.getElementById('homeIcon');
+      const machineIcon = document.getElementById('machineIcon');
+      const saveIcon = document.getElementById('saveIcon');
+      const bugIcon = document.getElementById('bugIcon');
+      const helpIcon = document.getElementById('helpIcon');
+      const tutorial_close_btn = document.getElementById('tutorial_close_btn');
+
+      homeIcon.addEventListener("click", function(){expandIcon('home')});
+      machineIcon.addEventListener("click", function(){expandIcon('settings')});
+      saveIcon.addEventListener("click", function(){expandIcon('save')});
+      bugIcon.addEventListener("click", function(){redirectToBugReport()});
+      helpIcon.addEventListener("click", function(){
+        openPopup();
+        closetheButton();
+      }); 
+      tutorial_close_btn.addEventListener("click",function(){closePopup();})
+
+      const nextBtn_1to2 = document.getElementById('nextBtn_1to2');
+      const nextBtn_2to3 = document.getElementById('nextBtn_2to3');
+      const nextBtn_3to4 = document.getElementById('nextBtn_3to4');
+      const prevBtn_2to1 = document.getElementById('prevBtn_2to1');
+      const prevBtn_3to2 = document.getElementById('prevBtn_3to2');
+      const prevBtn_4to3 = document.getElementById('prevBtn_4to3');
+
+      nextBtn_1to2.addEventListener("click", function(){pgAtoB(1,2)});
+      nextBtn_2to3.addEventListener("click", function(){pgAtoB(2,3)});
+      nextBtn_3to4.addEventListener("click", function(){pgAtoB(3,4)});
+      prevBtn_2to1.addEventListener("click", function(){pgAtoB(2,1)});
+      prevBtn_3to2.addEventListener("click", function(){pgAtoB(3,2)});
+      prevBtn_4to3.addEventListener("click", function(){pgAtoB(4,3)});
+}
+
 // moved from html file
 function w3_open() {
   document.getElementById("tutorial_content").style.display = "block";
@@ -431,17 +484,12 @@ function closetheButton() {
     icons[j].style.color = '#c7c2c2';
     icons[j].style.backgroundColor = '#273b7d';
   }
-  
-  
-  secondbar.hidden = false;
+  //secondbar.hidden = false;
 }
 
 function togglesidebar(classname) {
   let secondbar = document.getElementById('secondbar');
-  secondbar.style.transform = "translate(0vw)";   
-  if (secondbar.hidden == true) { 
-    closetheButton();
-  }
+  secondbar.style.transform = "translate(0vw)";  
   document.getElementById('secondbar').hidden = false;
   var i;
   var x = document.getElementsByClassName(classname);
@@ -450,16 +498,9 @@ function togglesidebar(classname) {
   }
 }
 
-// first time pop up implementation
-    // Check if the user is a first-time visitor
-    if (!localStorage.getItem('visitedBefore')) {
-      // User is a first-time visitor
-      openPopup();
-  
-      // Set flag to indicate the user has visited before
-      localStorage.setItem('visitedBefore', true);
-      } 
 
+/** global variable for funtions openOpoup() closePopup() and pgAtoB() */
+var currentPg = 1;
 // Function to open the pop-up
 function openPopup() {
   currentPg = 4;
@@ -475,17 +516,6 @@ function closePopup() {
   pgAtoB(currentPg,1);
 var popup = document.querySelector('.popup');
 popup.style.display = 'none';
-}
-
-function pgAtoB(a,b){
-  var pgName = 'pg';
-  var nameA = pgName + a;
-  var nameB = pgName + b;
-  const pgA = document.getElementById(nameA);
-  const pgB = document.getElementById(nameB);
-  pgA.style.display = "none";
-  pgB.style.display = "block";
-  currentPg = b;
 }
 
 //updated on funciton when clicking on an icon 5/16/2023
@@ -521,6 +551,17 @@ function expandIcon(nameOfClass){
 
 }
 
+function pgAtoB(a,b){
+  var pgName = 'pg';
+  var nameA = pgName + a;
+  var nameB = pgName + b;
+  const pgA = document.getElementById(nameA);
+  const pgB = document.getElementById(nameB);
+  pgA.style.display = "none";
+  pgB.style.display = "block";
+  currentPg = b;
+}
+
 function redirectToBugReport() {
   window.open('https://github.com/flapjs/vanilla/issues', '_blank');
   //below is code for opening bug report in current tab of browser
@@ -528,29 +569,6 @@ function redirectToBugReport() {
 }
 
 
-var currentPg = 1;
-let secondbar = document.getElementById('secondbar');
-var isOpen = secondbar.hidden;
-isOpen = false;
-const closeButton = document.getElementById('closeButton');
-closeButton.addEventListener('click',function(){
-  closetheButton();
-})
 
-const homeIcon = document.getElementById('homeIcon');
-const machineIcon = document.getElementById('machineIcon');
-const saveIcon = document.getElementById('saveIcon');
-const bugIcon = document.getElementById('bugIcon');
-const helpIcon = document.getElementById('helpIcon');
-
-homeIcon.addEventListener("click", expandIcon('home'));
-machineIcon.addEventListener("click", expandIcon('settings'));
-saveIcon.addEventListener("click", expandIcon('save'));
-bugIcon.addEventListener("click", redirectToBugReport());
-helpIcon.addEventListener("click", function(){
-  openPopup();
-  closetheButton();
-});
-*/
 
 
