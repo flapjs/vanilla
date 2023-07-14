@@ -8,6 +8,7 @@ import * as compute from './compute.js';
 import * as graph_ops from './graph_ops.js';
 import * as menus from './menus.js';
 import * as permalink from './permalink.js';
+// import * as home from './home.js';
 
 // if not in browser, don't run
 if (typeof document !== 'undefined') {
@@ -230,31 +231,104 @@ function bind_context_menu() {
   });
 }
 
+/** binds the run button to the run function */
+function bind_plus_minus() {
+  const plus_button = document.getElementById('plus_button');
+  const minus_button = document.getElementById('minus_button');
+
+  plus_button.addEventListener('click', () => {
+    const machine_inputs = document.querySelector('.machine_inputs');
+    //first, check if there is a hidden machine input
+    for (let i = 0; i < machine_inputs.children.length; i++) {
+      if (machine_inputs.children.item(i).classList.contains('machine_input') && machine_inputs.children.item(i).hidden) {
+        machine_inputs.children.item(i).hidden = false;
+        return;
+      }
+    }
+    // create a new machine input
+    add_input_bar();
+    bind_run_input();
+  });
+
+  // event listener for minus button
+  minus_button.addEventListener('click', () => {
+    // remove the last machine input
+    const machine_inputs = document.querySelector('.machine_inputs');
+    //iterate backwards through machine inputs, hide the first one that is not hidden
+    for (let i = machine_inputs.children.length - 1; i >= 0; i--) {
+      if (machine_inputs.children.item(i).classList.contains('machine_input') && !machine_inputs.children.item(i).hidden) {
+        machine_inputs.children.item(i).hidden = true;
+        break;
+      }
+    }
+  });
+}
+
+/** Generates a new input bar using the DOM
+ * I tried using HTML to generate the first one
+ * but ran into inconsistent spacing issue I couldn't figure out,
+ * so this will be used to generate all for consistency's sake
+ */
+function add_input_bar(){
+  const machine_inputs = document.querySelector('.machine_inputs');
+  const new_machine_input = document.createElement('div');
+  new_machine_input.classList.add('machine_input');
+
+  // create a new textarea box
+  const new_textarea = document.createElement('textarea');
+  new_textarea.classList.add("machineInput");
+  // create a new run button under the original one
+  const new_run_button = document.createElement('button');
+  new_run_button.classList.add('run_btn');
+  new_run_button.innerHTML = 'R';
+
+  // create a new step button
+  const new_step_button = document.createElement('button');
+  new_step_button.classList.add('step_btn');
+  new_step_button.innerHTML = 'S';
+
+  // create a new reset button
+  const new_reset_button = document.createElement('button');
+  new_reset_button.classList.add('reset_btn');
+  new_reset_button.innerHTML = 'X';
+
+  new_machine_input.appendChild(new_textarea);
+  new_machine_input.appendChild(new_run_button);
+  new_machine_input.appendChild(new_step_button);
+  new_machine_input.appendChild(new_reset_button);
+
+  // append the new button to the body
+  machine_inputs.appendChild(new_machine_input);
+}
+
 /** binds each machine input to the run_input function */
 function bind_run_input() {
   const input_divs = document.getElementsByClassName('machine_input');
   const computations = Array(input_divs.length);  // stores generators of the computation half evaluated
   for (let i = 0; i < input_divs.length; i++) {
-    const textbox = input_divs[i].querySelector('input');
+    const textbox = input_divs[i].querySelector('.machineInput');
     
     const run_btn = input_divs[i].querySelector('.run_btn');
     run_btn.addEventListener('click', () => {
+      input_divs[i].style.backgroundColor = consts.SECOND_BAR_COLOR;
       computations[i] = compute.run_input(graph, menus.machine_type(), textbox.value);  // noninteractive computation
       // eslint-disable-next-line no-unused-vars
       const { value: accepted, _ } = computations[i].next();  // second value is always true since it is noninteractive
-      alert(accepted ? 'Accepted' : 'Rejected');
+      // alert(accepted ? 'Accepted' : 'Rejected');
+      input_divs[i].style.backgroundColor = accepted ? consts.ACCEPT_COLOR : consts.REJECT_COLOR;
       computations[i] = undefined;
     });
     
     const step_btn = input_divs[i].querySelector('.step_btn');
     step_btn.addEventListener('click', () => {
+      input_divs[i].style.backgroundColor = consts.SECOND_BAR_COLOR;
       if (!computations[i]) {
         computations[i] = compute.run_input(graph, menus.machine_type(), textbox.value, true);  // true for interactive
       }
       const { value: accepted, done } = computations[i].next();
       if (done) {
         // whether true or false. We wrap this in timeout to execute after the vertex coloring is done
-        setTimeout(() => alert(accepted ? 'Accepted' : 'Rejected'));
+        setTimeout(() => input_divs[i].style.backgroundColor = accepted ? consts.ACCEPT_COLOR : consts.REJECT_COLOR);
         computations[i] = undefined;
       }
     });
@@ -400,7 +474,34 @@ export function bind_elongate_textbox() {
   document.querySelectorAll('input[type=text]').forEach(textbox => {
     textbox.addEventListener('input', change_width_func);
   });
+
+  // /** dynamically change the height of textbox */
+  // const resizeTextArea = textarea => {
+  //   const { style, value } = textarea;
+
+  //   // The 4 corresponds to the 2 2px borders (top and bottom):
+  //   // style.height = style.minHeight = 'auto';
+  //   // style.minHeight = `${ Math.min(textarea.scrollHeight + 4, parseInt(textarea.style.maxHeight)) }px`;
+  //   // style.height = `${ textarea.scrollHeight + 4 }px`;
+  //   // style.maxHeight = `100px`
+
+  // }
+
+  // const textarea = document.getElementById('machineInput');
+
+  // textarea.addEventListener('input', () => {
+  //   resizeTextArea(textarea);
+  // }); /* dynamically change the height of textbox */
 }
+
+
+
+
+// const textarea = document.getElementById('machineInput');
+
+// textarea.addEventListener('input', () => {
+//   resizeTextArea(textarea);
+// });
 
 /** button to generate permanent link */
 function bind_permalink() {
@@ -421,6 +522,8 @@ function init() {
   bind_double_click();
   bind_drag();
   bind_context_menu();
+  bind_plus_minus();
+  add_input_bar(); // called so one input bar appears on opening of homepage
   bind_run_input();
   bind_machine_transform();
   bind_save_drawing();

@@ -340,6 +340,58 @@ canvas {
   z-index: 100;
 }
 
+/* access the input field in div id input1*/
+.machineInput { 
+  width: 50px;
+  padding: 12px 20px;
+  margin: 8px 0;
+  margin-left: 8px;
+  /*background-color: #f2f0f0;
+  /*font-size: 12px;*
+  /* done */
+  height: 12px;
+  
+  /* overflow: auto; */
+  resize: none;
+  
+}
+
+#secondbar .machine_input {
+  max-height: 64px;
+}
+#secondbar .machine_input * {
+  display: inline-block;
+}
+
+#secondbar .home button {
+  width: 20px;
+  display: inline-block;
+  margin-left: 4px;
+  margin-right: 0px;
+  margin-top: -100px;
+  position: relative;
+  bottom: 20px;
+  border: #f2f0f0;
+  border-width: 2px;
+  border-style: solid;
+}
+
+#secondbar .home .pmbtn {
+  bottom: -16px;
+  width: 32px;
+  text-align: center;
+  margin-left: 52px;
+  margin-right: -44px;
+}
+
+#secondbar p, h3 {
+  position: relative;
+  color: white;
+}
+#secondbar h3 {
+  margin-left: 64px;
+  margin-bottom: 10px;
+}
 /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {
   .sidenav {padding-top: 15px;}

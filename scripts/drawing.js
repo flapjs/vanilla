@@ -162,8 +162,10 @@ export function draw_triangle(tip1, tip2, tip3) {
  * @param {Array<float>} start - where to begin
  * @param {Array<float>} end - where to end
  * @param {Array<float>} mid - control point for quadratic bezier curve
+ * @param {string} edge_text - the text to display on the edge
+ * @param {float} text_size - the size of the text
  */
-export function draw_arrow(start, end, mid) {
+export function draw_arrow(start, end, mid, edge_text, text_size) {
   if (!mid) {
     mid = linalg.scale(1/2, linalg.add(start, end));
   }  // find mid if DNE
@@ -174,7 +176,8 @@ export function draw_arrow(start, end, mid) {
   ctx.beginPath();
   ctx.moveTo(...start);
   // we boost the curve by the orthogonal component of v1 wrt v2
-  ctx.quadraticCurveTo(...linalg.add(mid, ortho_comp), ...end);
+  //ctx.quadraticCurveTo(...linalg.add(mid, ortho_comp), ...end);
+  drawSplit(start, end, mid, consts.DRAW_ARROW_RADIUS, edge_text, text_size);
   ctx.stroke();
   const arrow_tip = linalg.normalize(linalg.sub(mid_to_end, ortho_comp), consts.ARROW_LENGTH);  
   const normal_to_tip = linalg.normalize(linalg.normal_vec(arrow_tip), consts.ARROW_WIDTH/2);  // half the total width
@@ -183,6 +186,40 @@ export function draw_arrow(start, end, mid) {
     tip3 = linalg.sub(linalg.sub(end, arrow_tip), normal_to_tip);
   draw_triangle(tip1, tip2, tip3);
 }
+
+/**
+ * draw a split arrow with start, end and a mid
+ * do not draw points if the distance from point to mid is less than radius
+ * @param {Array<float>} start - where to begin
+ * @param {Array<float>} end - where to end
+ * @param {Array<float>} mid - control point for quadratic bezier curve
+ * @param {float} radius - radius of the midpoint text that we avoid
+ * @param {string} edge_text - the text to display on the edge
+ * @param {float} text_size - the size of the text
+ */
+function drawSplit(start, end, mid, radius, edge_text, text_size) {
+  // alert(end);
+  // alert(linalg.scale(t**2, end));
+  // console.log(start);
+  const iterations = 20;
+  const ctx = get_canvas().getContext('2d');
+  const estimated_pixels_of_text = edge_text.length * text_size * 0.6; 
+  ctx.lineWidth = 0.1;
+  for (let i = 0; i <= iterations; i++) {
+    let t = i/iterations;
+    let point = linalg.add(linalg.scale((1-t)**2, start), linalg.add(linalg.scale(2*(1-t)*t, mid), linalg.scale(t**2, end)));
+    //alert(point);
+    //if (linalg.vec_len(linalg.sub(point, mid)) > radius) 
+    //if the x distance is less than estimated_pixels / 2 OR the y distance is less than radius, we dont draw
+    if (Math.abs(point[0] - mid[0]) > estimated_pixels_of_text/2 || Math.abs(point[1] - mid[1]) > radius) {
+      ctx.lineTo(...point);
+      ctx.stroke();
+    } else {
+      ctx.moveTo(...point);
+    }
+  }
+}
+
 
 /**
  * checks if (x, y) wrt canvas is inside vertex v
@@ -290,8 +327,9 @@ export function compute_edge_geometry(graph, edge) {
 export function draw_edge(graph, edge, text_size) {
   let {transition, pop_symbol, push_symbol, move} = edge;
   const [start, end, mid] = compute_edge_geometry(graph, edge);
-  draw_arrow(start, end, mid);
   let edge_text = transition;  // vanilla NFA only uses transition
+  draw_arrow(start, end, mid, edge_text, text_size);
+  
   if (menus.is_PDA()) {  // append pop and push if we have PDA
     edge_text += ','+pop_symbol+consts.ARROW_SYMBOL+push_symbol;
   } else if (menus.is_Turing()) {  // append push and left/right if we have turing
