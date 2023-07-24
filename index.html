@@ -29,9 +29,9 @@
     
     <button class="NFA_specific" id="NFA_2_DFA">NFA to DFA</button>
     
-    <button id="save_machine">Save as png</button>
+    <button id="old_save_machine">Save as png</button>
 
-    <button id="permalink">Permalink</button>
+    <button id="old_permalink">Permalink</button>
     
     <button onclick=
       "document.getElementById('tutorial-content').hidden = !document.getElementById('tutorial-content').hidden">
@@ -49,8 +49,7 @@
   
   <!-- Side navigation -->
   <div class="sidenav">
-    <button class="Home" onclick="togglesidebar('home')" onclick=
-    "togglesidebar('home')">
+    <button class="sidenavBtn" id="homeIcon">
       <div class="tooltip">
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
@@ -71,7 +70,7 @@
         <span class="tooltiptext">Home</span>
       </div>
     </button>
-    <button class="menuBtn" onclick="togglesidebar('settings')">
+    <button class="sidenavBtn" id="machineIcon">
       <div class="tooltip">
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
@@ -114,7 +113,7 @@
         <span class="tooltiptext">Machine</span>
       </div>
     </button>
-    <button class="menuBtn" onclick="togglesidebar('save')">
+    <button class="sidenavBtn" id="saveIcon">
       <div class="tooltip">
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
@@ -133,7 +132,7 @@
         <span class="tooltiptext">Save</span>
       </div>
     </button>
-    <button class="Bug">
+    <button class="sidenavBtn" id="bugIcon">
       <div class="tooltip">
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
@@ -155,7 +154,7 @@
         <span class="tooltiptext">Report A Bug</span>
       </div>
     </button>
-    <button class="menuBtn" onclick= "openPopup()">
+    <button class="sidenavBtn" id="helpIcon">
       <div class="tooltip">
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
@@ -205,6 +204,7 @@
         />
       </svg>
     </button>
+    <div class = "secondBarHeader" id = 'secondBarHeader'>Header</div>
     <div class = "dropdown home">
       <div class = machine_inputs>
       </div>
@@ -246,7 +246,7 @@
   <div id ="overlay">
     <div class="popup">
       <div class="popup-content">
-        <button id="tutorial_close_btn" onclick="closePopup()">
+        <button id="tutorial_close_btn">
           <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 256 256"><path fill="currentColor" d="M208.49 191.51a12 12 0 0 1-17 17L128 145l-63.51 63.49a12 12 0 0 1-17-17L111 128L47.51 64.49a12 12 0 0 1 17-17L128 111l63.51-63.52a12 12 0 0 1 17 17L145 128Z"/></svg>
         </button>
         <div class = "popup-pages">
@@ -257,110 +257,48 @@
               <div>Right click on vertices or edge texts to inspect</div>
               <div>Left click drag on vertices or edge texts to drag</div>
               <div>Left click drag on empty space to pan, use scroll wheel to zoom</div>
-              <div>ctrl+z to undo, ctrl+shift+z to redo</div>
-              <div>dd to delete</div>
-            <img src = "basics.gif" style = "width:20vw;height:15vw;position:relative;">
+              <div>"ctrl+z" to undo, "ctrl+shift+z" to redo (please use "ctrl" instead of "cmd" on Mac)</div>
+              <div>"dd" to delete (quickly press 'd' two times)</div>
+            <img src = "tutorial_GIFs/basics.gif" style = "width:20vw;height:15vw;position:relative;">
             <p></p> 
-            <button class ='next-btn' onclick="pgAtoB(1,2)">Next >></button>
+            <button class ='next-btn' id="nextBtn_1to2">Next >></button>
         </div>
         <div class = "popup-content-pg2" id = 'pg2'>
             <h2>Running Input</h2>
-            <p>Enter the input string and press run. You can also step through the computation one character at a time.</p>  
-            <button class ='prev-btn' onclick="pgAtoB(2,1)">&lt;&lt; Prev</button>
-            <button class ='next-btn' onclick="pgAtoB(2,3)">Next>></button>
+            <p>Enter the input string and press run.</p>
+            <img src = "tutorial_GIFs/run_input.gif">  
+            <p></p> 
+            <button class ='prev-btn' id="prevBtn_2to1">&lt;&lt; Prev</button>
+            <button class ='next-btn' id="nextBtn_2to3">Next>></button>
         </div>
         <div class = "popup-content-pg3" id = 'pg3'>
-            <h2>Download PNG</h2>
-            <p>After you finish drawing your automaton, you can download a PNG of the drawing by clicking "Save as png" on the toolbar.</p>  
-            <button class ='prev-btn' onclick="pgAtoB(3,2)">&lt;&lt; Prev</button>
-            <button class ='next-btn' onclick="pgAtoB(3,4)">Next>></button>
+            <h2>Stepping Through Input</h2>
+            <p>You can also step through the computation one character at a time.</p> 
+            <img src = "tutorial_GIFs/step_through.gif">
+            <p></p> 
+            <button class ='prev-btn' id="prevBtn_3to2">&lt;&lt; Prev</button>
+            <button class ='next-btn' id="nextBtn_3to4">Next>></button>
         </div>
         <div class = "popup-content-pg4" id = 'pg4'>
+          <h2>Download PNG</h2>
+          <p>After you finish drawing your automaton, you can download a PNG of the drawing by clicking "Save as png" on the toolbar.</p> 
+          <img src = "tutorial_GIFs/save_img.gif"> 
+          <p></p> 
+          <button class ='prev-btn' id="prevBtn_4to3">&lt;&lt; Prev</button>
+          <button class ='next-btn' id="nextBtn_4to5">Next>></button>
+      </div>
+        <div class = "popup-content-pg5" id = 'pg5'>
           <h2>Permalink</h2>
           <p>This feature enables sharing machine drawings. Permalink stands for permanent link, meaning once you have created a link to share with your others, that link can uniquely decode back to a machine.</p>  
-          <button class ='prev-btn' onclick="pgAtoB(4,3)">&lt;&lt; Prev</button>
-          <button class ='next-btn' onclick="closePopup()">Finish</button>
+          <img src = "tutorial_GIFs/permalink.gif">
+          <p></p> 
+          <button class ='prev-btn' id="prevBtn_5to4">&lt;&lt; Prev</button>
+          <button class ='next-btn' id="tutorial_finish_btn">Finish</button>
         </div>
         </div>
       </div>
     </div>
   </div>
-
-
-  <script>
-    const closeButton = document.getElementById('closeButton');
-    closeButton.addEventListener('click',function(){
-      closetheButton();
-    })
-
-    let secondbar = document.getElementById('secondbar');
-    let open = secondbar.hidden;
-    
-    function closetheButton() {
-      secondbar.style.transform = 'translate(-20vw)';
-      var i;
-      var x = document.getElementsByClassName('dropdown');
-      for (i = 0; i < x.length; i++) {  
-        x[i].hidden = true;
-      }
-      open = false;
-    }
-
-    function togglesidebar(classname) {  
-      if (open) { 
-        closetheButton();
-      }
-      secondbar.hidden = false;
-      secondbar.style.transform = 'translate(0vw)';
-      var i;
-      var x = document.getElementsByClassName(classname);
-      for (i = 0; i < x.length; i++) {
-        x[i].hidden = false;
-      }
-    }
-
-    // first time pop up implementation
-    // Check if the user is a first-time visitor
-    if (!localStorage.getItem('visitedBefore')) {
-      // User is a first-time visitor
-      openPopup();
-
-      // Set flag to indicate the user has visited before
-      localStorage.setItem('visitedBefore', true);
-    } 
-    // User has visited before then do nothing
-
-
-    // Function to open the pop-up
-    function openPopup() {
-      currentPg = 4;
-      var popup = document.querySelector('.popup');
-      popup.style.display = 'block';
-      for(let i=currentPg; i>1 ; i--){
-        pgAtoB(i,i-1);
-      }
-      document.getElementById('overlay').style.display = 'block';
-    }
-
-    function pgAtoB(a,b){
-        var pgName = 'pg';
-        var nameA = pgName + a;
-        var nameB = pgName + b;
-        const pgA = document.getElementById(nameA);
-        const pgB = document.getElementById(nameB);
-        pgA.style.display = "none";
-        pgB.style.display = "block";
-        currentPg = b;
-    }
-
-    // Function to close the pop-up
-    function closePopup() {
-        pgAtoB(currentPg,1);
-      var popup = document.querySelector('.popup');
-      popup.style.display = 'none';
-      document.getElementById('overlay').style.display = 'none';
-    }
-  </script>
 
   <!-- the big canvas that we draw on -->
   <canvas id='machine_drawing'>Your browser does not support canvas</canvas>
