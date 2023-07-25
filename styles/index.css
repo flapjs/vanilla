@@ -392,6 +392,18 @@ canvas {
   margin-left: 64px;
   margin-bottom: 10px;
 }
+
+.secondBarHeader{
+  position: absolute;
+  padding: 3px;
+  top: 30px;
+  left: 18px;
+  width: 100px;
+  text-align: left;
+  color: lightgoldenrodyellow;
+  font-size: x-large;
+}
+
 /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {
   .sidenav {padding-top: 15px;}

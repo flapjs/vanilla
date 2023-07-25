@@ -533,5 +533,180 @@ function init() {
   bind_elongate_textbox();
   bind_permalink();
   trash_color(); // new
+  htmlSetUp(); // initiate eventlisteners for sidenavbar, second sidenavbar, and popup tutorial
   init_graph();  // leave this last since we want it to override some of the above
+}
+
+/** moved basic set up from index.html and combined into one function */
+function htmlSetUp(){
+  // first time pop up implementation
+    // Check if the user is a first-time visitor
+    if (!localStorage.getItem('visitedBefore')) {
+      // User is a first-time visitor
+      openPopup();
+  
+      // Set flag to indicate the user has visited before
+      localStorage.setItem('visitedBefore', true);
+      } 
+
+      let secondbar = document.getElementById('secondbar');
+      var isOpen = secondbar.hidden;
+      isOpen = false;
+      const closeButton = document.getElementById('closeButton');
+      closeButton.addEventListener('click',function(){
+        closetheButton();
+      })
+
+      const homeIcon = document.getElementById('homeIcon');
+      const machineIcon = document.getElementById('machineIcon');
+      const saveIcon = document.getElementById('saveIcon');
+      const bugIcon = document.getElementById('bugIcon');
+      const helpIcon = document.getElementById('helpIcon');
+      const tutorial_close_btn = document.getElementById('tutorial_close_btn');
+      const tutorial_finish_btn = document.getElementById('tutorial_finish_btn');
+
+      homeIcon.addEventListener("click", function(){expandIcon('home')});
+      machineIcon.addEventListener("click", function(){expandIcon('settings')});
+      saveIcon.addEventListener("click", function(){expandIcon('save')});
+      bugIcon.addEventListener("click", function(){redirectToBugReport()});
+      helpIcon.addEventListener("click", function(){
+        openPopup();
+        closetheButton();
+      }); 
+      tutorial_close_btn.addEventListener("click",function(){closePopup();})
+      tutorial_finish_btn.addEventListener("click",function(){closePopup();})
+
+      const nextBtn_1to2 = document.getElementById('nextBtn_1to2');
+      const nextBtn_2to3 = document.getElementById('nextBtn_2to3');
+      const nextBtn_3to4 = document.getElementById('nextBtn_3to4');
+      const nextBtn_4to5 = document.getElementById('nextBtn_4to5');
+
+      const prevBtn_2to1 = document.getElementById('prevBtn_2to1');
+      const prevBtn_3to2 = document.getElementById('prevBtn_3to2');
+      const prevBtn_4to3 = document.getElementById('prevBtn_4to3');
+      const prevBtn_5to4 = document.getElementById('prevBtn_5to4');
+
+      nextBtn_1to2.addEventListener("click", function(){pgAtoB(1,2)});
+      nextBtn_2to3.addEventListener("click", function(){pgAtoB(2,3)});
+      nextBtn_3to4.addEventListener("click", function(){pgAtoB(3,4)});
+      nextBtn_4to5.addEventListener("click", function(){pgAtoB(4,5)});
+
+      prevBtn_2to1.addEventListener("click", function(){pgAtoB(2,1)});
+      prevBtn_3to2.addEventListener("click", function(){pgAtoB(3,2)});
+      prevBtn_4to3.addEventListener("click", function(){pgAtoB(4,3)});
+      prevBtn_5to4.addEventListener("click", function(){pgAtoB(5,4)});
+}
+
+// moved from html file
+function w3_open() {
+  document.getElementById("tutorial_content").style.display = "block";
+}
+
+function w3_close() {
+  document.getElementById("tutorial_content").style.display = "none";
+}
+
+function closetheButton() {
+  let secondbar = document.getElementById('secondbar');
+  secondbar.style.transform = "translate(-20vw)";
+  var i;
+  var x = document.getElementsByClassName('dropdown');
+  for (i = 0; i < x.length; i++) {  
+    x[i].hidden = true;
+  }
+  var icons = document.getElementsByClassName('sidenavBtn');
+  var j;
+  for (j = 0; j < icons.length; j++) {  
+    icons[j].style.color = '#c7c2c2';
+    icons[j].style.backgroundColor = '#273b7d';
+  }
+  //secondbar.hidden = false;
+}
+
+function togglesidebar(classname) {
+  let secondbar = document.getElementById('secondbar');
+  secondbar.style.transform = "translate(0vw)";  
+  document.getElementById('secondbar').hidden = false;
+  var i;
+  var x = document.getElementsByClassName(classname);
+  for (i = 0; i < x.length; i++) {
+    x[i].hidden = false;
+  }
+}
+
+
+/** Global variable that records current page number of tutorial
+ *  Used for funtions openOpoup() closePopup() and pgAtoB() */
+var currentPg = 1;
+// Function to open the pop-up
+function openPopup() {
+  //set this to the total number of pages to avoid bug
+  //updated to 5 pages tutorial 7/24/2023
+  currentPg = 5;
+  const overlay = document.getElementById('overlay');
+  overlay.style.display = 'block';
+  const popup = document.querySelector('.popup');
+  popup.style.display = 'block';
+  for(let i=currentPg; i>1 ; i--){
+    pgAtoB(i,i-1);
+  }
+}
+
+// Function to close the pop-up
+function closePopup() {
+  pgAtoB(currentPg,1);
+var popup = document.querySelector('.popup');
+popup.style.display = 'none';
+const overlay = document.getElementById('overlay');
+overlay.style.display = 'none';
+}
+
+//updated on funciton when clicking on an icon 5/16/2023
+function expandIcon(nameOfClass){
+  closetheButton();
+  togglesidebar(nameOfClass);
+  var headerName = 'none';
+  var currIcon;
+  switch(nameOfClass){
+    case 'home':
+      headerName = 'Home';
+      currIcon = document.getElementById("homeIcon");
+      break;
+    case 'settings':
+      headerName = 'Machines';
+      currIcon = document.getElementById('machineIcon');
+      break;
+    case 'save':
+      headerName = 'Save';
+      currIcon = document.getElementById('saveIcon');
+      break;
+    case 'bug':
+      headerName = 'Bug';
+      currIcon = document.getElementById('bugIcon');
+      break;
+  }
+  var header = document.getElementById('secondBarHeader');
+  header.innerHTML = headerName;
+
+  currIcon.style.color = '#f2f0f0';
+  currIcon.style.backgroundColor = '#4e5aa3';
+  currIcon.style.transitionDuration = '0.4s';
+
+}
+
+function pgAtoB(a,b){
+  var pgName = 'pg';
+  var nameA = pgName + a;
+  var nameB = pgName + b;
+  const pgA = document.getElementById(nameA);
+  const pgB = document.getElementById(nameB);
+  pgA.style.display = "none";
+  pgB.style.display = "block";
+  currentPg = b;
+}
+
+function redirectToBugReport() {
+  window.open('https://github.com/flapjs/vanilla/issues', '_blank');
+  //below is code for opening bug report in current tab of browser
+  //window.location.href = 'https://github.com/flapjs/vanilla/issues';
 }
