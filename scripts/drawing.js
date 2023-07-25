@@ -31,12 +31,12 @@ export function over_trash(e) {
   const rect = get_canvas().getBoundingClientRect();
   const x = (e.clientX - rect.left)*window.devicePixelRatio;
   const y = (e.clientY - rect.top)*window.devicePixelRatio;
-  const trash_dims = { X: 1830, Y: 740, Width: 80, Height: 100 };
+  const trash_dims = { X: 1830, Y: 740, Width: 50, Height: 50 };
   if (
-    x >= trash_dims.X &&
-    x <= trash_dims.X + trash_dims.Width &&
-    y >= trash_dims.Y &&
-    y <= trash_dims.Y + trash_dims.Height
+    x >= (window.innerWidth*window.devicePixelRatio) - (trash.width + 30) &&
+    x <= (window.innerWidth*window.devicePixelRatio) - (trash.width + 30) + trash_dims.Width &&
+    y >= (window.innerHeight*window.devicePixelRatio) - (trash.height + 30) &&
+    y <= (window.innerHeight*window.devicePixelRatio) - (trash.width + 30) + trash_dims.Height
   ) {
     get_canvas().style.cursor = 'pointer';
     return true;
@@ -359,7 +359,7 @@ export function draw(graph) {
   const ctx = canvas.getContext('2d');
   if (!trash_init) { // upon initializing canvas, draw trash icon
     trash.onload = () => {
-      ctx.drawImage(trash, 1840, 770);
+      recolor_trash(false);
     };
     trash_init = true;
   } else { // otherwise, just draw the trash
@@ -371,11 +371,15 @@ export function draw(graph) {
 export function recolor_trash(status) {
   const canvas = get_canvas();
   const ctx = canvas.getContext('2d');
+  ctx.width = (window.innerWidth*window.devicePixelRatio) - (trash.width + 30);
+  ctx.height = (window.innerHeight*window.devicePixelRatio) - (trash.height + 30); 
+  var x = ctx.width;
+  var y = ctx.height;
   if (status) { // color red if hovering over trash
-    ctx.drawImage(hover_trash, 1840,770);  
+    ctx.drawImage(hover_trash,x,y); 
   }
   else { // color dark gray normally
-    ctx.drawImage(trash, 1840,770);
+    ctx.drawImage(trash, x,y);
   }
 }
 
