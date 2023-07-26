@@ -268,7 +268,12 @@ function bind_undo_redo() {
     } else if (e.ctrlKey) {
       graph = hist.undo();
     }
-    drawing.draw(graph);
+    if (menus.machine_type() != consts.MACHINE_TYPES.CFG) {
+      drawing.draw(graph);
+    } else {
+      cfg.clear_rules(true);
+      cfg.reload_rules(graph);
+    }
   });
 }
 

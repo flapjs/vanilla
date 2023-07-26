@@ -42,6 +42,7 @@ function load_rules() {
     if (isEmpty(rules)) {
         console.log("EMPTY");
         create_new_rule();
+        start_symbol.value = "";
     } else {
         reload_rules(rules);
     }
@@ -58,14 +59,13 @@ function isEmpty(obj) {
         return false;
       }
     }
-  
     return true;
   }
 
 /**
  * Create new rule
  */
-export function create_new_rule(enter=false) {
+export function create_new_rule(enter=false, want_to_push = true) {
     const new_cfg = document.createElement("li");
     const new_symbol = document.createElement("input");
     new_symbol.className = "cfg_symbol";
@@ -124,49 +124,14 @@ export function create_new_rule(enter=false) {
         push_to_history();
     });
 
-    let plus_btn = document.createElement('button');
-    plus_btn.textContent = ' + ';
-    plus_btn.addEventListener("click", () => {
-        const added_rule = document.createElement("input");
-        added_rule.className = "cfg_rule";
-        added_rule.maxLength = 15;
-        added_rule.placeholder = consts.EMPTY_SYMBOL;
-        rule_obj.rules.push(added_rule);
-        added_rule.addEventListener('input', autoResize, false);
-        added_rule.addEventListener("focusin", () => {
-            setTimeout(function() {
-                change_curr_index(rule_obj);
-            }, 50)
-        });
-        added_rule.addEventListener("focusout", () => {
-            curr_index = -1;
-        });
-        added_rule.addEventListener('change', function() {
-            push_to_history();
-        });
-        const line = document.createElement('text');
-        line.textContent = " | ";
-        new_cfg.insertBefore(line, new_cfg.children[new_cfg.children.length - 2]);
-        new_cfg.insertBefore(added_rule, new_cfg.children[new_cfg.children.length - 2]);
-    });
-
-    let minus_btn = document.createElement('button');
-    minus_btn.textContent = ' - ';
-    minus_btn.addEventListener("click", () => {
-        if (rule_obj.rules.length <= 1) {
-            return;
-        }
-        rule_obj.rules.pop();
-        new_cfg.removeChild(new_cfg.children[new_cfg.children.length - 3]);
-        new_cfg.removeChild(new_cfg.children[new_cfg.children.length - 3]);
-    });
-
-    new_cfg.append(plus_btn);
+    new_cfg.append(get_new_plus_btn(rule_obj, new_cfg));
     new_cfg.append(document.createTextNode(' / '));
-    new_cfg.append(minus_btn);
+    new_cfg.append(get_new_minus_btn(rule_obj, new_cfg));
 
     list_of_rules.splice(curr_index + 1, 0, rule_obj);
-    console.log(list_of_rules);
+    if (want_to_push) {
+        push_to_history();
+    }
 }
 
 function change_curr_index(rule_obj) {
@@ -234,7 +199,6 @@ function make_edges() {
             vertexCnt += rule.length;
             row++;
             if (rule.length == 1) {
-                console.log("1");
                 if (terminal_symbols.indexOf(rule[0]) < 0) {
                     terminal_symbols.push(rule[0]);
                 }
@@ -245,7 +209,6 @@ function make_edges() {
                 graph['loop'].out.push(graph_components.make_edge('loop', 'q' + (vertexCnt), undefined, 0.5 + row*0.1, 1.7 + row*0.5,
                     undefined, undefined, l));
             } else {
-                console.log("> 1");
                 if (rule.length > longest) {
                     longest = rule.length;
                 }
@@ -301,26 +264,22 @@ function push_to_history() {
     const to_push = [];
     const start = start_symbol.value;
     to_push.push(start);
-    console.log(list_of_rules);
-    for (const rule of list_of_rules) {
-        console.log(rule);
+    for (let i = 0; i < list_of_rules.length; i++) {
         let list = [];
-        for (const str of rule.rules) {
-            list.push(str.value);
+        for (let j = 0; j < list_of_rules[i].rules.length; j++) {
+            list.push(list_of_rules[i].rules[j].value);
         }
-        to_push.push({symbol: rule.symbol.value, rules: list});
-        console.log(list);
+        to_push.push({symbol: list_of_rules[i].symbol.value, rules: list});
     }
-    console.log(to_push);
     hist.push_history(to_push)
 }
 
 export function delete_rule() {
     list_of_rules.pop();
-    console.log(list.childNodes);
     if (list.childElementCount > 1) {
-        list.removeChild(list.childNodes[list.childElementCount - 1]);
+        list.removeChild(list.childNodes[list.childElementCount -1]);
     }
+    push_to_history();
 }
 
 export function clear_rules(machine_switch = false) {
@@ -333,12 +292,19 @@ export function clear_rules(machine_switch = false) {
     }
 }
 
-function reload_rules(rules) {
+export function reload_rules(rules) {
+    console.log(rules);
+    if (isEmpty(rules)) {
+        create_new_rule(false, false);
+        start_symbol.value = "";
+        return;
+    }
+
     start_symbol.value = rules[0];
-    const line = document.createElement('text');
-    line.textContent = " | ";
+
     for (let i = 1; i < rules.length; i++) {
         const new_cfg = document.createElement("li");
+        list.appendChild(new_cfg);
         const new_symbol = document.createElement("input");
         new_symbol.className = "cfg_symbol";
         new_symbol.maxLength = 1;
@@ -370,6 +336,8 @@ function reload_rules(rules) {
         };
 
         rules[i].rules.forEach(rule => {
+            const line = document.createElement('text');
+            line.textContent = " | ";
             const new_rule = document.createElement("input");
             new_rule.className = "cfg_rule";
             new_rule.maxLength = 15;
@@ -396,9 +364,19 @@ function reload_rules(rules) {
             new_cfg.appendChild(line);
         });
 
-        new_cfg.removeChild(new_cfg.childNodes[new_cfg.childElementCount])
+        new_cfg.removeChild(new_cfg.childNodes[new_cfg.childElementCount]);
+        
+        new_cfg.append(get_new_plus_btn(rule_obj, new_cfg));
+        new_cfg.append(document.createTextNode(' / '));
+        new_cfg.append(get_new_minus_btn(rule_obj, new_cfg));
 
-        let plus_btn = document.createElement('button');
+        list_of_rules.splice(i - 1, 0, rule_obj);
+        list.appendChild(new_cfg);
+    };
+}
+
+function get_new_plus_btn(rule_obj, new_cfg) {
+    let plus_btn = document.createElement('button');
         plus_btn.textContent = ' + ';
         plus_btn.addEventListener("click", () => {
             const added_rule = document.createElement("input");
@@ -422,24 +400,23 @@ function reload_rules(rules) {
             line.textContent = " | ";
             new_cfg.insertBefore(line, new_cfg.children[new_cfg.children.length - 2]);
             new_cfg.insertBefore(added_rule, new_cfg.children[new_cfg.children.length - 2]);
+            push_to_history();
         });
 
-        let minus_btn = document.createElement('button');
-        minus_btn.textContent = ' - ';
-        minus_btn.addEventListener("click", () => {
-            if (rule_obj.rules.length <= 1) {
-                return;
-            }
-            rule_obj.rules.pop();
-            new_cfg.removeChild(new_cfg.children[new_cfg.children.length - 3]);
-            new_cfg.removeChild(new_cfg.children[new_cfg.children.length - 3]);
-        });
+        return plus_btn;
+}
 
-        new_cfg.append(plus_btn);
-        new_cfg.append(document.createTextNode(' / '));
-        new_cfg.append(minus_btn);
-
-        list_of_rules.splice(curr_index + 1, 0, rule_obj);
-        list.appendChild(new_cfg);
-    };
+function get_new_minus_btn(rule_obj, new_cfg) {
+    let minus_btn = document.createElement('button');
+    minus_btn.textContent = ' - ';
+    minus_btn.addEventListener("click", () => {
+        if (rule_obj.rules.length <= 1) {
+            return;
+        }
+        rule_obj.rules.pop();
+        new_cfg.removeChild(new_cfg.children[new_cfg.children.length - 3]);
+        new_cfg.removeChild(new_cfg.children[new_cfg.children.length - 3]);
+        push_to_history();
+    });
+    return minus_btn;
 }

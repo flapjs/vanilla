@@ -290,6 +290,9 @@ export function draw_edge(graph, edge, text_size) {
  * @param {Object} graph - the graph object to draw on the canvas
  */
 export function draw(graph) {
+  if (menus.machine_type() === consts.MACHINE_TYPES.CFG) {
+    return;
+  }
   const canvas = get_canvas();
   canvas.width = window.innerWidth*window.devicePixelRatio;
   canvas.height = window.innerHeight*window.devicePixelRatio;
