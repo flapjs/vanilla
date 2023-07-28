@@ -532,7 +532,7 @@ function init() {
   bind_dd();
   bind_elongate_textbox();
   bind_permalink();
-  trash_color(); // new
+  trash_color(); // link mouse event to appropriate trash color
   htmlSetUp(); // initiate eventlisteners for sidenavbar, second sidenavbar, and popup tutorial
   init_graph();  // leave this last since we want it to override some of the above
 }
@@ -540,97 +540,136 @@ function init() {
 /** moved basic set up from index.html and combined into one function */
 function htmlSetUp(){
   // first time pop up implementation
-    // Check if the user is a first-time visitor
-    if (!localStorage.getItem('visitedBefore')) {
-      // User is a first-time visitor
-      openPopup();
-  
-      // Set flag to indicate the user has visited before
-      localStorage.setItem('visitedBefore', true);
-      } 
+  // Check if the user is a first-time visitor
+  if (!localStorage.getItem('visitedBefore')) {
+  // User is a first-time visitor
+  openPopup();
 
-      let secondbar = document.getElementById('secondbar');
-      var isOpen = secondbar.hidden;
-      isOpen = false;
-      const closeButton = document.getElementById('closeButton');
-      closeButton.addEventListener('click',function(){
-        closetheButton();
-      })
+  // Set flag to indicate the user has visited before
+  localStorage.setItem('visitedBefore', true);
+  } 
 
-      const homeIcon = document.getElementById('homeIcon');
-      const machineIcon = document.getElementById('machineIcon');
-      const saveIcon = document.getElementById('saveIcon');
-      const bugIcon = document.getElementById('bugIcon');
-      const helpIcon = document.getElementById('helpIcon');
-      const tutorial_close_btn = document.getElementById('tutorial_close_btn');
-      const tutorial_finish_btn = document.getElementById('tutorial_finish_btn');
+  const closeButton = document.getElementById('closeButton');
+  closeButton.addEventListener('click',function(){
+    closetheButton();
+  })
 
-      homeIcon.addEventListener("click", function(){expandIcon('home')});
-      machineIcon.addEventListener("click", function(){expandIcon('settings')});
-      saveIcon.addEventListener("click", function(){expandIcon('save')});
-      bugIcon.addEventListener("click", function(){redirectToBugReport()});
-      helpIcon.addEventListener("click", function(){
-        openPopup();
-        closetheButton();
-      }); 
-      tutorial_close_btn.addEventListener("click",function(){closePopup();})
-      tutorial_finish_btn.addEventListener("click",function(){closePopup();})
+  const homeIcon = document.getElementById('homeIcon');
+  const machineIcon = document.getElementById('machineIcon');
+  const saveIcon = document.getElementById('saveIcon');
+  const bugIcon = document.getElementById('bugIcon');
+  const helpIcon = document.getElementById('helpIcon');
+  const tutorial_close_btn = document.getElementById('tutorial_close_btn');
+  const tutorial_finish_btn = document.getElementById('tutorial_finish_btn');
 
-      const nextBtn_1to2 = document.getElementById('nextBtn_1to2');
-      const nextBtn_2to3 = document.getElementById('nextBtn_2to3');
-      const nextBtn_3to4 = document.getElementById('nextBtn_3to4');
-      const nextBtn_4to5 = document.getElementById('nextBtn_4to5');
+  homeIcon.addEventListener("click", () => {expandIcon('home')});
+  machineIcon.addEventListener("click", () => {expandIcon('settings')});
+  saveIcon.addEventListener("click", () => {expandIcon('save')});
+  bugIcon.addEventListener("click", () => {redirectToBugReport()});
+  helpIcon.addEventListener("click", () => {
+    openPopup();
+    closetheButton();
+  }); 
+  tutorial_close_btn.addEventListener("click",() => {closePopup();})
+  tutorial_finish_btn.addEventListener("click",() => {closePopup();})
 
-      const prevBtn_2to1 = document.getElementById('prevBtn_2to1');
-      const prevBtn_3to2 = document.getElementById('prevBtn_3to2');
-      const prevBtn_4to3 = document.getElementById('prevBtn_4to3');
-      const prevBtn_5to4 = document.getElementById('prevBtn_5to4');
+  const nextBtn_1to2 = document.getElementById('nextBtn_1to2');
+  const nextBtn_2to3 = document.getElementById('nextBtn_2to3');
+  const nextBtn_3to4 = document.getElementById('nextBtn_3to4');
+  const nextBtn_4to5 = document.getElementById('nextBtn_4to5');
 
-      nextBtn_1to2.addEventListener("click", function(){pgAtoB(1,2)});
-      nextBtn_2to3.addEventListener("click", function(){pgAtoB(2,3)});
-      nextBtn_3to4.addEventListener("click", function(){pgAtoB(3,4)});
-      nextBtn_4to5.addEventListener("click", function(){pgAtoB(4,5)});
+  const prevBtn_2to1 = document.getElementById('prevBtn_2to1');
+  const prevBtn_3to2 = document.getElementById('prevBtn_3to2');
+  const prevBtn_4to3 = document.getElementById('prevBtn_4to3');
+  const prevBtn_5to4 = document.getElementById('prevBtn_5to4');
 
-      prevBtn_2to1.addEventListener("click", function(){pgAtoB(2,1)});
-      prevBtn_3to2.addEventListener("click", function(){pgAtoB(3,2)});
-      prevBtn_4to3.addEventListener("click", function(){pgAtoB(4,3)});
-      prevBtn_5to4.addEventListener("click", function(){pgAtoB(5,4)});
+  nextBtn_1to2.addEventListener("click", () => {pgAtoB(1,2)});
+  nextBtn_2to3.addEventListener("click", () => {pgAtoB(2,3)});
+  nextBtn_3to4.addEventListener("click", () => {pgAtoB(3,4)});
+  nextBtn_4to5.addEventListener("click", () => {pgAtoB(4,5)});
+
+  prevBtn_2to1.addEventListener("click", () => {pgAtoB(2,1)});
+  prevBtn_3to2.addEventListener("click", () => {pgAtoB(3,2)});
+  prevBtn_4to3.addEventListener("click", () => {pgAtoB(4,3)});
+  prevBtn_5to4.addEventListener("click", () => {pgAtoB(5,4)});
 }
 
-// moved from html file
-function w3_open() {
-  document.getElementById("tutorial_content").style.display = "block";
-}
-
-function w3_close() {
-  document.getElementById("tutorial_content").style.display = "none";
-}
+let homeToggle = false;
+let machineToggle = false;
+let saveToggle = false;
 
 function closetheButton() {
   let secondbar = document.getElementById('secondbar');
-  secondbar.style.transform = "translate(-20vw)";
+  if (homeToggle || machineToggle || saveToggle) {
+    secondbar.style.transform = "translate(-20vw)";
+    homeToggle = false;
+    machineToggle = false;
+    saveToggle = false;
+  }
   var i;
   var x = document.getElementsByClassName('dropdown');
   for (i = 0; i < x.length; i++) {  
     x[i].hidden = true;
   }
-  var icons = document.getElementsByClassName('sidenavBtn');
-  var j;
-  for (j = 0; j < icons.length; j++) {  
-    icons[j].style.color = '#c7c2c2';
-    icons[j].style.backgroundColor = '#273b7d';
+  document.querySelector('.active')?.classList.remove('active');
+}
+
+function clearMenu() {
+  var i;
+  var x = document.getElementsByClassName('dropdown');
+  for (i = 0; i < x.length; i++) {  
+    x[i].hidden = true;
   }
-  //secondbar.hidden = false;
+  document.querySelector('.active')?.classList.remove('active');
 }
 
 function togglesidebar(classname) {
   let secondbar = document.getElementById('secondbar');
-  secondbar.style.transform = "translate(0vw)";  
-  document.getElementById('secondbar').hidden = false;
-  var i;
-  var x = document.getElementsByClassName(classname);
-  for (i = 0; i < x.length; i++) {
-    x[i].hidden = false;
+  // if closed, open the appropriate menu, or close if clicked on the same icon
+  if (classname === 'home' && !homeToggle) {
+    secondbar.style.transform = "translate(0vw)"; 
+    document.getElementById('secondbar').hidden = false;
+    var x = document.getElementsByClassName(classname);
+    for (var i = 0; i < x.length; i++) {
+      x[i].hidden = false;
+    }
+    homeToggle = true;
+    machineToggle = false;
+    saveToggle = false;
+    return true;
+  }
+  else if (classname === 'settings' && !machineToggle) {
+    secondbar.style.transform = "translate(0vw)"; 
+    document.getElementById('secondbar').hidden = false;
+    var i;
+    var x = document.getElementsByClassName(classname);
+    for (i = 0; i < x.length; i++) {
+      x[i].hidden = false;
+    }
+    homeToggle = false;
+    machineToggle = true;
+    saveToggle = false;
+    return true;
+  }
+  else if (classname === 'save' && !saveToggle) {
+    secondbar.style.transform = "translate(0vw)"; 
+    document.getElementById('secondbar').hidden = false;
+    var i;
+    var x = document.getElementsByClassName(classname);
+    for (i = 0; i < x.length; i++) {
+      x[i].hidden = false;
+    }
+    homeToggle = false;
+    machineToggle = false;
+    saveToggle = true;
+    return true;
+  }
+  else {
+    closetheButton();
+    homeToggle = false;
+    machineToggle = false;
+    saveToggle = false;
+    return false;
   }
 }
 
@@ -655,16 +694,15 @@ function openPopup() {
 // Function to close the pop-up
 function closePopup() {
   pgAtoB(currentPg,1);
-var popup = document.querySelector('.popup');
-popup.style.display = 'none';
-const overlay = document.getElementById('overlay');
-overlay.style.display = 'none';
+  var popup = document.querySelector('.popup');
+  popup.style.display = 'none';
+  const overlay = document.getElementById('overlay');
+  overlay.style.display = 'none';
 }
 
-//updated on funciton when clicking on an icon 5/16/2023
+//updated on function when clicking on an icon 5/16/2023
 function expandIcon(nameOfClass){
-  closetheButton();
-  togglesidebar(nameOfClass);
+  clearMenu();
   var headerName = 'none';
   var currIcon;
   switch(nameOfClass){
@@ -684,16 +722,24 @@ function expandIcon(nameOfClass){
       headerName = 'Bug';
       currIcon = document.getElementById('bugIcon');
       break;
+    }
+   if (togglesidebar(nameOfClass)) {
+    var header = document.getElementById('secondBarHeader');
+    header.innerHTML = headerName;
+    currIcon.classList.add('active');
   }
-  var header = document.getElementById('secondBarHeader');
-  header.innerHTML = headerName;
-
-  currIcon.style.color = '#f2f0f0';
-  currIcon.style.backgroundColor = '#4e5aa3';
-  currIcon.style.transitionDuration = '0.4s';
-
+  else {
+    document.querySelector('.active')?.classList.remove('active');
+  }
 }
 
+// const navLinks = document.querySelectorAll('.sidenavBtn');
+// navLinks.forEach(act => {
+//   act.addEventListener('click', () => {
+//     document.querySelector('.active')?.classList.remove('active');
+//     this.classList.add('active');
+//   })
+// });
 function pgAtoB(a,b){
   var pgName = 'pg';
   var nameA = pgName + a;

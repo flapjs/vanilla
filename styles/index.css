@@ -105,23 +105,22 @@ input {
   padding-top: 1.5rem;
 }
 
-/* The navigation menu links */
-.sidenav a{
-  padding: 6px 8px 6px 16px;
+/* The navigation menu icons without hovering*/
+.sidenav li:not(.active) {
+  padding: .4rem .4rem .4rem;
   text-decoration: none;
-  font-size: 10px;
-  color:#f2f0f0;
+  color:#c7c2c2;
   display: block;
   border-radius: 7px;
-  width: 43px;
-  height: 43px;
+  width: 30px;
+  height: 30px;
   margin-bottom: 20px;
   margin-left: 9.5px;
-  padding: 0 0 0 0;
   position: relative;
+  transition:all 0.4s;
 }
 
-.sidenav button {
+/* .sidenav button {
   padding: .4rem .4rem .4rem;
   text-decoration: none;
   color:#c7c2c2;
@@ -144,14 +143,38 @@ input {
 
 .sidenav #five {
   margin-top: 50vh;
-}
+} */
 
 /* When you mouse over the navigation links, change their color */
-.sidenav a:hover, .sidenav button:hover {
+/* .sidenav button:hover {
   color: #f2f0f0;
   background-color: #4e5aa3;
   width:43px;
   height:43px;
+  transition-duration: 0.4s;
+} */
+
+.sidenav li:hover, .active {
+  padding: .4rem .4rem .4rem;
+  text-decoration: none;
+  color: #f2f0f0;
+  background-color: #4e5aa3;
+  display: block;
+  border-radius: 7px;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 20px;
+  margin-left: 9.5px;
+  position: relative;
+  transition-duration: 0.4s;
+}
+
+.sidenav li:active {
+  padding: .4rem .4rem .4rem;
+  color: #f2f0f0;
+  background-color: #4e5aa3;
+  width:30px;
+  height:30px;
   transition-duration: 0.4s;
 }
 
@@ -166,7 +189,7 @@ input {
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 20px;
   margin-left: 64px; /*margin next to navbar */
-  transition: transform .5s;
+  transition: all .5s;
   transform: translate(0vw);
 }
 

@@ -376,10 +376,10 @@ export function recolor_trash(status) {
   var x = ctx.width;
   var y = ctx.height;
   if (status) { // color red if hovering over trash
-    ctx.drawImage(hover_trash,x,y); 
+    ctx.drawImage(hover_trash, x, y); 
   }
   else { // color dark gray normally
-    ctx.drawImage(trash, x,y);
+    ctx.drawImage(trash, x, y);
   }
 }
 
