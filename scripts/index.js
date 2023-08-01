@@ -606,11 +606,6 @@ function closetheButton() {
     machineToggle = false;
     saveToggle = false;
   }
-  var i;
-  var x = document.getElementsByClassName('dropdown');
-  for (i = 0; i < x.length; i++) {  
-    x[i].hidden = true;
-  }
   document.querySelector('.active')?.classList.remove('active');
 }
 
@@ -627,7 +622,9 @@ function togglesidebar(classname) {
   let secondbar = document.getElementById('secondbar');
   // if closed, open the appropriate menu, or close if clicked on the same icon
   if (classname === 'home' && !homeToggle) {
-    secondbar.style.transform = "translate(0vw)"; 
+    window.requestAnimationFrame(function(){
+      secondbar.style.transform = "translate(0vw)"; 
+    });
     document.getElementById('secondbar').hidden = false;
     var x = document.getElementsByClassName(classname);
     for (var i = 0; i < x.length; i++) {
@@ -639,7 +636,9 @@ function togglesidebar(classname) {
     return true;
   }
   else if (classname === 'settings' && !machineToggle) {
-    secondbar.style.transform = "translate(0vw)"; 
+    window.requestAnimationFrame(function(){
+      secondbar.style.transform = "translate(0vw)"; 
+    });
     document.getElementById('secondbar').hidden = false;
     var i;
     var x = document.getElementsByClassName(classname);
@@ -652,7 +651,9 @@ function togglesidebar(classname) {
     return true;
   }
   else if (classname === 'save' && !saveToggle) {
-    secondbar.style.transform = "translate(0vw)"; 
+    window.requestAnimationFrame(function(){
+      secondbar.style.transform = "translate(0vw)"; 
+    });
     document.getElementById('secondbar').hidden = false;
     var i;
     var x = document.getElementsByClassName(classname);

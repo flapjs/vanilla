@@ -180,7 +180,7 @@ input {
 
 #secondbar {
   height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 200px; /* Set the width of the sidebar */
+  width: 17vw; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 0; /* Stay on top */
   top: 0; /* Stay at the top */
@@ -209,6 +209,7 @@ input {
   height: 25px;
   margin-bottom: 20px;
   margin-left: 10px;
+  transition: all .5s;
 }
 
 #secondbar button:hover {
@@ -284,7 +285,7 @@ select{
   position: relative;
   width:2vw;
   top: 0vw;
-  left:10vw;
+  left:12vw;
   cursor:pointer;
 }
 
