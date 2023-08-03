@@ -120,40 +120,6 @@ input {
   transition:all 0.4s;
 }
 
-/* .sidenav button {
-  padding: .4rem .4rem .4rem;
-  text-decoration: none;
-  color:#c7c2c2;
-  background-color: #273b7d;
-  display: block;
-  border-radius: 7px;
-  width: 43px;
-  height: 43px;
-  margin-bottom: 20px;
-  margin-left: 9.5px;
-  cursor: pointer;
-}
-
-#one{
-  margin-top: 100px;
-  width: 50px;
-  height: 50px;
-  padding: 0 0 0 0;
-}
-
-.sidenav #five {
-  margin-top: 50vh;
-} */
-
-/* When you mouse over the navigation links, change their color */
-/* .sidenav button:hover {
-  color: #f2f0f0;
-  background-color: #4e5aa3;
-  width:43px;
-  height:43px;
-  transition-duration: 0.4s;
-} */
-
 .sidenav li:hover, .active {
   padding: .4rem .4rem .4rem;
   text-decoration: none;
@@ -229,7 +195,7 @@ input {
 }
 
 /* text when hovering */
-.button .tooltip {
+.tooltip {
   position: relative;
   display: inline-block;
 }
@@ -410,7 +376,7 @@ canvas {
 
 #secondbar p, h3 {
   position: relative;
-  color: white;
+  color: #f2f0f0;
 }
 #secondbar h3 {
   margin-left: 64px;
@@ -424,7 +390,7 @@ canvas {
   left: 18px;
   width: 100px;
   text-align: left;
-  color: lightgoldenrodyellow;
+  color: #c7c2c2;
   font-size: x-large;
 }
 

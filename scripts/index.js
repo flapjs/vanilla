@@ -160,14 +160,14 @@ function bind_drag() {
       edge_animation = higher_order_edge_animation(clicked_vertex);
       canvas.addEventListener('mousemove', edge_animation);
     } else if (e.button === consts.LEFT_BTN) {  // left drag
-      if (clicked_edge) {  // left drag edge
+      if (clicked_edge) {   // left drag edge
         drag_edge = higher_order_drag_edge(clicked_edge);        
         canvas.addEventListener('mousemove', drag_edge);
-        trash_color();  // change color if edge is over trash
+        trash_color();      // change color if edge is over trash
       } else if (clicked_vertex) {  // vertex has lower priority than edge
         drag_vertex = higher_order_drag_vertex(clicked_vertex);  // create the function
         canvas.addEventListener('mousemove', drag_vertex);
-        trash_color();  // change color if vertex is over trash
+        trash_color();      // change color if vertex is over trash
       } else {  // left drag scene
         canvas.addEventListener('mousemove', drag_scene);
       } 
@@ -177,10 +177,10 @@ function bind_drag() {
     const [x, y] = drawing.event_position_on_canvas(e);
     const drop_vertex = drawing.in_any_vertex(graph, x, y);
     const drop_edge = drawing.in_edge_text(graph, x, y);
-    if (drop_vertex && drawing.over_trash(e)) { // if we release a vertex over the trash
+    if (drop_vertex && drawing.over_trash(e)) { // delete vertex if dropped over trash
       graph_ops.delete_vertex(graph, drop_vertex);
     }
-    else if (drop_edge && drawing.over_trash(e)) { // if we release an edge over the trash
+    else if (drop_edge && drawing.over_trash(e)) { // delete edge if dropped over trash
       graph_ops.delete_edge(graph, drop_edge);
     }
     else { // not dropped over trash can and release drag
@@ -193,6 +193,7 @@ function bind_drag() {
   });
 }
 
+/* adds mouse event to change the color of the trash if over the icon */
 function trash_color() {
   const canvas = drawing.get_canvas();
   canvas.addEventListener('mousemove', e => {
@@ -550,8 +551,8 @@ function htmlSetUp(){
   } 
 
   const closeButton = document.getElementById('closeButton');
-  closeButton.addEventListener('click',function(){
-    closetheButton();
+  closeButton.addEventListener('click', () => {
+    closeMenu();
   })
 
   const homeIcon = document.getElementById('homeIcon');
@@ -568,7 +569,7 @@ function htmlSetUp(){
   bugIcon.addEventListener("click", () => {redirectToBugReport()});
   helpIcon.addEventListener("click", () => {
     openPopup();
-    closetheButton();
+    closeMenu();
   }); 
   tutorial_close_btn.addEventListener("click",() => {closePopup();})
   tutorial_finish_btn.addEventListener("click",() => {closePopup();})
@@ -597,9 +598,9 @@ function htmlSetUp(){
 let homeToggle = false;
 let machineToggle = false;
 let saveToggle = false;
+let secondbar = document.getElementById('secondbar');
 
-function closetheButton() {
-  let secondbar = document.getElementById('secondbar');
+function closeMenu() {
   if (homeToggle || machineToggle || saveToggle) {
     secondbar.style.transform = "translate(-20vw)";
     homeToggle = false;
@@ -618,8 +619,12 @@ function clearMenu() {
   document.querySelector('.active')?.classList.remove('active');
 }
 
-function togglesidebar(classname) {
-  let secondbar = document.getElementById('secondbar');
+/**
+ * Toggle menu open or closed
+ * @param {Object} classname - name of class associated with icon
+ * @returns {boolean} true if menu was opened, false if closed
+ */
+function toggleMenu(classname) {
   // if closed, open the appropriate menu, or close if clicked on the same icon
   if (classname === 'home' && !homeToggle) {
     window.requestAnimationFrame(function(){
@@ -666,17 +671,14 @@ function togglesidebar(classname) {
     return true;
   }
   else {
-    closetheButton();
-    homeToggle = false;
-    machineToggle = false;
-    saveToggle = false;
+    closeMenu();
     return false;
   }
 }
 
 
 /** Global variable that records current page number of tutorial
- *  Used for funtions openOpoup() closePopup() and pgAtoB() */
+ *  Used for funtions openPopup() closePopup() and pgAtoB() */
 var currentPg = 1;
 // Function to open the pop-up
 function openPopup() {
@@ -724,7 +726,7 @@ function expandIcon(nameOfClass){
       currIcon = document.getElementById('bugIcon');
       break;
     }
-   if (togglesidebar(nameOfClass)) {
+   if (toggleMenu(nameOfClass)) {
     var header = document.getElementById('secondBarHeader');
     header.innerHTML = headerName;
     currIcon.classList.add('active');
