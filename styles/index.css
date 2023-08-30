@@ -100,7 +100,7 @@ input {
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
   left: 0;
-  background-color:#273b7d; /* Black */
+  background-color: rgb(27, 38, 74); /* UCSD blue */
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 1.5rem;
 }
@@ -109,7 +109,6 @@ input {
 .sidenav li:not(.active) {
   padding: .4rem .4rem .4rem;
   text-decoration: none;
-  color:#c7c2c2;
   display: block;
   border-radius: 7px;
   width: 30px;
@@ -118,13 +117,13 @@ input {
   margin-left: 9.5px;
   position: relative;
   transition:all 0.4s;
+  cursor: pointer;
 }
 
 .sidenav li:hover, .active {
   padding: .4rem .4rem .4rem;
   text-decoration: none;
-  color: #f2f0f0;
-  background-color: #4e5aa3;
+  background-color: #3a468f;
   display: block;
   border-radius: 7px;
   width: 30px;
@@ -135,23 +134,14 @@ input {
   transition-duration: 0.4s;
 }
 
-.sidenav li:active {
-  padding: .4rem .4rem .4rem;
-  color: #f2f0f0;
-  background-color: #4e5aa3;
-  width:30px;
-  height:30px;
-  transition-duration: 0.4s;
-}
-
 #secondbar {
   height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 17vw; /* Set the width of the sidebar */
+  width: 240px; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 0; /* Stay on top */
   top: 0; /* Stay at the top */
   left: 0;
-  background-color:#3a468f; /* background */
+  background-image:linear-gradient(to right, rgb(27, 38, 74, 1), rgb(27, 38, 74, 0.8), rgb(27, 38, 74, 0.6), rgb(27, 38, 74, 0.4)); /* background */
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 20px;
   margin-left: 64px; /*margin next to navbar */
@@ -160,38 +150,38 @@ input {
 }
 
 #secondbar button {
-  padding: 10px 15px 20px 10px;
-  text-align: left;
+  margin: 15px;
+  padding: 10px 15px 10px 15px;
+  align-items: center;
   text-decoration: none;
   font-size: 13px;
-  color:#c7c2c2;
+  color:gold;
   background-color: #3a468f;
-  display: block;
   border-radius: 5px;
-  border-width: 2px;
-  border-color:#3a468f;
-  border-style: solid;
-  width: 125px;
-  height: 25px;
-  margin-bottom: 20px;
-  margin-left: 10px;
   transition: all .5s;
+  cursor: pointer;
 }
 
 #secondbar button:hover {
   background-color:#4e5aa3;
-  color:#f2f0f0;
-  transition-duration: 0.4s;
-  border-radius: 5px;
-  padding: 10px 15px 20px 10px;
 }
 
-#secondbar #closeButton { 
-  left: 130px;
-  padding: 5px 30px 28px 5px;
+#secondBarHeader {
+  display: flex;
+  justify-content: space-between;
 }
-#secondbar #closeButton:hover {
-  padding: 5px 30px 28px 5px;
+
+#secondBarHeaderTitle > h1 {
+  margin: 10px;
+  padding-left: 5px;
+  text-align: center;
+  color: gold;
+  font-size: x-large;
+}
+
+#secondBarHeaderBtn > #closeButton{
+  padding: 7px 7px 3px 7px;  /* the image is not quite centered hence lower margin at the bottom */
+  margin: 8px 24px 8px 8px;  /* extra space on the right */
 }
 
 /* text when hovering */
@@ -244,15 +234,6 @@ select{
 
 .menu-content.active {
   display: block;
-}
-
-#secondbar #closeButton{
-  padding: 5px 30px 28px 5px;
-  position: relative;
-  width:2vw;
-  top: 0vw;
-  left:12vw;
-  cursor:pointer;
 }
 
 /* Darken background window when popup is open */
@@ -383,20 +364,8 @@ canvas {
   margin-bottom: 10px;
 }
 
-.secondBarHeader{
-  position: absolute;
-  padding: 3px;
-  top: 30px;
-  left: 18px;
-  width: 100px;
-  text-align: left;
-  color: #c7c2c2;
-  font-size: x-large;
-}
-
 /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {
   .sidenav {padding-top: 15px;}
   .sidenav a {font-size: 18px;}
 }
-

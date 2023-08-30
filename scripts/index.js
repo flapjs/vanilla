@@ -341,7 +341,7 @@ function bind_run_input() {
     });
   }
   // clear the partial computations when user switches machines
-  document.getElementById('dropdown-content').addEventListener('change', () => computations.fill(undefined));
+  document.getElementById('select_machine').addEventListener('change', () => computations.fill(undefined));
 }
 
 /** offers ctrl-z and ctrl-shift-z features */
@@ -409,7 +409,7 @@ function bind_dd() {
 function hash_change_handler() {
   if (window.location.hash.length > 1) {
     const graph_str = window.location.hash.slice(1);
-    const select = document.getElementById('dropdown-content');
+    const select = document.getElementById('select_machine');
     if (permalink.serialize(select.value, graph) === graph_str) {
       // debounce two types of events
       // 1. the permalink generation will trigger a hash change event, which we do not want to handle
@@ -441,7 +441,7 @@ function refresh_graph() {
 
 /** handle switching machine type event */
 function bind_switch_machine() {
-  const select = document.getElementById('dropdown-content');
+  const select = document.getElementById('select_machine');
   select.value = consts.DEFAULT_MACHINE;  // set to default machine here too
   select.addEventListener('change', e => {
     hist.set_history_keys(e.target.value);
@@ -508,7 +508,7 @@ export function bind_elongate_textbox() {
 function bind_permalink() {
   const permalink_btn = document.getElementById('permalink');
   permalink_btn.addEventListener('click', () => {
-    const select = document.getElementById('dropdown-content');
+    const select = document.getElementById('select_machine');
     const graph_str = permalink.serialize(select.value, graph);
     history.replaceState(undefined, undefined, '#'+graph_str);
     navigator.clipboard.writeText(window.location.href)
@@ -602,7 +602,7 @@ let secondbar = document.getElementById('secondbar');
 
 function closeMenu() {
   if (homeToggle || machineToggle || saveToggle) {
-    secondbar.style.transform = "translate(-20vw)";
+    secondbar.style.transform = "translate(-240px)";
     homeToggle = false;
     machineToggle = false;
     saveToggle = false;
@@ -727,8 +727,8 @@ function expandIcon(nameOfClass){
       break;
     }
    if (toggleMenu(nameOfClass)) {
-    var header = document.getElementById('secondBarHeader');
-    header.innerHTML = headerName;
+    const header = document.querySelector('#secondBarHeaderTitle > h1');
+    header.textContent = headerName;
     currIcon.classList.add('active');
   }
   else {

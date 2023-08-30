@@ -176,8 +176,8 @@ export function draw_arrow(start, end, mid, edge_text, text_size) {
   ctx.beginPath();
   ctx.moveTo(...start);
   // we boost the curve by the orthogonal component of v1 wrt v2
-  //ctx.quadraticCurveTo(...linalg.add(mid, ortho_comp), ...end);
-  drawSplit(start, end, mid, consts.DRAW_ARROW_RADIUS, edge_text, text_size);
+  ctx.quadraticCurveTo(...linalg.add(mid, ortho_comp), ...end);
+  // drawSplit(start, end, mid, consts.DRAW_ARROW_RADIUS, "1", 10);
   ctx.stroke();
   const arrow_tip = linalg.normalize(linalg.sub(mid_to_end, ortho_comp), consts.ARROW_LENGTH);  
   const normal_to_tip = linalg.normalize(linalg.normal_vec(arrow_tip), consts.ARROW_WIDTH/2);  // half the total width

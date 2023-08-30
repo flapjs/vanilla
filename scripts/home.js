@@ -121,7 +121,7 @@ function bind_run_input() {
       });
     }
     // clear the partial computations when user switches machines
-    document.getElementById('dropdown-content').addEventListener('change', () => computations.fill(undefined));
+    document.getElementById('select_machine').addEventListener('change', () => computations.fill(undefined));
   }
 
   export {bind_run_input};
