@@ -602,7 +602,7 @@ let secondbar = document.getElementById('secondbar');
 
 function closeMenu() {
   if (homeToggle || machineToggle || saveToggle) {
-    secondbar.style.transform = "translate(-20vw)";
+    secondbar.style.transform = "translate(-240px)";
     homeToggle = false;
     machineToggle = false;
     saveToggle = false;
@@ -727,8 +727,8 @@ function expandIcon(nameOfClass){
       break;
     }
    if (toggleMenu(nameOfClass)) {
-    var header = document.getElementById('secondBarHeader');
-    header.innerHTML = headerName;
+    const header = document.querySelector('#secondBarHeaderTitle > h1');
+    header.textContent = headerName;
     currIcon.classList.add('active');
   }
   else {
