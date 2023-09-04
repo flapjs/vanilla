@@ -11,11 +11,15 @@ import * as permalink from './permalink.js';
 
 // if not in browser, don't run
 if (typeof document !== 'undefined') {
-  document.addEventListener('DOMContentLoaded', init);
-  window.addEventListener('resize', () => drawing.draw(graph));
+  // get current page
+  const cur_file_path = window.location.pathname;
+  if (!cur_file_path.includes('grade.html')) {
+    document.addEventListener('DOMContentLoaded', init);
+    window.addEventListener('resize', () => drawing.draw(graph));
+  }
 }
 
-let graph = consts.EMPTY_GRAPH;  // global graph
+let graph = {};  // global graph, initially empty
 
 /** handles double click */
 function bind_double_click() {
@@ -308,7 +312,7 @@ function bind_dd() {
     if (!Object.keys(graph).length) {  // nothing to delete
       return;
     }
-    graph = consts.EMPTY_GRAPH;
+    graph = {};
     drawing.draw(graph);
     hist.push_history(graph);
   });

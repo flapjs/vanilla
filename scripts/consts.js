@@ -12,9 +12,6 @@ export const RIGHT_BTN = 2;
 /** @constant {function} EMPTY_FUNCTION - place holder function */
 export const EMPTY_FUNCTION = () => {};
 
-/** @constant {Object} EMPTY_GRAPH - empty graph object */
-export const EMPTY_GRAPH = {};
-
 /** @constant {float} CLICK_HOLD_TIME - [ms] the maximum time between mousedown and mouseup still considered as click */
 export const CLICK_HOLD_TIME = 240;
 
