@@ -25,25 +25,9 @@ export function event_position_on_canvas(e) {
   return [x, y];
 }
 
-const hover_trash = new Image();
-hover_trash.src = '../assets/icon-hover-trash.svg';
-export function over_trash(e) {
+function canvas_size() {
   const rect = get_canvas().getBoundingClientRect();
-  const x = (e.clientX - rect.left)*window.devicePixelRatio;
-  const y = (e.clientY - rect.top)*window.devicePixelRatio;
-  const trash_dims = { X: 1830, Y: 740, Width: 50, Height: 50 };
-  if (
-    x >= (window.innerWidth*window.devicePixelRatio) - (trash.width + 30) &&
-    x <= (window.innerWidth*window.devicePixelRatio) - (trash.width + 30) + trash_dims.Width &&
-    y >= (window.innerHeight*window.devicePixelRatio) - (trash.height + 30) &&
-    y <= (window.innerHeight*window.devicePixelRatio) - (trash.width + 30) + trash_dims.Height
-  ) {
-    get_canvas().style.cursor = 'pointer';
-    return true;
-  } else {
-    get_canvas().style.cursor = 'auto';
-    return false;
-  }
+  return [rect.right*window.devicePixelRatio, rect.bottom*window.devicePixelRatio];
 }
 
 /**
@@ -339,9 +323,52 @@ export function draw_edge(graph, edge, text_size) {
 }
 
 /* load the asset before it is drawn */
-const trash = new Image();
-trash.src = '../assets/icon-trash.svg';
-let trash_init = false;
+const normal_trash = new Image();
+normal_trash.src = '../assets/icon-trash.svg';
+const red_trash = new Image();
+red_trash.src = '../assets/icon-hover-trash.svg';
+let trash = normal_trash;
+let trash_inited = false;
+
+export function over_trash(e) {
+  const [x, y] = event_position_on_canvas(e);
+  const trash_dims = { X: 1830, Y: 740, Width: 50, Height: 50 };
+  const [canvas_width, canvas_height] = canvas_size();
+  if (
+    x >= canvas_width - (trash.width + 30) &&
+    x <= canvas_width - (trash.width + 30) + trash_dims.Width &&
+    y >= canvas_height - (trash.height + 30) &&
+    y <= canvas_height - (trash.width + 30) + trash_dims.Height
+  ) {
+    get_canvas().style.cursor = 'pointer';
+    trash = red_trash;
+    draw_trash();
+    return true;
+  } else {
+    get_canvas().style.cursor = 'auto';
+    trash = normal_trash;
+    draw_trash();
+    return false;
+  }
+}
+
+export function draw_trash() {
+  const canvas = get_canvas();
+  const ctx = canvas.getContext('2d');
+  const [canvas_width, canvas_height] = canvas_size();
+  const x = canvas_width - (trash.width + 30);
+  const y = canvas_height - (trash.height + 30);
+  if (!trash_inited) {
+    trash.onload = () => {
+      ctx.drawImage(trash, x, y);
+      canvas.addEventListener('mousemove', over_trash);  // constantly check if mouse is over trash
+      trash_inited = true;
+    }
+  } else {
+    ctx.drawImage(trash, x, y);
+  }
+}
+
 /**
  * draw the entire graph on the canvas
  * @param {Object} graph - the graph object to draw on the canvas
@@ -356,31 +383,7 @@ export function draw(graph) {
       draw_edge(graph, edge, consts.EDGE_TEXT_SACALING*vertex.r);
     }
   }
-  const ctx = canvas.getContext('2d');
-  if (!trash_init) { // upon initializing canvas, draw trash icon
-    trash.onload = () => {
-      recolor_trash(false);
-    };
-    trash_init = true;
-  } else { // otherwise, just draw the trash
-    recolor_trash(false);
-  }
-  return trash;
-}
-
-export function recolor_trash(status) {
-  const canvas = get_canvas();
-  const ctx = canvas.getContext('2d');
-  ctx.width = (window.innerWidth*window.devicePixelRatio) - (trash.width + 30);
-  ctx.height = (window.innerHeight*window.devicePixelRatio) - (trash.height + 30); 
-  var x = ctx.width;
-  var y = ctx.height;
-  if (status) { // color red if hovering over trash
-    ctx.drawImage(hover_trash, x, y); 
-  }
-  else { // color dark gray normally
-    ctx.drawImage(trash, x, y);
-  }
+  draw_trash();
 }
 
 /**

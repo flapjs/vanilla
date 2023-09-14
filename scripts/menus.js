@@ -2,7 +2,6 @@
 
 import * as consts from './consts.js';
 import * as graph_ops from './graph_ops.js';
-import { bind_elongate_textbox } from './index.js';
 
 export function machine_type() {
   return document.getElementById('select_machine').value;
@@ -32,6 +31,19 @@ export function is_Turing() {
   return machine_type() === consts.MACHINE_TYPES.Turing;
 }
 
+/** dynamically change the length of textboxes inside the container */
+function bind_elongate_textbox(container) {
+  const minimum_width = 4;  // minimum width of 4ch
+  const change_width_func = e => {
+    e.target.style.width = `${Math.max(minimum_width, e.target.value.length)}ch`;
+  };
+  const text_boxes = container.querySelectorAll('input[type="text"]');
+  for (const text_box of text_boxes) {
+    text_box.style.width = `${Math.max(minimum_width, text_box.value.length)}ch`;  // set initial width
+    text_box.addEventListener('input', change_width_func);
+  }
+}
+
 /**
  * creates the context menu to change a vertex and display it
  * @param {Object} graph - the graph containing the vertex v
@@ -52,6 +64,7 @@ export function display_vertex_menu(graph, v, x, y) {
   container.appendChild(buttons_div);
   container.appendChild(delete_div);
   const rename = document.createElement('input');
+  bind_elongate_textbox(rename);
   rename.type = 'text';
   rename.value = v;  // prepopulate vertex name
   rename_div.appendChild(rename);
@@ -74,7 +87,7 @@ export function display_vertex_menu(graph, v, x, y) {
   document.querySelector('body').appendChild(container);
   rename.focus();  // focus on the first text box
   rename.select();  // select all text
-  bind_elongate_textbox();
+  bind_elongate_textbox(container);
 }
 
 /**
@@ -126,7 +139,7 @@ export function display_edge_menu(graph, edge, x, y) {
   document.querySelector('body').appendChild(container);
   transition.focus();  // focus on the first text box
   transition.select();  // select all text
-  bind_elongate_textbox();
+  bind_elongate_textbox(container);
 }
 
 /** wipes the context menu; does nothing if none exists */
