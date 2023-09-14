@@ -33,16 +33,12 @@
         <span class="tooltiptext">Save</span>
       </li>
       <li class="sidenavBtn" id="bugIcon">
-        <div class="tooltip">
-          <img src="assets/bug.svg" alt="bug icon"/>
-          <span class="tooltiptext">Report A Bug</span>
-        </div>
+        <img src="assets/bug.svg" alt="bug icon"/>
+        <span class="tooltiptext">Report A Bug</span>
       </li>
       <li class="sidenavBtn" id="helpIcon">
-        <div class="tooltip">
-          <img src="assets/help.svg" alt="help icon"/>
-          <span class="tooltiptext">Help</span>
-        </div>   
+        <img src="assets/help.svg" alt="help icon"/>
+        <span class="tooltiptext">Help</span> 
       </li>
     </ul>
   </div>
@@ -75,13 +71,7 @@
       </p>
     </div>
     <div class = "dropdown settings">
-    <button class = "NFA_specific" id = "NFA_to_DFA" >NFA to DFA</button>
-    <!-- dropdown menu activated when button is clicked-->
-      <!--
-      <button onclick=
-      "document.getElementById('').hidden = !document.getElementById('select_machine').hidden"
-      >dropdown</button>
-      -->
+      <button class="NFA_specific" id="NFA_to_DFA" >NFA to DFA</button>
       <select id="select_machine">
         <option value="NFA">Finite Automata</option>
         <option value="PDA">Pushdown Automata</option>
@@ -99,9 +89,11 @@
   <div id ="overlay">
     <div class="popup">
       <div class="popup-content">
-        <button id="tutorial_close_btn">
-          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 256 256"><path fill="currentColor" d="M208.49 191.51a12 12 0 0 1-17 17L128 145l-63.51 63.49a12 12 0 0 1-17-17L111 128L47.51 64.49a12 12 0 0 1 17-17L128 111l63.51-63.52a12 12 0 0 1 17 17L145 128Z"/></svg>
-        </button>
+        <div id="popup-close-div">
+          <button id="tutorial_close_btn">
+            <img src="assets/close.svg" alt="close icon"/>
+          </button>
+        </div>
         <div class = "popup-pages">
           <div class = "popup-content-pg1" id = 'pg1'>
             <h2>The Basics</h2>
