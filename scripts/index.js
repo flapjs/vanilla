@@ -8,6 +8,7 @@ import * as compute from './compute.js';
 import * as graph_ops from './graph_ops.js';
 import * as menus from './menus.js';
 import * as permalink from './permalink.js';
+import * as regex from './regex.js';
 
 // if not in browser, don't run
 if (typeof document !== 'undefined') {
@@ -389,6 +390,12 @@ function bind_permalink() {
   window.addEventListener('hashchange', hash_change_handler);
 }
 
+function bind_regex() {
+  let [input_field, open_btn, close_btn, union_btn, concat_btn, kleene_btn, sigma_btn, empty_btn, submit_btn, convert] = regex.create_buttons();
+
+  
+}
+
 /** run after all the contents are loaded to hook up callbacks */
 function init() {
   bind_switch_machine();
@@ -403,5 +410,6 @@ function init() {
   bind_dd();
   bind_elongate_textbox();
   bind_permalink();
+  bind_regex();
   init_graph();  // leave this last since we want it to override some of the above
 }

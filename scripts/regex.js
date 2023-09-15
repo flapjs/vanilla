@@ -100,7 +100,12 @@ export function shunting_yard(string) {
   return result;
 }
 
-
+/**
+ * performs the union operation on two graphs
+ * @param {string} graph1 - the first graph
+ * @param {string} graph2 - the second graph
+ * @returns {string} the new resulting graph of the union operation
+ */
 export function union(graph1, graph2) {
   let graph = {};
   graph["q0"] = graph_components.make_vertex("q0", 300, 300, consts.DEFAULT_VERTEX_RADIUS, true, false, []);
@@ -158,6 +163,12 @@ export function union(graph1, graph2) {
   return graph;
 }
 
+/**
+ * performs the concatenation operation on two graphs
+ * @param {string} graph1 - the first graph
+ * @param {string} graph2 - the second graph
+ * @returns {string} the new resulting graph of the concatenation operation
+ */
 export function concat(graph1, graph2) {
   let graph1accept = [];
   let graph2start = "";
@@ -212,6 +223,11 @@ export function concat(graph1, graph2) {
   return graph;
 }
 
+/**
+ * performs the union operation on two graphs
+ * @param {string} graph - the graph
+ * @returns {string} the new resulting graph of the kleene operation
+ */
 export function kleene(graph) {
   // make new start and end states
   graph["new start"] = graph_components.make_vertex("new start", 300, 300, consts.DEFAULT_VERTEX_RADIUS, true, false, []);
@@ -287,6 +303,72 @@ export function thompson(regex) {
   return stack.pop();
 }
 
+export function create_buttons() {
+  let input_field = document.getElementById('regex_string');
+
+  let open_btn = document.getElementById('OPEN');
+  open_btn.addEventListener('click', () => {
+    input_field.value += consts.OPEN;
+    input_field.focus();
+  });
+  let close_btn = document.getElementById('CLOSE');
+  close_btn.addEventListener('click', () => {
+    input_field.value += consts.CLOSE;
+    input_field.focus();
+  });
+  let union_btn = document.getElementById('UNION');
+  union_btn.addEventListener('click', () => {
+    input_field.value += consts.UNION;
+    input_field.focus();
+  });
+  let concat_btn = document.getElementById('CONCAT');
+  concat_btn.addEventListener('click', () => {
+    input_field.value += consts.CONCAT;
+    input_field.focus();
+  });
+  let kleene_btn = document.getElementById('KLEENE');
+  kleene_btn.addEventListener('click', () => {
+    input_field.value += consts.KLEENE;
+    input_field.focus();
+  });
+  // const plus_btn = document.getElementById('PLUS');
+  let sigma_btn = document.getElementById('SIGMA');
+  sigma_btn.addEventListener('click', () => {
+    input_field.value += consts.SIGMA;
+    input_field.focus();
+  });
+  let empty_btn = document.getElementById('EMPTY_SET');
+  empty_btn.addEventListener('click', () => {
+    input_field.value += consts.EMPTY_SET;
+    input_field.focus();
+  });
+
+  let submit_btn = document.getElementById('regex_submit');
+  submit_btn.addEventListener('click', () => {
+    let result = process_string(input_field.value);
+    console.log(result);
+  });
+
+  let convert = document.getElementById("convert_to_nfa");
+  convert.addEventListener('click', () => {
+
+  })
+
+  return [input_field, open_btn, close_btn, union_btn, concat_btn, kleene_btn, sigma_btn, empty_btn, submit_btn, convert];
+}
+
+export function add_test_string() {
+
+}
+
+export function process_string(string) {
+  let injectedConcat = injectConcatSymbols(string);
+  let postfix = shunting_yard(injectedConcat);
+  let finalGraph = thompson(postfix);
+
+  return permalink.serialize('NFA', finalGraph)
+}
+
 function regexTest(regex) {
   let injectedConcat = injectConcatSymbols(regex);
   // console.log(injectedConcat);
@@ -300,6 +382,6 @@ function regexTest(regex) {
 
 //regexTest("a(a+b)*b")
 // last concat for the last b is broken still, no edge connecting it to the class
-regexTest("a"+consts.OPEN+"a"+consts.UNION+"b"+consts.CLOSE+consts.KLEENE+"b");
+//regexTest("a"+consts.OPEN+"a"+consts.UNION+"b"+consts.CLOSE+consts.KLEENE+"b");
 
 // regexTest("ab");

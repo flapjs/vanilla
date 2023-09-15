@@ -70,8 +70,10 @@ export function delete_vertex(graph, v) {
  * @param {string} v - the vertex to rename
  * @param {*} new_name - new name of the vertex
  */
-export function rename_vertex(graph, v, new_name) {
-  menus.remove_context_menu();
+export function rename_vertex(graph, v, new_name, no_gui) {
+  if (!no_gui) {
+    menus.remove_context_menu();
+  }
   if (v === new_name) {  // nothing to do
     return;
   } else if (new_name in graph) {
@@ -92,8 +94,10 @@ export function rename_vertex(graph, v, new_name) {
         }
       }
     }
-    drawing.draw(graph);
-    hist.push_history(graph);
+    if (!no_gui) {
+      drawing.draw(graph);
+      hist.push_history(graph);
+    }
   }
 }
 

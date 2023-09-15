@@ -80,31 +80,35 @@ export const ARROW_SYMBOL = '→';
 export const MACHINE_TYPES = {
   NFA: 'NFA',
   PDA: 'PDA',
-  Turing: 'Turing'
+  Turing: 'Turing',
+  Regex: 'Regex'
 };
 
-/** @constant {string} DEFAULT_MACHINE - choice from ['NFA', 'PDA', 'Turing'] */
+/** @constant {string} DEFAULT_MACHINE - choice from ['NFA', 'PDA', 'Turing', 'Regex'] */
 export const DEFAULT_MACHINE = MACHINE_TYPES.NFA;
 
 /** @constant {Object} HIST_KEYS - localstore key to the history stack */
 export const HIST_KEYS = {
   NFA: '%nfa_history',
   PDA: '%PDA_history',
-  Turing: '%turing_history'
+  Turing: '%turing_history',
+  Regex: '%regex_history'
 };
 
 /** @constant {Object} HIST_TIP_KEYS - localstore key to pointer to the top of the history stack */
 export const HIST_TIP_KEYS = {
   NFA: '%nfa_hist_tip',
   PDA: '%PDA_hist_tip',
-  Turing: '%turing_hist_tip'
+  Turing: '%turing_hist_tip',
+  Regex: '%regex_hist_tip'
 };
 
 /** @constant {Object} HIST_PTR_KEYS - localstore key to pointer to the currently displayed graph */
 export const HIST_PTR_KEYS = {
   NFA: '%nfa_hist_ptr',
   PDA: '%PDA_hist_ptr',
-  Turing: '%turing_hist_ptr'
+  Turing: '%turing_hist_ptr',
+  Regex: '%regex_hist_ptr'
 };
 
 /** @constant {float} ZOOM_SPEED - final zoom is ZOOM_SPEED*scroll_wheel_ticks */
@@ -161,9 +165,6 @@ export const KLEENE = '*';
 
 /** @constant {string} PLUS - plus symbol (one or more) for regular expressions */
 export const PLUS = '\u207A';
-
-/** @constant {string} EMPTY - epsilon symbol for regular expressions */
-export const EMPTY = '\u03B5';
 
 /** @constant {string} SIGMA - alphabet symbol for regular expressions */
 export const SIGMA = '\u03A3';
