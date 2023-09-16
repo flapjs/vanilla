@@ -1,8 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@500;700&display=swap');
-:root {
-  --primary-blue: #3a468f;
-  --light-blue: #4e5aa3;
-}
+
 * {
   margin: 0;
   padding: 0;
@@ -20,42 +17,23 @@
 canvas {
   width: 100%;
   height: 100%;
+  z-index: 100;
+  background-color:#f2f0f0;
 }
 
-/* all input textboxes */
+button {
+  border-radius: 5px;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
 input {
-  text-align: left;
-  padding: 0 5px 0 5px;
-  width: 4ch;
-  border-radius: 10px;
-  border: 1px solid rgb(128, 128, 16);
+  border-radius: 5px;
 }
 
-
-.topnav {
-  display: none;
-  overflow: hidden;
-  background-color: rgba(192, 192, 32, 0.3);
-}
-
-.topnav > * {
-  float: left;
-  color: brown;
-  text-align: center;
-  margin: 0 3px;
-  padding: 3px;
-}
-
-.topnav > *:hover {
-  background-color: rgba(32, 128, 16, 0.3);
-  color: lightyellow;
-}
-
-.topnav > select:hover {
-  background-color: white;
-  color: brown;
-}
-
+/***** Graph Context Menu *****/
 .context_menu {
   z-index: 99;
   position: absolute;
@@ -65,187 +43,274 @@ input {
   background-color: rgba(240, 245, 255, 0.7);
 }
 
-.start:hover {
+.context_menu button {
+  margin: 2px 5px 2px 5px;
+  padding: 0px 4px 0px 4px;
+}
+
+.context_menu button:hover {
   background-color: #c7c2c2;
-  border-radius: 5px;
-  cursor:pointer;
   transition: all .15s ease-in-out;
 }
 
-.final:hover {
-  background-color: #c7c2c2;
-  border-radius: 5px;
-  cursor:pointer;
-  transition: all .15s ease-in-out;
-}
-.delete {
-  color: red;
-}
-
+/* delete is a div not a button so need to duplicate here */
 .delete:hover {
+  color: red;
   background-color: #c7c2c2;
   border-radius: 5px;
   cursor:pointer;
   transition: all .15s ease-in-out;
 }
+/***** End Graph Context Menu *****/
 
-#tutorial-content {
-  font-size: 12px;
-  padding-top: 8px;
-}
-
-
-/* Sidebar menu */
-.nav {
-  padding-top: 1.5rem;
-  height: 100vh;
-  width: 5rem;
+/***** The Sidebar of Icons *****/
+.sidenav {
+  height: 100vh; /* Full-height: remove this if you want "auto" height */
+  width: 4rem;
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
-  top: 0; /* Stay at the top */
-  left: 0;
-  background-color:#273b7d; /* Black */
-  overflow-x: hidden; /* Disable horizontal scroll */
-  transition: all .4s;
+  background-color: rgb(27, 38, 74); /* UCSD blue */
+  padding-top: 1.5rem;
 }
 
-/* Flex container holding nav-icons */
-.nav-container {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items:center;
-  color:#c7c2c2;
-  text-align: center;
-}
-
-/* The navigation menu icons without hovering*/
-.nav-icon:not(.active) {
-  display: flex;
-  padding: 1rem 1rem 1rem;
-  color:#c7c2c2;
-  border-radius: 7px;
-  margin-bottom: 1rem;
-  width: 2rem;
-  position: relative;
-  transition: all .4s;
-  align-items:start
-}
-
-.nav-icon:hover, .active {
-  padding: 1rem 1rem 1rem;
-  color: #f2f0f0;
-  background-color: #4e5aa3;
-  border-radius: 7px;
-  margin-bottom: 1rem;
-  width: 2rem;
-  position: relative;
-  transition: all .4s;
-  align-items: end;
-}
-
-.nav-icon svg {
-  min-width: 2rem;
-  height: 2rem;
-}
-
-/* text when hovering */
-.nav-label {
+/* The navigation menu icons */
+.sidenav li {
+  padding: .4rem;
   display: block;
-  width:max-content;
-  font-size: 12px;
-  position: absolute; /* appears above all other elments */
-  z-index: 2;
-  transition: all .1s ease-in-out;
-  margin: 0 auto;
-  left: 0;
-  right: 0;
-  margin-top: -3px;
-  align-items: end;
+  border-radius: 7px;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 20px;
+  margin-left: 9.5px;
+  position: relative;
 }
 
-.icon-container {
-  display: block;
+.sidenav li:hover, .active {
+  background-color: #3a468f;
+  transition-duration: 0.4s;
+  cursor: pointer;
 }
 
+.tooltiptext {
+  visibility: hidden;
+  background-color:#f2f0f0;
+  padding: 7px 10px;
+  border-radius: 6px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  left: 65px; /* move tooltip left away from icons */
+  position: fixed; /* appears above all other elments */
+  z-index: 1;
+  transform: translate3d(0,-2px,0);
+  align-items: center;
+}
+
+.sidenav li:hover .tooltiptext {
+  visibility: visible;
+}
+/***** End The Sidebar of Icon<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="styles/index.css">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>flap.js</title>
+
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="assets/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="assets/favicon-16x16.png" sizes="16x16">
+  <link rel="manifest" href="assets/site.webmanifest">
+  <meta name="theme-color" content="#ffffff">
+
+  <script src="scripts/index.js" type="module"></script>
+</head>
+<body>
+
+  <!-- Side navigation -->
+  <div class="sidenav">
+    <ul>
+      <li class="sidenavBtn", id="homeIcon">
+        <img src="assets/home.svg" alt="home icon"/>
+        <span class="tooltiptext">Home</span>
+      </li>
+      <li class="sidenavBtn" id="machineIcon">
+        <img src="assets/machine.svg" alt="machine icon"/>
+        <span class="tooltiptext">Machine</span>
+      </li>
+      <li class="sidenavBtn" id="saveIcon">
+        <img src="assets/save.svg" alt="save icon"/>
+        <span class="tooltiptext">Save</span>
+      </li>
+      <li class="sidenavBtn" id="bugIcon">
+        <img src="assets/bug.svg" alt="bug icon"/>
+        <span class="tooltiptext">Report A Bug</span>
+      </li>
+      <li class="sidenavBtn" id="helpIcon">
+        <img src="assets/help.svg" alt="help icon"/>
+        <span class="tooltiptext">Help</span> 
+      </li>
+    </ul>
+  </div>
+
+  <section hidden id="secondbar">
+    <div id="secondBarHeader">
+      <div id="secondBarHeaderTitle">
+        <h1>Header</h1>
+      </div>
+      <div id="secondBarHeaderBtn">
+        <button id="closeButton">
+          <img src="assets/close.svg" alt="close icon"/>
+        </button>
+      </div>
+    </div>
+    <div class = "dropdown home">
+      <div class = machine_inputs>
+      </div>
+      <button class="plus_btn pmbtn" id="plus_button">+</button>
+      <button class="minus_btn pmbtn" id="minus_button">-</button>
+      <h3>
+        Key: 
+      </h3>
+      <p>
+        R - Run Input on Machine
+      </p><p>
+        S - Step Input on Machine
+      </p><p>
+        X - Reset Step Function
+      </p>
+    </div>
+    <div class = "dropdown settings">
+      <button class="NFA_specific" id="NFA_to_DFA" >NFA to DFA</button>
+      <select id="select_machine">
+        <option value="NFA">Finite Automata</option>
+        <option value="PDA">Pushdown Automata</option>
+        <option value="Turing">Turing Machine</option>
+      </select>
+    </div>
+    
+    <div hidden class="dropdown save">
+      <button id="save_machine">Save as png</button>
+      <button id="permalink">Permalink</button>
+    </div>
+  </section>
+
+  <!-- Tutorial Popup -->
+  <div id ="overlay">
+    <div class="popup">
+      <div class="popup-content">
+        <div id="popup-close-div">
+          <button id="tutorial_close_btn">
+            <img src="assets/close.svg" alt="close icon"/>
+          </button>
+        </div>
+        <div class = "popup-pages">
+          <div class = "popup-content-pg1" id = 'pg1'>
+            <h2>The Basics</h2>
+              <div>Double click to create vertices, additional double clicks to toggle final</div>
+              <div>Right click on vertices (or ctrl) drag to create edges</div>
+              <div>Right click on vertices or edge texts to inspect</div>
+              <div>Left click drag on vertices or edge texts to drag</div>
+              <div>Left click drag on empty space to pan, use scroll wheel to zoom</div>
+              <div>"ctrl+z" to undo, "ctrl+shift+z" to redo (please use "ctrl" instead of "cmd" on Mac)</div>
+              <div>"dd" to delete (quickly press 'd' two times)</div>
+            <img src = "tutorial_GIFs/basics.gif" style = "width:20vw;height:15vw;position:relative;">
+            <p></p> 
+            <button class ='next-btn' id="nextBtn_1to2">Next >></button>
+        </div>
+        <div class = "popup-content-pg2" id = 'pg2'>
+            <h2>Running Input</h2>
+            <p>Enter the input string and press run.</p>
+            <img src = "tutorial_GIFs/run_input.gif">  
+            <p></p> 
+            <button class ='prev-btn' id="prevBtn_2to1">&lt;&lt; Prev</button>
+            <button class ='next-btn' id="nextBtn_2to3">Next>></button>
+        </div>
+        <div class = "popup-content-pg3" id = 'pg3'>
+            <h2>Stepping Through Input</h2>
+            <p>You can also step through the computation one character at a time.</p> 
+            <img src = "tutorial_GIFs/step_through.gif">
+            <p></p> 
+            <button class ='prev-btn' id="prevBtn_3to2">&lt;&lt; Prev</button>
+            <button class ='next-btn' id="nextBtn_3to4">Next>></button>
+        </div>
+        <div class = "popup-content-pg4" id = 'pg4'>
+          <h2>Download PNG</h2>
+          <p>After you finish drawing your automaton, you can download a PNG of the drawing by clicking "Save as png" on the toolbar.</p> 
+          <img src = "tutorial_GIFs/save_img.gif"> 
+          <p></p> 
+          <button class ='prev-btn' id="prevBtn_4to3">&lt;&lt; Prev</button>
+          <button class ='next-btn' id="nextBtn_4to5">Next>></button>
+      </div>
+        <div class = "popup-content-pg5" id = 'pg5'>
+          <h2>Permalink</h2>
+          <p>This feature enables sharing machine drawings. Permalink stands for permanent link, meaning once you have created a link to share with your others, that link can uniquely decode back to a machine.</p>  
+          <img src = "tutorial_GIFs/permalink.gif">
+          <p></p> 
+          <button class ='prev-btn' id="prevBtn_5to4">&lt;&lt; Prev</button>
+          <button class ='next-btn' id="tutorial_finish_btn">Finish</button>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- the big canvas that we draw on -->
+  <canvas id='machine_drawing'>Your browser does not support canvas</canvas>
+</body>
+</html>s *****/
+
+/***** The Second Sidebar That Rolls Out *****/
 #secondbar {
   height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 13rem; /* Set the width of the sidebar */
+  width: 240px; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 0; /* Stay on top */
-  top: 0; /* Stay at the top */
-  left: 0;
-  margin-left: 5rem;
-  background-color:#3a468f; /* background */
-  overflow-x: hidden; /* Disable horizontal scroll */
+  background-image:linear-gradient(to right, rgb(27, 38, 74, 1), rgb(27, 38, 74, 0.8), rgb(27, 38, 74, 0.6), rgb(27, 38, 74, 0.4)); /* background */
   padding-top: 20px;
+  margin-left: 64px; /* using margin to clear the sidebar */
   transition: all .5s;
-  transform: translate(-20rem);
+  transform: translate(0vw);
 }
 
 #secondbar button {
-  padding: 10px 15px 20px 10px;
-  text-align: left;
-  text-decoration: none;
+  margin: 13px;
+  padding: 10px 15px 10px 15px;
+  align-items: center;
   font-size: 13px;
-  color:#c7c2c2;
+  color:gold;
   background-color: #3a468f;
-  display: block;
-  border-radius: 5px;
-  border-width: 2px;
-  border-color:#3a468f;
-  border-style: solid;
-  width: 125px;
-  height: 25px;
-  margin-bottom: 20px;
-  margin-left: 10px;
-  transition: all .4s;
+  transition: all .5s;
 }
 
 #secondbar button:hover {
   background-color:#4e5aa3;
-  color:#f2f0f0;
-  transition-duration: 0.4s;
-  border-radius: 5px;
-  padding: 10px 15px 20px 10px;
 }
 
-#secondbar #closeButton{
-  padding: 5px 30px 28px 5px;
-  position: relative;
-  width:2rem;
-  top: 0rem;
-  left:9.5rem;
-  cursor:pointer;
+#secondBarHeader {
+  display: flex;
+  justify-content: space-between;
 }
 
-#secondbar #closeButton:hover {
-  padding: 5px 30px 28px 5px;
+#secondBarHeaderTitle > h1 {
+  margin: 10px;
+  padding-left: 5px;
+  text-align: center;
+  color: gold;
+  font-size: x-large;
 }
 
-.NFA_specific{
-  cursor:pointer;
+#secondBarHeaderBtn > #closeButton{
+  padding: 7px 7px 3px 7px;  /* the image is not quite centered hence lower margin at the bottom */
+  margin: 8px 24px 8px 8px;  /* extra space on the right */
 }
 
-select{
+select {
   position: relative;
   font-size: 10px;
-  width:10vw;
-  left: 1vw;
-  height: 3vw;
+  left: 1.4vw;
   padding: 10px 0px 10px 10px;
   border: 2px solid #ccc;
-  border-radius: 10px;
-}
-
-.menu-content {
-  display: none;
-}
-
-.menu-content.active {
-  display: block;
+  border-radius: 5px;
 }
 
 /* Darken background window when popup is open */
@@ -288,7 +353,6 @@ select{
   position: relative;
   border-radius: 1vw;
   padding: 0.5vw;
-  cursor: pointer;
   border: 0,5vw;
   border-color: rgb(4, 4, 4);
   margin: 3px;
@@ -302,41 +366,22 @@ select{
   transition-duration: 0.4s;
 }
 
+#popup-close-div {
+  display: flex;
+  justify-content: right;
+}
+
 .popup-content #tutorial_close_btn{
-  position: fixed;
-  top:5px;
-  right:5px;
-}
-
-.popup-content #tutorial_close_btn:hover{
-  color: #f2f0f0;
-  background-color: #4e5aa3;
-  transition-duration: 0.4s;
-}
-
-.popup-content-pg1{
-  display: block;
-}
-
-canvas {
-  background-color:#f2f0f0;
-  z-index: 100;
+  padding-bottom: 0px;  /* hack to fix image blank space at the bottom */
 }
 
 /* access the input field in div id input1*/
 .machineInput { 
-  width: 50px;
-  padding: 12px 20px;
+  width: 120px;
+  height: 15px;
+  padding: 8px;
   margin: 8px 0;
-  margin-left: 8px;
-  /*background-color: #f2f0f0;
-  /*font-size: 12px;*
-  /* done */
-  height: 12px;
-  
-  /* overflow: auto; */
   resize: none;
-  
 }
 
 #secondbar .machine_input {
@@ -357,6 +402,7 @@ canvas {
   border: #f2f0f0;
   border-width: 2px;
   border-style: solid;
+  padding: 4px;
 }
 
 #secondbar .home .pmbtn {
@@ -376,19 +422,8 @@ canvas {
   margin-bottom: 10px;
 }
 
-.secondBarHeader{
-  position: absolute;
-  padding: 3px;
-  top: 1.5rem;
-  left: 18px;
-  width: 100px;
-  text-align: left;
-  color: #c7c2c2;
-  font-size: x-large;
-}
-
 /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
-@media screen and (min-width: 600px) {
-
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
 }
-
