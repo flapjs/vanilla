@@ -157,7 +157,7 @@ function bind_drag() {
     const [x, y] = drawing.event_position_on_canvas(e);
     const clicked_vertex = drawing.in_any_vertex(graph, x, y);
     const clicked_edge = drawing.in_edge_text(graph, x, y);
-    if ((e.button === consts.RIGHT_BTN || e.ctrlKey) && clicked_vertex) {  // right create edge
+    if ((e.button === consts.RIGHT_BTN || e.ctrlKey || e.metaKey) && clicked_vertex) {  // right create edge
       edge_animation = higher_order_edge_animation(clicked_vertex);
       canvas.addEventListener('mousemove', edge_animation);
     } else if (e.button === consts.LEFT_BTN) {  // left drag
@@ -261,13 +261,13 @@ export function bind_run_input() {
 /** offers ctrl-z and ctrl-shift-z features */
 function bind_undo_redo() {
   document.addEventListener('keydown', e => {
-    if (e.code !== 'KeyZ' || e.metaKey || e.altKey) {
+    if (e.code !== 'KeyZ' || e.altKey) {  // must not have alt pressed but must have 'z' pressed
       return;
     }
     e.preventDefault();  // prevent input undo
-    if (e.ctrlKey && e.shiftKey) {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
       graph = hist.redo(); 
-    } else if (e.ctrlKey) {
+    } else if ((e.ctrlKey || e.metaKey)) {
       graph = hist.undo(); 
     }
     drawing.draw(graph);
