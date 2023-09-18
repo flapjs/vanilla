@@ -27,7 +27,6 @@ plus_button.addEventListener('click', () => {
         }
     }
 
-
     // create a new machine input
     const new_machine_input = document.createElement('div');
     new_machine_input.classList.add('machine_input');

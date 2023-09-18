@@ -44,8 +44,8 @@ function bind_double_click() {
 function drag_scene(e) {
   const dx = e.movementX, dy = e.movementY;
   for (const vertex of Object.values(graph)) {
-    vertex.x += dx;
-    vertex.y += dy;
+    vertex.x += dx*window.devicePixelRatio;
+    vertex.y += dy*window.devicePixelRatio;  // calculated in canvas pixel, which is some multiple of window pixel
   }
   drawing.draw(graph);
 }

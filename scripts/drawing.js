@@ -3,7 +3,6 @@
 import * as consts from './consts.js';
 import * as linalg from './linalg.js';
 import * as menus from './menus.js';
-import { make_vertex } from './graph_components.js';
 
 /**
  * get the machine drawing canvas
@@ -204,7 +203,6 @@ function drawSplit(start, end, mid, radius, edge_text, text_size) {
   }
 }
 
-
 /**
  * checks if (x, y) wrt canvas is inside vertex v
  * @param {Object} graph - the graph of interest
@@ -355,16 +353,19 @@ export function over_trash(e) {
 export function draw_trash() {
   const canvas = get_canvas();
   const ctx = canvas.getContext('2d');
-  const [canvas_width, canvas_height] = canvas_size();
-  const x = canvas_width - (trash.width + 30);
-  const y = canvas_height - (trash.height + 30);
   if (!trash_inited) {
     trash.onload = () => {
+      const [canvas_width, canvas_height] = canvas_size();  // duplicate logic here because canvas size may change
+      const x = canvas_width - (trash.width + 30);
+      const y = canvas_height - (trash.height + 30);
       ctx.drawImage(trash, x, y);
       canvas.addEventListener('mousemove', over_trash);  // constantly check if mouse is over trash
       trash_inited = true;
     }
   } else {
+    const [canvas_width, canvas_height] = canvas_size();
+    const x = canvas_width - (trash.width + 30);
+    const y = canvas_height - (trash.height + 30);
     ctx.drawImage(trash, x, y);
   }
 }
