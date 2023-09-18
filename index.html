@@ -57,18 +57,17 @@
     <div class = "dropdown home">
       <div class = machine_inputs>
       </div>
-      <button class="plus_btn pmbtn" id="plus_button">+</button>
-      <button class="minus_btn pmbtn" id="minus_button">-</button>
-      <h3>
-        Key: 
-      </h3>
-      <p>
-        R - Run Input on Machine
-      </p><p>
-        S - Step Input on Machine
-      </p><p>
-        X - Reset Step Function
-      </p>
+      <div id="plus_minus_div">
+        <button class="pmbtn" id="minus_button">–</button>
+        <button class="pmbtn" id="plus_button">+</button>
+      </div>
+      <div id="input_instructions">
+        <ul>
+          <li>R - Run Input on Machine</li>
+          <li>S - Step Input on Machine</li>
+          <li>X - Reset Step Function</li>
+        </ul>
+      </div>
     </div>
     <div class = "dropdown settings">
       <button class="NFA_specific" id="NFA_to_DFA" >NFA to DFA</button>

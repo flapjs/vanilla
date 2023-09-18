@@ -1,6 +1,7 @@
 /** @module ui_setup */
 
-import * as drawing from './drawing.js';
+import * as consts from './consts.js';
+import {bind_run_input}  from './index.js';
 
 function pgAtoB(a,b){
   let pgName = 'pg';
@@ -225,14 +226,13 @@ export function bind_plus_minus() {
     const machine_inputs = document.querySelector('.machine_inputs');
     //first, check if there is a hidden machine input
     for (let i = 0; i < machine_inputs.children.length; i++) {
-      if (machine_inputs.children.item(i).classList.contains('machine_input') && machine_inputs.children.item(i).hidden) {
-        machine_inputs.children.item(i).hidden = false;
+      if (machine_inputs.children[i].style.display === 'none') {
+        machine_inputs.children[i].style.display = 'block';
         return;
       }
     }
     // create a new machine input
     add_input_bar();
-    bind_run_input();
   });
 
   // event listener for minus button
@@ -241,9 +241,9 @@ export function bind_plus_minus() {
     const machine_inputs = document.querySelector('.machine_inputs');
     //iterate backwards through machine inputs, hide the first one that is not hidden
     for (let i = machine_inputs.children.length - 1; i >= 0; i--) {
-      if (machine_inputs.children.item(i).classList.contains('machine_input') && !machine_inputs.children.item(i).hidden) {
-        machine_inputs.children.item(i).hidden = true;
-        break;
+      if (machine_inputs.children[i].style.display !== 'none') {
+        machine_inputs.children[i].style.display = 'none';
+        return;
       }
     }
   });
@@ -258,10 +258,12 @@ export function add_input_bar() {
   const machine_inputs = document.querySelector('.machine_inputs');
   const new_machine_input = document.createElement('div');
   new_machine_input.classList.add('machine_input');
+  new_machine_input.style.backgroundColor = consts.SECOND_BAR_COLOR;
 
-  // create a new textarea box
-  const new_textarea = document.createElement('textarea');
-  new_textarea.classList.add("machineInput");
+  // create a new input box
+  const new_inputbox = document.createElement('input');
+  new_inputbox.type = 'text';
+  new_inputbox.classList.add("machine_input_text");
   // create a new run button under the original one
   const new_run_button = document.createElement('button');
   new_run_button.classList.add('run_btn');
@@ -277,11 +279,12 @@ export function add_input_bar() {
   new_reset_button.classList.add('reset_btn');
   new_reset_button.innerHTML = 'X';
 
-  new_machine_input.appendChild(new_textarea);
+  new_machine_input.appendChild(new_inputbox);
   new_machine_input.appendChild(new_run_button);
   new_machine_input.appendChild(new_step_button);
   new_machine_input.appendChild(new_reset_button);
 
   // append the new button to the body
   machine_inputs.appendChild(new_machine_input);
+  bind_run_input();
 }

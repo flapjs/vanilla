@@ -218,46 +218,44 @@ function bind_context_menu() {
   });
 }
 
+const computations = [];  // we want the computations to be persistent
 /** binds each machine input to the run_input function */
-function bind_run_input() {
+export function bind_run_input() {
   const input_divs = document.getElementsByClassName('machine_input');
-  const computations = Array(input_divs.length);  // stores generators of the computation half evaluated
-  for (let i = 0; i < input_divs.length; i++) {
-    const textbox = input_divs[i].querySelector('.machineInput');
+  const new_input_idx = input_divs.length - 1;
+  const new_input = input_divs[new_input_idx];
+  
+  const textbox = new_input.querySelector('.machine_input_text');
+  const run_btn = new_input.querySelector('.run_btn');
+  run_btn.addEventListener('click', () => {
+    new_input.style.backgroundColor = consts.SECOND_BAR_COLOR;
+    computations[new_input_idx] = compute.run_input(graph, menus.machine_type(), textbox.value);  // noninteractive
+    // eslint-disable-next-line no-unused-vars
+    const { value: accepted, _ } = computations[new_input_idx].next();  // second value always true when noninteractive
+    new_input.style.backgroundColor = accepted ? consts.ACCEPT_COLOR : consts.REJECT_COLOR;
+    computations[new_input_idx] = undefined;
+  });
     
-    const run_btn = input_divs[i].querySelector('.run_btn');
-    run_btn.addEventListener('click', () => {
-      input_divs[i].style.backgroundColor = consts.SECOND_BAR_COLOR;
-      computations[i] = compute.run_input(graph, menus.machine_type(), textbox.value);  // noninteractive computation
-      // eslint-disable-next-line no-unused-vars
-      const { value: accepted, _ } = computations[i].next();  // second value is always true since it is noninteractive
-      // alert(accepted ? 'Accepted' : 'Rejected');
-      input_divs[i].style.backgroundColor = accepted ? consts.ACCEPT_COLOR : consts.REJECT_COLOR;
-      computations[i] = undefined;
-    });
-    
-    const step_btn = input_divs[i].querySelector('.step_btn');
-    step_btn.addEventListener('click', () => {
-      input_divs[i].style.backgroundColor = consts.SECOND_BAR_COLOR;
-      if (!computations[i]) {
-        computations[i] = compute.run_input(graph, menus.machine_type(), textbox.value, true);  // true for interactive
-      }
-      const { value: accepted, done } = computations[i].next();
-      if (done) {
-        // whether true or false. We wrap this in timeout to execute after the vertex coloring is done
-        setTimeout(() => input_divs[i].style.backgroundColor = accepted ? consts.ACCEPT_COLOR : consts.REJECT_COLOR);
-        computations[i] = undefined;
-      }
-    });
+  const step_btn = new_input.querySelector('.step_btn');
+  step_btn.addEventListener('click', () => {
+    new_input.style.backgroundColor = consts.SECOND_BAR_COLOR;
+    if (!computations[new_input_idx]) {
+      // last param true for interactive computation
+      computations[new_input_idx] = compute.run_input(graph, menus.machine_type(), textbox.value, true);
+    }
+    const { value: accepted, done } = computations[new_input_idx].next();
+    if (done) {
+      new_input.style.backgroundColor = accepted ? consts.ACCEPT_COLOR : consts.REJECT_COLOR;
+      computations[new_input_idx] = undefined;
+    }
+  });
 
-    const reset_btn = input_divs[i].querySelector('.reset_btn');
-    reset_btn.addEventListener('click', () => {
-      computations[i] = undefined;
-      drawing.highlight_states(graph, []);  // clear the highlighting
-    });
-  }
-  // clear the partial computations when user switches machines
-  document.getElementById('select_machine').addEventListener('change', () => computations.fill(undefined));
+  const reset_btn = new_input.querySelector('.reset_btn');
+  reset_btn.addEventListener('click', () => {
+    computations[new_input_idx] = undefined;
+    new_input.style.backgroundColor = consts.SECOND_BAR_COLOR;
+    drawing.highlight_states(graph, []);  // clear the highlighting
+  });
 }
 
 /** offers ctrl-z and ctrl-shift-z features */
@@ -348,6 +346,8 @@ function bind_switch_machine() {
     menus.display_UI_for(e.target.value);
     history.replaceState(undefined, undefined, '#');  // clear the permalink
   });
+  // clear the partial computations when user switches machines
+  document.getElementById('select_machine').addEventListener('change', () => computations.fill(undefined));
 }
 
 /** handles the NFA to DFA button */
@@ -385,7 +385,6 @@ function init() {
   bind_double_click();
   bind_drag();
   bind_context_menu();
-  bind_run_input();
   bind_machine_transform();
   bind_save_drawing();
   bind_undo_redo();

@@ -23,6 +23,7 @@ canvas {
 
 button {
   border-radius: 5px;
+  text-align: center;
 }
 
 button:hover {
@@ -31,6 +32,10 @@ button:hover {
 
 input {
   border-radius: 5px;
+}
+
+ul {
+  list-style: none;
 }
 
 /***** Graph Context Menu *****/
@@ -122,18 +127,8 @@ input {
   transform: translate(0vw);
 }
 
-#secondbar button {
-  margin: 13px;
-  padding: 10px 15px 10px 15px;
-  align-items: center;
-  font-size: 13px;
-  color:gold;
-  background-color: #3a468f;
-  transition: all .5s;
-}
-
-#secondbar button:hover {
-  background-color:#4e5aa3;
+#secondbar > * {
+  margin-left: 10px;
 }
 
 #secondBarHeader {
@@ -154,15 +149,74 @@ input {
   margin: 8px 24px 8px 8px;  /* extra space on the right */
 }
 
-select {
-  position: relative;
-  font-size: 10px;
-  left: 1.4vw;
+#secondbar button {
+  margin: 13px;
+  padding: 10px 15px 10px 15px;
+  align-items: center;
+  font-size: 13px;
+  color:gold;
+  background-color: #3a468f;
+  transition: all .5s;
+}
+
+#secondbar button:hover {
+  background-color:#4e5aa3;
+}
+
+#secondbar .machine_inputs {
+  margin-right: 5px;
+}
+
+#secondbar .machine_input {
+  margin: 5px;
+  padding: 2px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.machine_input_text { 
+  width: 120px;
+  padding: 4px;
+  margin: 4px;
+  resize: none;
+}
+
+#secondbar select {
+  font-size: 13px;
+  margin-left: 13px;
   padding: 10px 0px 10px 10px;
   border: 2px solid #ccc;
+  background-color:#f2f0f0;
   border-radius: 5px;
 }
 
+#secondbar .home button {
+  margin: 4px;
+  border: #f2f0f0;
+  border-width: 2px;
+  border-style: solid;
+  padding: 2px 5px;
+}
+
+#secondbar #plus_minus_div {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0px;
+  padding-right: 20px;
+}
+
+#plus_minus_div > button {
+  font-size: 16px;
+}
+
+#secondbar #input_instructions {
+  color: #f2f0f0;
+  margin: 10px;
+}
+/***** End The Second Sidebar That Rolls Out *****/
+
+/***** Styling for the pop-up *****/
 /* Darken background window when popup is open */
 #overlay {
   position: fixed;
@@ -175,7 +229,6 @@ select {
   display: none; /* Initially hidden */
 }
 
-/* Styling for the pop-up */
 .popup {
   display: none;
   position: fixed;
@@ -224,53 +277,7 @@ select {
 .popup-content #tutorial_close_btn{
   padding-bottom: 0px;  /* hack to fix image blank space at the bottom */
 }
-
-/* access the input field in div id input1*/
-.machineInput { 
-  width: 120px;
-  height: 15px;
-  padding: 8px;
-  margin: 8px 0;
-  resize: none;
-}
-
-#secondbar .machine_input {
-  max-height: 64px;
-}
-#secondbar .machine_input * {
-  display: inline-block;
-}
-
-#secondbar .home button {
-  width: 20px;
-  display: inline-block;
-  margin-left: 4px;
-  margin-right: 0px;
-  margin-top: -100px;
-  position: relative;
-  bottom: 20px;
-  border: #f2f0f0;
-  border-width: 2px;
-  border-style: solid;
-  padding: 4px;
-}
-
-#secondbar .home .pmbtn {
-  bottom: -16px;
-  width: 32px;
-  text-align: center;
-  margin-left: 52px;
-  margin-right: -44px;
-}
-
-#secondbar p, h3 {
-  position: relative;
-  color: #f2f0f0;
-}
-#secondbar h3 {
-  margin-left: 64px;
-  margin-bottom: 10px;
-}
+/***** End Styling for the pop-up *****/
 
 /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {
