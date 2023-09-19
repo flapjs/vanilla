@@ -62,7 +62,7 @@ export function shunting_yard(string) {
 
   for (let ch of string) {
     // case if ch is a character or epsilon
-    if (ch.match(/[a-z]/i) || ch === consts.EMPTY) {
+    if (ch.match(/[a-z]/i) || ch === consts.EMPTY || ch === consts.SIGMA) {
       queue.enqueue(ch);
     }
     // case if ch is an operator
@@ -272,7 +272,7 @@ export function thompson(regex) {
   let stack = new util.Stack();
 
   for (let c of regex) {
-    if (c.match(/[a-z]/i) || c === consts.EMPTY) {
+    if (c.match(/[a-z]/i) || c === consts.EMPTY || c === consts.SIGMA) {
       // make graph of single vertex
       stack.push(single_transition(c));
     }
@@ -380,8 +380,18 @@ function regexTest(regex) {
   console.log(permalink.serialize('NFA', finalGraph))
 }
 
-//regexTest("a(a+b)*b")
+// a(a∪b)*b
 // last concat for the last b is broken still, no edge connecting it to the class
-//regexTest("a"+consts.OPEN+"a"+consts.UNION+"b"+consts.CLOSE+consts.KLEENE+"b");
+// regexTest("a"+consts.OPEN+"a"+consts.UNION+"b"+consts.CLOSE+consts.KLEENE+"b");
+
+// (abc)*
+// regexTest(consts.OPEN+"abc"+consts.CLOSE+consts.KLEENE)
+
+// Σ*(bc)*
+regexTest(consts.SIGMA+consts.KLEENE+consts.OPEN+"bc"+consts.CLOSE+consts.KLEENE)
+
+// regexTest(consts.SIGMA)
+
+// console.log(JSON.stringify(single_transition(consts.SIGMA)))
 
 // regexTest("ab");
