@@ -46,13 +46,18 @@ export function htmlSetUp(){
   const nav = document.getElementById('nav');
   let secondbar = document.getElementById('secondbar');
 
+  secondbar.addEventListener('', () => {
+    if (secondbar.classList.contains('open')) {
+      nav.classList.add('open');
+    }
+  })
+
   menu.addEventListener('click', () => {
     if (nav.classList.contains('open') && secondbar.classList.contains('open')) {
       closeMenu();
     }
     nav.classList.toggle('open');
   });
-
 
   // Check if the user is a first-time visitor
   if (!localStorage.getItem('visitedBefore')) {
