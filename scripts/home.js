@@ -32,12 +32,11 @@ plus_button.addEventListener('click', () => {
     const new_machine_input = document.createElement('div');
     new_machine_input.classList.add('machine_input');
 
-    // create a new textarea box
+    // Create a new textarea box 
     const new_textarea = document.createElement('textarea');
-    //give it id machineinput
-    new_textarea.classList.add("machineInput");
+    new_textarea.classList.add('text-input');
     //new_textarea.type = "text";
-    //new_textarea.placeholder = "Enter your machine here";
+
 
     // create a new run button under the original one
     const new_run_button = document.createElement('button');
@@ -91,7 +90,7 @@ function bind_run_input() {
     const computations = Array(input_divs.length);  // stores generators of the computation half evaluated
     // console.log(input_divs.length);
     for (let i = 0; i < input_divs.length; i++) {
-      const textbox = input_divs[i].querySelector('.machineInput');
+      const textbox = input_divs[i].querySelector('.text-input');
       const run_btn = input_divs[i].querySelector('.run_btn');
       run_btn.addEventListener('click', () => {
         computations[i] = compute.run_input(graph, menus.machine_type(), textbox.value);  // noninteractive computation

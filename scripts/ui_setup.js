@@ -41,39 +41,49 @@ function closePopup() {
 
 /** moved basic set up from index.html and combined into one function */
 export function htmlSetUp(){
-  // first time pop up implementation
+  // Add toggle functionality to hamburger menu
+  const menu = document.getElementById('menu-container');
+  const nav = document.getElementById('nav');
+  let secondbar = document.getElementById('secondbar');
+
+  menu.addEventListener('click', () => {
+    if (nav.classList.contains('open') && secondbar.classList.contains('open')) {
+      closeMenu();
+    }
+    nav.classList.toggle('open');
+  });
+
+
   // Check if the user is a first-time visitor
   if (!localStorage.getItem('visitedBefore')) {
-  // User is a first-time visitor
-  openPopup();
-
-  // Set flag to indicate the user has visited before
-  localStorage.setItem('visitedBefore', true);
+    openPopup();
+    // Set flag to indicate the user has visited before
+    localStorage.setItem('visitedBefore', true);
   } 
 
-  const closeButton = document.getElementById('closeButton');
+  const closeButton = document.getElementById('close-button');
   closeButton.addEventListener('click', () => {
     closeMenu();
   })
 
-  const homeIcon = document.getElementById('homeIcon');
-  const machineIcon = document.getElementById('machineIcon');
-  const saveIcon = document.getElementById('saveIcon');
-  const bugIcon = document.getElementById('bugIcon');
-  const helpIcon = document.getElementById('helpIcon');
+  const homeIcon = document.getElementById('home-icon');
+  const machineIcon = document.getElementById('machine-icon');
+  const saveIcon = document.getElementById('save-icon');
+  const bugIcon = document.getElementById('bug-icon');
+  const helpIcon = document.getElementById('help-icon');
   const tutorial_close_btn = document.getElementById('tutorial_close_btn');
   const tutorial_finish_btn = document.getElementById('tutorial_finish_btn');
 
-  homeIcon.addEventListener("click", () => {expandIcon('home')});
-  machineIcon.addEventListener("click", () => {expandIcon('settings')});
-  saveIcon.addEventListener("click", () => {expandIcon('save')});
-  bugIcon.addEventListener("click", () => {redirectToBugReport()});
+  homeIcon.addEventListener("click", () => { expandIcon('home') });
+  machineIcon.addEventListener("click", () => { expandIcon('settings') });
+  saveIcon.addEventListener("click", () => { expandIcon('save') });
+  bugIcon.addEventListener("click", () => { redirectToBugReport() });
   helpIcon.addEventListener("click", () => {
     openPopup();
     closeMenu();
   }); 
-  tutorial_close_btn.addEventListener("click",() => {closePopup();})
-  tutorial_finish_btn.addEventListener("click",() => {closePopup();})
+  tutorial_close_btn.addEventListener("click",() => { closePopup() });
+  tutorial_finish_btn.addEventListener("click",() => { closePopup() });
 
   const nextBtn_1to2 = document.getElementById('nextBtn_1to2');
   const nextBtn_2to3 = document.getElementById('nextBtn_2to3');
@@ -85,25 +95,24 @@ export function htmlSetUp(){
   const prevBtn_4to3 = document.getElementById('prevBtn_4to3');
   const prevBtn_5to4 = document.getElementById('prevBtn_5to4');
 
-  nextBtn_1to2.addEventListener("click", () => {pgAtoB(1,2)});
-  nextBtn_2to3.addEventListener("click", () => {pgAtoB(2,3)});
-  nextBtn_3to4.addEventListener("click", () => {pgAtoB(3,4)});
-  nextBtn_4to5.addEventListener("click", () => {pgAtoB(4,5)});
+  nextBtn_1to2.addEventListener("click", () => { pgAtoB(1,2) });
+  nextBtn_2to3.addEventListener("click", () => { pgAtoB(2,3) });
+  nextBtn_3to4.addEventListener("click", () => { pgAtoB(3,4) });
+  nextBtn_4to5.addEventListener("click", () => { pgAtoB(4,5) });
 
-  prevBtn_2to1.addEventListener("click", () => {pgAtoB(2,1)});
-  prevBtn_3to2.addEventListener("click", () => {pgAtoB(3,2)});
-  prevBtn_4to3.addEventListener("click", () => {pgAtoB(4,3)});
-  prevBtn_5to4.addEventListener("click", () => {pgAtoB(5,4)});
+  prevBtn_2to1.addEventListener("click", () => { pgAtoB(2,1) });
+  prevBtn_3to2.addEventListener("click", () => { pgAtoB(3,2) });
+  prevBtn_4to3.addEventListener("click", () => { pgAtoB(4,3) });
+  prevBtn_5to4.addEventListener("click", () => { pgAtoB(5,4) });
 }
 
 let homeToggle = false;
 let machineToggle = false;
 let saveToggle = false;
-let secondbar = document.getElementById('secondbar');
 
 function closeMenu() {
   if (homeToggle || machineToggle || saveToggle) {
-    secondbar.style.transform = "translate(-240px)";
+    secondbar.classList.remove('open');
     homeToggle = false;
     machineToggle = false;
     saveToggle = false;
@@ -118,6 +127,7 @@ function clearMenu() {
     x[i].hidden = true;
   }
   document.querySelector('.active')?.classList.remove('active');
+  secondbar.classList.remove('open');
 }
 
 /**
@@ -129,7 +139,7 @@ function toggleMenu(classname) {
   // if closed, open the appropriate menu, or close if clicked on the same icon
   if (classname === 'home' && !homeToggle) {
     window.requestAnimationFrame(function(){
-      secondbar.style.transform = "translate(0vw)"; 
+      secondbar.classList.add('open'); 
     });
     document.getElementById('secondbar').hidden = false;
     var x = document.getElementsByClassName(classname);
@@ -143,7 +153,7 @@ function toggleMenu(classname) {
   }
   else if (classname === 'settings' && !machineToggle) {
     window.requestAnimationFrame(function(){
-      secondbar.style.transform = "translate(0vw)"; 
+      secondbar.classList.add('open'); 
     });
     document.getElementById('secondbar').hidden = false;
     var i;
@@ -158,7 +168,7 @@ function toggleMenu(classname) {
   }
   else if (classname === 'save' && !saveToggle) {
     window.requestAnimationFrame(function(){
-      secondbar.style.transform = "translate(0vw)"; 
+      secondbar.classList.add('open'); 
     });
     document.getElementById('secondbar').hidden = false;
     var i;
@@ -185,15 +195,15 @@ function expandIcon(nameOfClass){
   switch(nameOfClass){
     case 'home':
       headerName = 'Home';
-      currIcon = document.getElementById("homeIcon");
+      currIcon = document.getElementById('home-icon');
       break;
     case 'settings':
-      headerName = 'Machines';
-      currIcon = document.getElementById('machineIcon');
+      headerName = 'Machine';
+      currIcon = document.getElementById('machine-icon');
       break;
     case 'save':
       headerName = 'Save';
-      currIcon = document.getElementById('saveIcon');
+      currIcon = document.getElementById('save-icon');
       break;
     case 'bug':
       headerName = 'Bug';
@@ -261,7 +271,8 @@ export function add_input_bar() {
 
   // create a new textarea box
   const new_textarea = document.createElement('textarea');
-  new_textarea.classList.add("machineInput");
+  new_textarea.classList.add('text-input');
+  new_textarea.placeholder = "Enter input";
   // create a new run button under the original one
   const new_run_button = document.createElement('button');
   new_run_button.classList.add('run_btn');
@@ -285,3 +296,4 @@ export function add_input_bar() {
   // append the new button to the body
   machine_inputs.appendChild(new_machine_input);
 }
+

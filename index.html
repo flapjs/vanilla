@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<link rel="stylesheet" href="styles/index.css">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,34 +10,38 @@
   <link rel="icon" type="image/png" href="assets/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="assets/favicon-16x16.png" sizes="16x16">
   <link rel="manifest" href="assets/site.webmanifest">
+  <link rel="stylesheet" href="styles/index.css">
   <meta name="theme-color" content="#ffffff">
 
   <script src="scripts/index.js" type="module"></script>
 </head>
 <body>
+  <div id="menu-container">
+    <img src="assets/menu.svg" alt="menu icon" class="menu-icon"/>
+  </div>
 
   <!-- Side navigation -->
-  <div class="sidenav">
+  <div class="nav" id="nav">
     <ul>
-      <li class="sidenavBtn", id="homeIcon">
-        <img src="assets/home.svg" alt="home icon"/>
-        <span class="tooltiptext">Home</span>
+      <li class="nav-btn", id="home-icon">
+        <img src="assets/home.svg" alt="home icon" class="icon"/>
+        <span class="nav-label">Home</span>
       </li>
-      <li class="sidenavBtn" id="machineIcon">
-        <img src="assets/machine.svg" alt="machine icon"/>
-        <span class="tooltiptext">Machine</span>
+      <li class="nav-btn" id="machine-icon">
+        <img src="assets/machine.svg" alt="machine icon" class="icon"/>
+        <span class="nav-label">Machine</span>
       </li>
-      <li class="sidenavBtn" id="saveIcon">
-        <img src="assets/save.svg" alt="save icon"/>
-        <span class="tooltiptext">Save</span>
+      <li class="nav-btn" id="save-icon">
+        <img src="assets/save.svg" alt="save icon" class="icon"/>
+        <span class="nav-label">Save</span>
       </li>
-      <li class="sidenavBtn" id="bugIcon">
-        <img src="assets/bug.svg" alt="bug icon"/>
-        <span class="tooltiptext">Report A Bug</span>
+      <li class="nav-btn" id="bug-icon">
+        <img src="assets/bug.svg" alt="bug icon" class="icon"/>
+        <span class="nav-label">Report</span>
       </li>
-      <li class="sidenavBtn" id="helpIcon">
-        <img src="assets/help.svg" alt="help icon"/>
-        <span class="tooltiptext">Help</span> 
+      <li class="nav-btn" id="help-icon">
+        <img src="assets/help.svg" alt="help icon" class="icon"/>
+        <span class="nav-label">Help</span> 
       </li>
     </ul>
   </div>
@@ -49,29 +52,26 @@
         <h1>Header</h1>
       </div>
       <div id="secondBarHeaderBtn">
-        <button id="closeButton">
-          <img src="assets/close.svg" alt="close icon"/>
+        <button id="close-button">
+          <img src="assets/close.svg" alt="close icon" class="close-icon"/>
         </button>
       </div>
     </div>
-    <div class = "dropdown home">
-      <div class = machine_inputs>
-      </div>
-      <button class="plus_btn pmbtn" id="plus_button">+</button>
-      <button class="minus_btn pmbtn" id="minus_button">-</button>
-      <h3>
-        Key: 
-      </h3>
-      <p>
-        R - Run Input on Machine
-      </p><p>
-        S - Step Input on Machine
-      </p><p>
-        X - Reset Step Function
-      </p>
+    <div class="dropdown home">
+      <div class=machine_inputs></div>
+      <button class="plus_btn pmbtn" id="plus_button">
+        <img src="assets/plus.svg" class="icon machine-btn">
+      </button>
+      <button class="minus_btn pmbtn" id="minus_button">
+        <img src="assets/minus.svg" class="icon machine-btn">
+      </button>
+      <h3>Key: </h3>
+      <p>R - Run Input on Machine</p>
+      <p>S - Step Input on Machine</p>
+      <p>X - Reset Step Function</p>
     </div>
-    <div class = "dropdown settings">
-      <button class="NFA_specific" id="NFA_to_DFA" >NFA to DFA</button>
+    <div class="dropdown settings">
+      <button class="NFA_specific" id="NFA_to_DFA">NFA to DFA</button>
       <select id="select_machine">
         <option value="NFA">Finite Automata</option>
         <option value="PDA">Pushdown Automata</option>
@@ -86,65 +86,64 @@
   </section>
 
   <!-- Tutorial Popup -->
-  <div id ="overlay">
+  <div id="overlay">
     <div class="popup">
       <div class="popup-content">
         <div id="popup-close-div">
           <button id="tutorial_close_btn">
-            <img src="assets/close.svg" alt="close icon"/>
+            <img src="assets/close.svg" alt="close icon" class="icon"/>
           </button>
         </div>
-        <div class = "popup-pages">
-          <div class = "popup-content-pg1" id = 'pg1'>
+        <div class="popup-pages">
+          <div class="popup-content-pg1" id='pg1'>
             <h2>The Basics</h2>
-              <div>Double click to create vertices, additional double clicks to toggle final</div>
-              <div>Right click on vertices (or ctrl) drag to create edges</div>
-              <div>Right click on vertices or edge texts to inspect</div>
-              <div>Left click drag on vertices or edge texts to drag</div>
-              <div>Left click drag on empty space to pan, use scroll wheel to zoom</div>
-              <div>"ctrl+z" to undo, "ctrl+shift+z" to redo (please use "ctrl" instead of "cmd" on Mac)</div>
-              <div>"dd" to delete (quickly press 'd' two times)</div>
-            <img src = "tutorial_GIFs/basics.gif" style = "width:20vw;height:15vw;position:relative;">
+            <div>Double click to create vertices, additional double clicks to toggle final</div>
+            <div>Right click on vertices (or ctrl) drag to create edges</div>
+            <div>Right click on vertices or edge texts to inspect</div>
+            <div>Left click drag on vertices or edge texts to drag</div>
+            <div>Left click drag on empty space to pan, use scroll wheel to zoom</div>
+            <div>"ctrl+z" to undo, "ctrl+shift+z" to redo (please use "ctrl" instead of "cmd" on Mac)</div>
+            <div>"dd" to delete (quickly press 'd' two times)</div>
+            <img src="tutorial_GIFs/basics.gif" style = "width:20vw;height:15vw;position:relative;">
             <p></p> 
-            <button class ='next-btn' id="nextBtn_1to2">Next >></button>
+            <button class='next-btn' id="nextBtn_1to2">Next >></button>
         </div>
-        <div class = "popup-content-pg2" id = 'pg2'>
+        <div class="popup-content-pg2" id='pg2'>
             <h2>Running Input</h2>
             <p>Enter the input string and press run.</p>
-            <img src = "tutorial_GIFs/run_input.gif">  
+            <img src="tutorial_GIFs/run_input.gif">  
             <p></p> 
-            <button class ='prev-btn' id="prevBtn_2to1">&lt;&lt; Prev</button>
-            <button class ='next-btn' id="nextBtn_2to3">Next>></button>
+            <button class='prev-btn' id="prevBtn_2to1">&lt;&lt; Prev</button>
+            <button class='next-btn' id="nextBtn_2to3">Next>></button>
         </div>
-        <div class = "popup-content-pg3" id = 'pg3'>
+        <div class="popup-content-pg3" id='pg3'>
             <h2>Stepping Through Input</h2>
             <p>You can also step through the computation one character at a time.</p> 
-            <img src = "tutorial_GIFs/step_through.gif">
+            <img src="tutorial_GIFs/step_through.gif">
             <p></p> 
-            <button class ='prev-btn' id="prevBtn_3to2">&lt;&lt; Prev</button>
-            <button class ='next-btn' id="nextBtn_3to4">Next>></button>
+            <button class='prev-btn' id="prevBtn_3to2">&lt;&lt; Prev</button>
+            <button class='next-btn' id="nextBtn_3to4">Next>></button>
         </div>
-        <div class = "popup-content-pg4" id = 'pg4'>
+        <div class="popup-content-pg4" id='pg4'>
           <h2>Download PNG</h2>
           <p>After you finish drawing your automaton, you can download a PNG of the drawing by clicking "Save as png" on the toolbar.</p> 
           <img src = "tutorial_GIFs/save_img.gif"> 
           <p></p> 
-          <button class ='prev-btn' id="prevBtn_4to3">&lt;&lt; Prev</button>
-          <button class ='next-btn' id="nextBtn_4to5">Next>></button>
+          <button class='prev-btn' id="prevBtn_4to3">&lt;&lt; Prev</button>
+          <button class='next-btn' id="nextBtn_4to5">Next>></button>
       </div>
-        <div class = "popup-content-pg5" id = 'pg5'>
+        <div class="popup-content-pg5" id='pg5'>
           <h2>Permalink</h2>
           <p>This feature enables sharing machine drawings. Permalink stands for permanent link, meaning once you have created a link to share with your others, that link can uniquely decode back to a machine.</p>  
           <img src = "tutorial_GIFs/permalink.gif">
-          <p></p> 
-          <button class ='prev-btn' id="prevBtn_5to4">&lt;&lt; Prev</button>
-          <button class ='next-btn' id="tutorial_finish_btn">Finish</button>
+          <button class='prev-btn' id="prevBtn_5to4">&lt;&lt; Prev</button>
+          <button class='next-btn' id="tutorial_finish_btn">Finish</button>
         </div>
         </div>
       </div>
     </div>
   </div>
-
+  
   <!-- the big canvas that we draw on -->
   <canvas id='machine_drawing'>Your browser does not support canvas</canvas>
 </body>
