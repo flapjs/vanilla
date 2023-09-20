@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const RandExp = require('randexp');
@@ -7,7 +11,7 @@ import * as compute from '../scripts/compute.js';
 
 const regex_graph_pairs = [
   ['^(c?a*d|bb*c?)*$', 'NFAq0:393:194:40:3;q1:393:665:40:0;q2:395:439:40:2;0:2:b%CE%B5%CE%B5R:5:-10:-1:-30~0:0:d%CE%B5%CE%B5R:5:10:23:7~0:1:a%CE%B5%CE%B5R:5:-34:-18:-26~0:1:c%CE%B5%CE%B5R:5:-54:-7:-24~1:1:a%CE%B5%CE%B5R:2:12:20:4~1:0:d%CE%B5%CE%B5R:5:-44:24:12~2:0:c%CE%B5%CE%B5R:5:-12:30:0~2:0:d%CE%B5%CE%B5R:5:0:-31:0~2:1:a%CE%B5%CE%B5R:5:0:-2:-24~2:2:b%CE%B5%CE%B5R:3:15:23:6~'],
-  
+
   ['^(a|b)+(q?(c|d)+)*@(w?(e|f)+)*$', 'NFAq0:669:162:40:1;q1:665:368:40:0;q2:809:494:40:0;q3:651:880:40:2;q4:721:730:40:0;q5:653:1060:40:0;0:1:a%CE%B5%CE%B5R:5:11:-1:-28~0:1:b%CE%B5%CE%B5R:5:0:4:7~1:1:a%CE%B5%CE%B5R:5:10:24:9~1:1:b%CE%B5%CE%B5R:5:-10:-22:-9~1:4:c%CE%B5%CE%B5R:5:-11:0:-20~1:4:d%CE%B5%CE%B5R:5:0:1:-5~1:2:q%CE%B5%CE%B5R:5:0:7:-20~1:3:@%CE%B5%CE%B5R:5:-21:-4:-22~2:4:c%CE%B5%CE%B5R:5:10:-5:24~2:4:d%CE%B5%CE%B5R:4:-9:-2:8~3:3:e%CE%B5%CE%B5R:5:10:24:6~3:3:f%CE%B5%CE%B5R:5:-10:-23:-10~3:5:w%CE%B5%CE%B5R:5:-15:-2:-11~4:2:q%CE%B5%CE%B5R:6:-33:18:6~4:4:c%CE%B5%CE%B5R:5:-10:-24:-11~4:4:d%CE%B5%CE%B5R:0:13:19:3~4:3:@%CE%B5%CE%B5R:5:0:-4:20~5:3:e%CE%B5%CE%B5R:5:-12:29:18~5:3:f%CE%B5%CE%B5R:5:0:30:9~']
 ];
 
@@ -52,6 +56,6 @@ function validate(regex_str, graph_str, num_strs=100, len_const=10) {
 
 regex_graph_pairs.forEach(([regex, graph], idx) => {
   test(`NFA test ${idx}`, () => {
-    validate(regex, graph);
+    validate(regex, graph); // TODO: can't run deserialized NFA's
   });
 });

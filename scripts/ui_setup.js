@@ -132,7 +132,7 @@ function toggleMenu(classname) {
     window.requestAnimationFrame(function(){
       secondbar.style.transform = "translate(0vw)"; 
     });
-    document.getElementById('secondbar').hidden = false;
+    // document.getElementById('secondbar').hidden = false;
     var x = document.getElementsByClassName(classname);
     for (var i = 0; i < x.length; i++) {
       x[i].hidden = false;
@@ -146,7 +146,7 @@ function toggleMenu(classname) {
     window.requestAnimationFrame(function(){
       secondbar.style.transform = "translate(0vw)"; 
     });
-    document.getElementById('secondbar').hidden = false;
+    // document.getElementById('secondbar').hidden = false;
     var i;
     var x = document.getElementsByClassName(classname);
     for (i = 0; i < x.length; i++) {
@@ -161,7 +161,7 @@ function toggleMenu(classname) {
     window.requestAnimationFrame(function(){
       secondbar.style.transform = "translate(0vw)"; 
     });
-    document.getElementById('secondbar').hidden = false;
+    // document.getElementById('secondbar').hidden = false;
     var i;
     var x = document.getElementsByClassName(classname);
     for (i = 0; i < x.length; i++) {

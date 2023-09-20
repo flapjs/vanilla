@@ -52,7 +52,7 @@ function drag_scene(e) {
 
 /**
  * builds a drag vertex callback function
- * @param {string} v - name of the vertex to be dragged 
+ * @param {string} v - name of the vertex to be dragged
  * @returns {function} a callback function to handle dragging a vertex
  */
 function higher_order_drag_vertex(v) {
@@ -169,7 +169,7 @@ function bind_drag() {
         canvas.addEventListener('mousemove', drag_vertex);
       } else {  // left drag scene
         canvas.addEventListener('mousemove', drag_scene);
-      } 
+      }
     }
   });
   canvas.addEventListener('mouseup', e => {
@@ -231,8 +231,12 @@ export function bind_run_input() {
     new_input.style.backgroundColor = consts.SECOND_BAR_COLOR;
     computations[new_input_idx] = compute.run_input(graph, menus.machine_type(), textbox.value);  // noninteractive
     // eslint-disable-next-line no-unused-vars
-    const { value: accepted, _ } = computations[new_input_idx].next();  // second value always true when noninteractive
-    new_input.style.backgroundColor = accepted ? consts.ACCEPT_COLOR : consts.REJECT_COLOR;
+    const { value: output, _ } = computations[new_input_idx].next();  // second value always true when noninteractive
+    if(menus.machine_type() === consts.MACHINE_TYPES.Moore || menus.machine_type() === consts.MACHINE_TYPES.Mealy) {
+      window.setTimeout(() => alert(output), 0);  // alert after the color change
+    } else {
+      new_input.style.backgroundColor = output ? consts.ACCEPT_COLOR : consts.REJECT_COLOR;
+    }
     computations[new_input_idx] = undefined;
   });
     
@@ -243,9 +247,13 @@ export function bind_run_input() {
       // last param true for interactive computation
       computations[new_input_idx] = compute.run_input(graph, menus.machine_type(), textbox.value, true);
     }
-    const { value: accepted, done } = computations[new_input_idx].next();
+    const { value: output, done } = computations[new_input_idx].next();
     if (done) {
-      new_input.style.backgroundColor = accepted ? consts.ACCEPT_COLOR : consts.REJECT_COLOR;
+      if(menus.machine_type() === consts.MACHINE_TYPES.Moore || menus.machine_type() === consts.MACHINE_TYPES.Mealy) {
+        window.setTimeout(() => alert(output), 0);  // alert after the color change
+      } else {
+        new_input.style.backgroundColor = output ? consts.ACCEPT_COLOR : consts.REJECT_COLOR;
+      }
       computations[new_input_idx] = undefined;
     }
   });

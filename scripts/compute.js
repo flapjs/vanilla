@@ -4,19 +4,22 @@ import * as consts from './consts.js';
 import * as drawing from './drawing.js';
 import { edge_equal } from './graph_components.js';
 
-/**
- * finds all letters used in the transitions
- * @param {Object} graph - the graph whose alphebet is to be computed
- * @returns {Set<string>} a set of letters used in the transitions
- */
-export function compute_alphabet(graph) {
+/** given a graph and its input, compute the input alphabet */
+export function compute_alphabet(graph, input) {
   const alphabet = new Set();
-  for (const vertex of Object.values(graph)) {
-    for (const edge of vertex.out) {
-      alphabet.add(edge.transition);
+  for(const vertex of Object.values(graph)) {
+    for(const e of vertex.out) {
+      alphabet.add(e.transition);
     }
   }
-  alphabet.delete(consts.EMPTY_SYMBOL);  // exclude epsilon
+
+  if(input) {
+    for(let i = 0; i < input.length; i++) {
+      alphabet.add(input.charAt(i));
+    }
+  }
+
+  alphabet.delete(consts.EMPTY_SYMBOL);
   return alphabet;
 }
 
@@ -83,6 +86,39 @@ export function NFA_step(graph, cur_states, symbol) {
     }
   }
   return closure(graph, new_states);
+}
+
+/**
+ * a single step of the NFA running algorithm
+ * @param {Object} graph - the Mealy machine of interest
+ * @param {string} cur_state - current state of the machine
+ * @param {string} symbol - the transition symbol
+ * @returns {Object} the output of the transition and the next state
+ */
+export function mealy_step(graph, cur_state, symbol) {
+  let next_state;
+  let output;
+
+  for (const edge of graph[cur_state].out) {
+    if(edge.transition === symbol) {
+      next_state = edge.to;
+      output = edge.mealy_output;
+    }
+  }
+
+  return { next_state, output };
+}
+
+export function moore_step(graph, cur_state, symbol) {
+  let next_state;
+
+  for (const edge of graph[cur_state].out) {
+    if(edge.transition === symbol) {
+      next_state = edge.to;
+    }
+  }
+  
+  return next_state;
 }
 
 /**
@@ -289,6 +325,68 @@ function* run_input_Turing(graph, input, interactive=false, allowed_steps=512) {
 }
 
 /**
+ * check if the input is accepted
+ * @param {Object} graph - machine graph
+ * @param {string} input - input string
+ * @param {boolean} interactive - whether to show the computation step by step
+ * @returns {Iterable} a generator that evaluates to the final output of the machine
+ */
+function* run_input_Mealy(graph, input, interactive) {
+  let cur_state = find_start(graph);  // find closure of start
+  let output_string = '';
+
+  if (interactive) {
+    drawing.highlight_states(graph, [cur_state]);
+    drawing.viz_NFA_input(input, 0);
+    yield;
+  }
+  for (let i = 0; i < input.length; ++i) {
+    let mealy_output = mealy_step(graph, cur_state, input.charAt(i));
+    cur_state = mealy_output.next_state;
+    output_string += mealy_output.output;
+    
+    if (interactive) {
+      drawing.highlight_states(graph, [cur_state]);
+      drawing.viz_NFA_input(input, i+1);
+      if (i === input.length-1) {  // last step
+        break;
+      } else {
+        yield;
+      }
+    }
+  }
+
+  return output_string;
+}
+
+function* run_input_Moore(graph, input, interactive) {
+  let cur_state = find_start(graph);
+  let output_string = graph[cur_state].moore_output;
+
+  if (interactive) {
+    drawing.highlight_states(graph, [cur_state]);
+    drawing.viz_NFA_input(input, 0);
+    yield;
+  }
+  for (let i = 0; i < input.length; ++i) {
+    cur_state = moore_step(graph, cur_state, input.charAt(i));
+    output_string += graph[cur_state].moore_output;
+    
+    if (interactive) {
+      drawing.highlight_states(graph, [cur_state]);
+      drawing.viz_NFA_input(input, i+1);
+      if (i === input.length-1) {  // last step
+        break;
+      } else {
+        yield;
+      }
+    }
+  }
+
+  return output_string;
+}
+
+/**
  * determines whether the machine is PDA or normal NFA and checks if the input is accepted
  * @param {Object} graph - machine graph
  * @param {string} machine_type - type of machine the graph represents
@@ -311,12 +409,52 @@ export function run_input(graph, machine_type, input, interactive=false) {
     return run_input_PDA(graph, input, interactive);
   } else if (machine_type === consts.MACHINE_TYPES.Turing) {
     return run_input_Turing(graph, input, interactive);
+  } else if (machine_type === consts.MACHINE_TYPES.Mealy && is_DFA(graph, input)) {
+    return run_input_Mealy(graph, input, interactive);
+  } else if (machine_type === consts.MACHINE_TYPES.Moore && is_DFA(graph, input)) {
+    return run_input_Moore(graph, input, interactive);
   }
 }
 
 /** given an NFA, check if it is in fact deterministic */
-export function is_DFA(NFA) {
+export function is_DFA(NFA, input) {
+  const alphabet = compute_alphabet(NFA, input);
 
+  for(const vertex of Object.values(NFA)) {
+    const outgoing = [];
+    for(const e of vertex.out) {
+      outgoing.push(e.transition);
+    }
+
+    if(outgoing.includes(consts.EMPTY_SYMBOL)) {
+      return false;
+    }
+
+    if(outgoing.length < alphabet.size) {
+      let missing_transitions = '';
+      let alpha_array = Array.from(alphabet);
+      for(let i = 0; i < alpha_array.length; i++) {
+        if(!outgoing.includes(alpha_array[i])) {
+          missing_transitions += alpha_array[i] + ', ';
+        }
+      }
+
+      alert("Missing transitions " + missing_transitions.substring(0, missing_transitions.length - 2) + " for " + vertex.name);
+      return false;
+    } else if(outgoing.length > alphabet.size) {
+      let extra_transitions = '';
+      for(let i = 0; i < outgoing; i++) {
+        if(!alphabet.has(outgoing[i])) {
+          extra_transitions += outgoing[i] + ', ';
+        }
+      }
+
+      alert("Extra transitions " + extra_transitions.substring(0, extra_transitions.length - 2) + " for " + vertex.name);
+      return false;
+    }
+  }
+
+  return true;
 }
 
 /**

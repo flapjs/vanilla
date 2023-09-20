@@ -44,6 +44,18 @@ function bind_elongate_textbox(container) {
   }
 }
 
+export function is_Mealy() {
+  return machine_type() === consts.MACHINE_TYPES.Mealy;
+}
+
+/**
+ * reports the type of machine the user is working on
+ * @returns {boolean} true or false 
+ */
+export function is_Moore() {
+  return machine_type() === consts.MACHINE_TYPES.Moore;
+}
+
 /**
  * creates the context menu to change a vertex and display it
  * @param {Object} graph - the graph containing the vertex v
@@ -68,6 +80,13 @@ export function display_vertex_menu(graph, v, x, y) {
   rename.type = 'text';
   rename.value = v;  // prepopulate vertex name
   rename_div.appendChild(rename);
+  let moore_output;
+  if (is_Moore()) {
+    moore_output = document.createElement('input');
+    moore_output.type = 'text';
+    moore_output.value = graph[v].moore_output;
+    rename_div.appendChild(moore_output);
+  }
   const start_btn = document.createElement('button');
   start_btn.innerText = 'make start';
   start_btn.className = 'start';
@@ -81,7 +100,11 @@ export function display_vertex_menu(graph, v, x, y) {
   container.style = `left:${x}px; top:${y}px`;
   container.addEventListener('keyup', e => {
     if (e.key === 'Enter') {
-      graph_ops.rename_vertex(graph, v, rename.value);
+      if (is_Moore()) {
+        graph_ops.rename_vertex(graph, v, rename.value, moore_output.value);
+      } else {
+        graph_ops.rename_vertex(graph, v, rename.value);
+      }
     }
   });
   document.querySelector('body').appendChild(container);
@@ -120,6 +143,9 @@ export function display_edge_menu(graph, edge, x, y) {
   left_right_choice.type = 'checkbox';
   left_right_choice.className = 'L_R_toggle';
   left_right_choice.checked = edge.move === consts.LEFT;
+  const m_output = document.createElement('input');
+  m_output.type = 'text';
+  m_output.value = edge.mealy_output;
   rename_div.appendChild(transition);
   if (is_PDA()) {
     rename_div.appendChild(pop);
@@ -127,13 +153,15 @@ export function display_edge_menu(graph, edge, x, y) {
   } else if (is_Turing()) {
     rename_div.appendChild(push);
     rename_div.appendChild(left_right_choice);
+  } else if (is_Mealy()) {
+    rename_div.appendChild(m_output);
   }
   container.style = `left:${x}px; top:${y}px`;
   container.addEventListener('keyup', e => {
     if (e.key === 'Enter') {
       graph_ops.rename_edge(graph, edge,
         transition.value, pop.value, push.value,
-        left_right_choice.checked ? consts.LEFT : consts.RIGHT);
+        left_right_choice.checked ? consts.LEFT : consts.RIGHT, m_output.value);
     }
   });
   document.querySelector('body').appendChild(container);
