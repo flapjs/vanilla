@@ -46,17 +46,12 @@ export function htmlSetUp(){
   const nav = document.getElementById('nav');
   let secondbar = document.getElementById('secondbar');
 
-  secondbar.addEventListener('', () => {
-    if (secondbar.classList.contains('open')) {
-      nav.classList.add('open');
-    }
-  })
-
+  // If both nav and secondbar are open, close them when clicking on menu icon
   menu.addEventListener('click', () => {
-    if (nav.classList.contains('open') && secondbar.classList.contains('open')) {
+    if (!nav.classList.contains('close') && secondbar.classList.contains('open')) {
       closeMenu();
     }
-    nav.classList.toggle('open');
+    nav.classList.toggle('close');
   });
 
   // Check if the user is a first-time visitor

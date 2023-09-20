@@ -328,12 +328,12 @@ select {
   .nav {
     width: 4.5rem;
     padding-top: 4.5rem;
-    transform: translateX(-4.5rem);
+    transform: translateX(0);
     transition: all .35s;
   }
 
-  .nav.open {
-    transform: translateX(0);
+  .nav.close {
+    transform: translateX(-4.5rem);
   }
 
   .nav li {
