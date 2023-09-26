@@ -69,6 +69,13 @@ ul {
 /***** End Graph Context Menu *****/
 
 /***** The Sidebar of Icons *****/
+/* Hamburger Menu */
+.menu-check, .menu-icon {
+  display: none;
+  visibility: none;
+}
+
+/* Entire Navbar */
 .nav {
   height: 100vh; /* Full-height: remove this if you want "auto" height */
   width: 5rem;
@@ -97,7 +104,7 @@ ul {
 }
 
 .nav li:hover, .active {
-  background-color: #3a468f;
+  background-color: #263275;
   transition-duration: 0.4s;
   cursor: pointer;
 }
@@ -120,15 +127,9 @@ ul {
   filter: invert(1) sepia(1) saturate(10%) hue-rotate(10deg) brightness(1) contrast(.5);
   transition: all .3s;
 }
+
 .nav li:hover > .icon {
   filter: invert(1) sepia(1) saturate(10%) hue-rotate(1deg);
-}
-
-.nav li:hover, .active {
-  background-color: #263275;
-  transition-duration: 0.4s;
-  cursor: pointer;
-  color: #f2f0f0;
 }
 
 .nav li:hover > .nav-label {
@@ -142,12 +143,15 @@ ul {
   height: 100%; /* Full-height: remove this if you want "auto" height */
   width: 15rem; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-  z-index: 0; /* Stay on top */
   background: rgb(39, 52, 92);
   padding-top: 20px;
   margin-left: 5rem; /* using margin to clear the sidebar */
   transition: all .5s;
-  transform: translate(0vw);
+  transform: translate(-20rem);
+}
+
+#secondbar.open {
+  transform: translate(0rem);
 }
 
 #secondbar > * {
@@ -168,8 +172,8 @@ ul {
 }
 
 #secondBarHeaderBtn > #closeButton{
-  padding: 7px 7px 3px 7px;  /* the image is not quite centered hence lower margin at the bottom */
-  margin: 8px 16px 8px 8px;  /* extra space on the right */
+  padding: 3px;  /* the image is not quite centered hence lower margin at the bottom */
+  margin: 8px;  /* extra space on the right */
 }
 
 #secondbar button {
@@ -203,6 +207,11 @@ ul {
   padding: 4px;
   margin: 4px;
   resize: none;
+  background-color: rgb(31, 42, 79);
+}
+
+::placeholder {
+  color:#c7c2c2;
 }
 
 #secondbar select {
@@ -239,7 +248,7 @@ ul {
 }
 /***** End The Second Sidebar That Rolls Out *****/
 
-/***** Styling for the pop-up *****/
+/***** Tutorial Popup *****/
 /* Darken background window when popup is open */
 #overlay {
   position: fixed;
@@ -252,6 +261,19 @@ ul {
   display: none; /* Initially hidden */
 }
 
+/* Darken background window when popup is open */
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(30, 30, 30, 0.5); /* Adjust the last value (alpha) to control darkness */
+  z-index: 9998;
+  display: none; /* Initially hidden */
+}
+
+/* Tutorial Pop-up Container*/
 .popup {
   display: none;
   position: fixed;
@@ -267,37 +289,38 @@ ul {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 50vw;
+  width: 50%;
   padding: 20px;
-  background-color: #273b7d;
-  color: #f2f0f0;
+  background-color: rgb(27, 38, 74);
+  color: #c7c2c2;
   text-align: center;
   border-radius: 7px;
 }
 
-.popup-content button{
+.popup-content button {
   position: relative;
-  border-radius: 1vw;
-  padding: 0.5vw;
-  border: 0,5vw;
-  border-color: rgb(4, 4, 4);
+  border-radius: 5px;
+  padding: 5px;
   margin: 3px;
-  background-color: #273b7d;
-  color:#ccc
+  background-color: rgb(27, 38, 74);
+  color:#c7c2c2;
 }
 
 .popup-content button:hover {
   color: #f2f0f0;
-  background-color: #4e5aa3;
+  background-color: #3d4684;
   transition-duration: 0.4s;
 }
 
+.popup-header {
+  font-size: 16px;
+}
 #popup-close-div {
   display: flex;
   justify-content: right;
 }
 
-.popup-content #tutorial_close_btn{
+.popup-content #tutorial_close_btn {
   padding-bottom: 0px;  /* hack to fix image blank space at the bottom */
 }
 /***** End Styling for the pop-up *****/

@@ -42,17 +42,27 @@ function closePopup() {
 
 /** moved basic set up from index.html and combined into one function */
 export function htmlSetUp(){
-  // first time pop up implementation
+  // Add toggle functionality to hamburger menu
+  const menu = document.getElementById('menu-container');
+  const nav = document.getElementById('nav');
+  let secondbar = document.getElementById('secondbar');
+
+  // If both nav and secondbar are open, close them when clicking on menu icon
+  menu.addEventListener('click', () => {
+    if (!nav.classList.contains('close') && secondbar.classList.contains('open')) {
+      closeMenu();
+    }
+    nav.classList.toggle('close');
+  });
+
   // Check if the user is a first-time visitor
   if (!localStorage.getItem('visitedBefore')) {
-  // User is a first-time visitor
-  openPopup();
-
-  // Set flag to indicate the user has visited before
-  localStorage.setItem('visitedBefore', true);
+    openPopup();
+    // Set flag to indicate the user has visited before
+    localStorage.setItem('visitedBefore', true);
   } 
 
-  const closeButton = document.getElementById('closeButton');
+  const closeButton = document.getElementById('close-button');
   closeButton.addEventListener('click', () => {
     closeMenu();
   })
@@ -65,16 +75,16 @@ export function htmlSetUp(){
   const tutorial_close_btn = document.getElementById('tutorial_close_btn');
   const tutorial_finish_btn = document.getElementById('tutorial_finish_btn');
 
-  homeIcon.addEventListener("click", () => {expandIcon('home')});
-  machineIcon.addEventListener("click", () => {expandIcon('settings')});
-  saveIcon.addEventListener("click", () => {expandIcon('save')});
-  bugIcon.addEventListener("click", () => {redirectToBugReport()});
+  homeIcon.addEventListener("click", () => { expandIcon('home') });
+  machineIcon.addEventListener("click", () => { expandIcon('settings') });
+  saveIcon.addEventListener("click", () => { expandIcon('save') });
+  bugIcon.addEventListener("click", () => { redirectToBugReport() });
   helpIcon.addEventListener("click", () => {
     openPopup();
     closeMenu();
   }); 
-  tutorial_close_btn.addEventListener("click",() => {closePopup();})
-  tutorial_finish_btn.addEventListener("click",() => {closePopup();})
+  tutorial_close_btn.addEventListener("click",() => { closePopup() });
+  tutorial_finish_btn.addEventListener("click",() => { closePopup() });
 
   const nextBtn_1to2 = document.getElementById('nextBtn_1to2');
   const nextBtn_2to3 = document.getElementById('nextBtn_2to3');
@@ -86,25 +96,24 @@ export function htmlSetUp(){
   const prevBtn_4to3 = document.getElementById('prevBtn_4to3');
   const prevBtn_5to4 = document.getElementById('prevBtn_5to4');
 
-  nextBtn_1to2.addEventListener("click", () => {pgAtoB(1,2)});
-  nextBtn_2to3.addEventListener("click", () => {pgAtoB(2,3)});
-  nextBtn_3to4.addEventListener("click", () => {pgAtoB(3,4)});
-  nextBtn_4to5.addEventListener("click", () => {pgAtoB(4,5)});
+  nextBtn_1to2.addEventListener("click", () => { pgAtoB(1,2) });
+  nextBtn_2to3.addEventListener("click", () => { pgAtoB(2,3) });
+  nextBtn_3to4.addEventListener("click", () => { pgAtoB(3,4) });
+  nextBtn_4to5.addEventListener("click", () => { pgAtoB(4,5) });
 
-  prevBtn_2to1.addEventListener("click", () => {pgAtoB(2,1)});
-  prevBtn_3to2.addEventListener("click", () => {pgAtoB(3,2)});
-  prevBtn_4to3.addEventListener("click", () => {pgAtoB(4,3)});
-  prevBtn_5to4.addEventListener("click", () => {pgAtoB(5,4)});
+  prevBtn_2to1.addEventListener("click", () => { pgAtoB(2,1) });
+  prevBtn_3to2.addEventListener("click", () => { pgAtoB(3,2) });
+  prevBtn_4to3.addEventListener("click", () => { pgAtoB(4,3) });
+  prevBtn_5to4.addEventListener("click", () => { pgAtoB(5,4) });
 }
 
 let homeToggle = false;
 let machineToggle = false;
 let saveToggle = false;
-let secondbar = document.getElementById('secondbar');
 
 function closeMenu() {
   if (homeToggle || machineToggle || saveToggle) {
-    secondbar.style.transform = "translate(-240px)";
+    secondbar.classList.remove('open');
     homeToggle = false;
     machineToggle = false;
     saveToggle = false;
@@ -119,6 +128,7 @@ function clearMenu() {
     x[i].hidden = true;
   }
   document.querySelector('.active')?.classList.remove('active');
+  secondbar.classList.remove('open');
 }
 
 /**
@@ -130,9 +140,9 @@ function toggleMenu(classname) {
   // if closed, open the appropriate menu, or close if clicked on the same icon
   if (classname === 'home' && !homeToggle) {
     window.requestAnimationFrame(function(){
-      secondbar.style.transform = "translate(0vw)"; 
+      secondbar.classList.add('open'); 
     });
-    // document.getElementById('secondbar').hidden = false;
+    document.getElementById('secondbar').hidden = false;
     var x = document.getElementsByClassName(classname);
     for (var i = 0; i < x.length; i++) {
       x[i].hidden = false;
@@ -144,9 +154,9 @@ function toggleMenu(classname) {
   }
   else if (classname === 'settings' && !machineToggle) {
     window.requestAnimationFrame(function(){
-      secondbar.style.transform = "translate(0vw)"; 
+      secondbar.classList.add('open'); 
     });
-    // document.getElementById('secondbar').hidden = false;
+    document.getElementById('secondbar').hidden = false;
     var i;
     var x = document.getElementsByClassName(classname);
     for (i = 0; i < x.length; i++) {
@@ -159,9 +169,9 @@ function toggleMenu(classname) {
   }
   else if (classname === 'save' && !saveToggle) {
     window.requestAnimationFrame(function(){
-      secondbar.style.transform = "translate(0vw)"; 
+      secondbar.classList.add('open'); 
     });
-    // document.getElementById('secondbar').hidden = false;
+    document.getElementById('secondbar').hidden = false;
     var i;
     var x = document.getElementsByClassName(classname);
     for (i = 0; i < x.length; i++) {
@@ -183,13 +193,13 @@ function expandIcon(nameOfClass){
   clearMenu();
   var headerName = 'none';
   var currIcon;
-  switch(nameOfClass){
+  switch (nameOfClass) {
     case 'home':
       headerName = 'Home';
       currIcon = document.getElementById('home-icon');
       break;
     case 'settings':
-      headerName = 'Machines';
+      headerName = 'Machine';
       currIcon = document.getElementById('machine-icon');
       break;
     case 'save':
@@ -200,13 +210,12 @@ function expandIcon(nameOfClass){
       headerName = 'Bug';
       currIcon = document.getElementById('bug-icon');
       break;
-    }
-   if (toggleMenu(nameOfClass)) {
+  }
+  if (toggleMenu(nameOfClass)) {
     const header = document.querySelector('#secondBarHeaderTitle > h1');
     header.textContent = headerName;
     currIcon.classList.add('active');
-  }
-  else {
+  } else {
     document.querySelector('.active')?.classList.remove('active');
   }
 }
@@ -263,7 +272,7 @@ export function add_input_bar() {
   // create a new input box
   const new_inputbox = document.createElement('input');
   new_inputbox.type = 'text';
-  new_inputbox.placeholder = 'enter input';
+  new_inputbox.placeholder = 'Enter input';
   new_inputbox.classList.add("machine_input_text");
   // create a new run button under the original one
   const new_run_button = document.createElement('button');
