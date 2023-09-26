@@ -261,7 +261,7 @@ export function bind_plus_minus() {
     //first, check if there is a hidden machine input
     for (let i = 0; i < machine_inputs.children.length; i++) {
       if (machine_inputs.children[i].style.display === 'none') {
-        machine_inputs.children[i].style.display = 'block';
+        machine_inputs.children[i].style.display = 'flex';
         return;
       }
     }

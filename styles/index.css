@@ -207,6 +207,7 @@ ul {
   margin: 4px;
   resize: none;
   background-color: rgb(31, 42, 79);
+  color: #c7c2c2
 }
 
 ::placeholder {
