@@ -123,6 +123,18 @@ ul {
 .nav li:hover > .icon {
   filter: invert(1) sepia(1) saturate(10%) hue-rotate(1deg);
 }
+
+.nav li:hover, .active {
+  background-color: #263275;
+  transition-duration: 0.4s;
+  cursor: pointer;
+  color: #f2f0f0;
+}
+
+.nav li:hover > .nav-label {
+  color: #f2f0f0;
+}
+
 /***** End The Sidebar of Icons *****/
 
 /***** The Second Sidebar That Rolls Out *****/
@@ -291,7 +303,51 @@ ul {
 /***** End Styling for the pop-up *****/
 
 /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
-@media screen and (max-height: 450px) {
-  .nav {padding-top: 15px;}
-  .nav a {font-size: 18px;}
+@media (max-width: 700px) { 
+  .nav {
+    width: 4.5rem;
+    padding-top: 4.5rem;
+    transform: translateX(0);
+    transition: all .35s;
+  }
+
+  .nav.close {
+    transform: translateX(-4.5rem);
+  }
+
+  .nav li {
+    padding: .9rem;
+    width: 1.8rem;
+    margin-bottom: .4rem;
+    position: relative;
+  }
+
+  #secondbar {
+    width: 13rem;
+    margin-left: 4.5rem;
+  }
+
+  #menu-container {
+    position: absolute;
+    height: 30px;
+    width: 30px;
+    z-index: 1000;
+    cursor: pointer;
+    background-color: rgb(27, 38, 74);
+    border-radius: 7px;
+    padding: .4rem 1rem .9rem .3rem;
+    top: 1rem;
+    left: .65rem;
+  }
+
+  .menu-icon {
+    visibility: visible;
+    display:block;
+    filter: invert(.6) sepia(1) saturate(1000%) hue-rotate(15deg) brightness(1) contrast(.7);
+    transition: all .3s;
+  }
+
+  #menu-container:hover > .menu-icon {
+    filter: invert(.6) sepia(1) saturate(1000%) hue-rotate(17deg) brightness(1.2) contrast(1);
+  }
 }
