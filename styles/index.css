@@ -69,60 +69,71 @@ ul {
 /***** End Graph Context Menu *****/
 
 /***** The Sidebar of Icons *****/
-.sidenav {
+.nav {
   height: 100vh; /* Full-height: remove this if you want "auto" height */
-  width: 4rem;
+  width: 5rem;
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-  z-index: 1; /* Stay on top */
+  z-index: 100; /* Stay on top */
   background-color: rgb(27, 38, 74); /* UCSD blue */
   padding-top: 1.5rem;
 }
 
-/* The navigation menu icons */
-.sidenav li {
-  padding: .4rem;
-  display: block;
-  border-radius: 7px;
-  width: 30px;
-  height: 30px;
-  margin-bottom: 20px;
-  margin-left: 9.5px;
-  position: relative;
+/* Navbar Container */
+.nav ul {
+  display: flex;
+  flex-direction: column;
+  align-items:center;
 }
 
-.sidenav li:hover, .active {
+/* The navigation menu icons */
+.nav li {
+  display: block;
+  padding: 1rem;
+  border-radius: 7px;
+  width: 2rem;
+  margin-bottom: .5rem;
+  position: relative;
+  transition: all .3s;
+}
+
+.nav li:hover, .active {
   background-color: #3a468f;
   transition-duration: 0.4s;
   cursor: pointer;
 }
 
-.tooltiptext {
-  visibility: hidden;
-  background-color:#f2f0f0;
-  padding: 7px 10px;
-  border-radius: 6px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
-  left: 65px; /* move tooltip left away from icons */
-  position: fixed; /* appears above all other elments */
-  z-index: 1;
-  transform: translate3d(0,-2px,0);
-  align-items: center;
+.nav-label {
+  display: block;
+  width:max-content;
+  font-size: 12px;
+  position: absolute; /* appears above all other elments */
+  transition: all .1s ease-in-out;
+  margin: 0 auto;
+  left: 0;
+  right: 0;
+  margin-top: -3px;
+  color: #c7c2c2;
 }
 
-.sidenav li:hover .tooltiptext {
-  visibility: visible;
+/* Navbar SVG */
+.icon {
+  filter: invert(1) sepia(1) saturate(10%) hue-rotate(10deg) brightness(1) contrast(.5);
+  transition: all .3s;
+}
+.nav li:hover > .icon {
+  filter: invert(1) sepia(1) saturate(10%) hue-rotate(1deg);
 }
 /***** End The Sidebar of Icons *****/
 
 /***** The Second Sidebar That Rolls Out *****/
 #secondbar {
   height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 240px; /* Set the width of the sidebar */
+  width: 15rem; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 0; /* Stay on top */
-  background-image:linear-gradient(to right, rgb(27, 38, 74, 1), rgb(27, 38, 74, 0.8), rgb(27, 38, 74, 0.6), rgb(27, 38, 74, 0.4)); /* background */
+  background: rgb(39, 52, 92);
   padding-top: 20px;
-  margin-left: 64px; /* using margin to clear the sidebar */
+  margin-left: 5rem; /* using margin to clear the sidebar */
   transition: all .5s;
   transform: translate(0vw);
 }
@@ -140,7 +151,7 @@ ul {
   margin: 10px;
   padding-left: 5px;
   text-align: center;
-  color: gold;
+  color: #c7c2c2;
   font-size: x-large;
 }
 
@@ -154,13 +165,13 @@ ul {
   padding: 10px 15px 10px 15px;
   align-items: center;
   font-size: 13px;
-  color:gold;
-  background-color: #3a468f;
+  color:#c7c2c2;
+  background-color: rgb(39, 52, 92);
   transition: all .5s;
 }
 
 #secondbar button:hover {
-  background-color:#4e5aa3;
+  background-color:#3d4684;
 }
 
 #secondbar .machine_inputs {
@@ -194,7 +205,7 @@ ul {
 #secondbar .home button {
   margin: 4px;
   border: #f2f0f0;
-  border-width: 2px;
+  border-width: 1px;
   border-style: solid;
   padding: 2px 5px;
 }
@@ -281,6 +292,6 @@ ul {
 
 /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {
-  .sidenav {padding-top: 15px;}
-  .sidenav a {font-size: 18px;}
+  .nav {padding-top: 15px;}
+  .nav a {font-size: 18px;}
 }

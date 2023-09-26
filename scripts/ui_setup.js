@@ -57,11 +57,11 @@ export function htmlSetUp(){
     closeMenu();
   })
 
-  const homeIcon = document.getElementById('homeIcon');
-  const machineIcon = document.getElementById('machineIcon');
-  const saveIcon = document.getElementById('saveIcon');
-  const bugIcon = document.getElementById('bugIcon');
-  const helpIcon = document.getElementById('helpIcon');
+  const homeIcon = document.getElementById('home-icon');
+  const machineIcon = document.getElementById('machine-icon');
+  const saveIcon = document.getElementById('save-icon');
+  const bugIcon = document.getElementById('bug-icon');
+  const helpIcon = document.getElementById('help-icon');
   const tutorial_close_btn = document.getElementById('tutorial_close_btn');
   const tutorial_finish_btn = document.getElementById('tutorial_finish_btn');
 
@@ -186,19 +186,19 @@ function expandIcon(nameOfClass){
   switch(nameOfClass){
     case 'home':
       headerName = 'Home';
-      currIcon = document.getElementById("homeIcon");
+      currIcon = document.getElementById('home-icon');
       break;
     case 'settings':
       headerName = 'Machines';
-      currIcon = document.getElementById('machineIcon');
+      currIcon = document.getElementById('machine-icon');
       break;
     case 'save':
       headerName = 'Save';
-      currIcon = document.getElementById('saveIcon');
+      currIcon = document.getElementById('save-icon');
       break;
     case 'bug':
       headerName = 'Bug';
-      currIcon = document.getElementById('bugIcon');
+      currIcon = document.getElementById('bug-icon');
       break;
     }
    if (toggleMenu(nameOfClass)) {
@@ -263,6 +263,7 @@ export function add_input_bar() {
   // create a new input box
   const new_inputbox = document.createElement('input');
   new_inputbox.type = 'text';
+  new_inputbox.placeholder = 'enter input';
   new_inputbox.classList.add("machine_input_text");
   // create a new run button under the original one
   const new_run_button = document.createElement('button');
