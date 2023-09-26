@@ -162,7 +162,7 @@ export const EDGE_DELIM = '~';
 export const DRAW_ARROW_RADIUS = 25;
 
 /** @constant {string} SECOND_BAR_COLOR - color of second bar, specifically homepage  */
-export const SECOND_BAR_COLOR = '#3a468f';
+export const SECOND_BAR_COLOR = 'rgb(39, 52, 92)';
 
 /** @constant {string} ACCEPT_COLOR - color of machine input when accepted  */
 export const ACCEPT_COLOR = 'green';
