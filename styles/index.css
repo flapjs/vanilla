@@ -203,10 +203,12 @@ ul {
 
 .machine_input_text { 
   width: 120px;
+  max-width: 120px;
   padding: 4px;
   margin: 4px;
   resize: none;
   background-color: rgb(31, 42, 79);
+  color: #c7c2c2;
 }
 
 ::placeholder {
