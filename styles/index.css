@@ -169,7 +169,7 @@ ul {
 
 #secondBarHeaderBtn > #closeButton{
   padding: 7px 7px 3px 7px;  /* the image is not quite centered hence lower margin at the bottom */
-  margin: 8px 24px 8px 8px;  /* extra space on the right */
+  margin: 8px 16px 8px 8px;  /* extra space on the right */
 }
 
 #secondbar button {
