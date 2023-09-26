@@ -12,9 +12,6 @@ export const RIGHT_BTN = 2;
 /** @constant {function} EMPTY_FUNCTION - place holder function */
 export const EMPTY_FUNCTION = () => {};
 
-/** @constant {Object} EMPTY_GRAPH - empty graph object */
-export const EMPTY_GRAPH = {};
-
 /** @constant {float} CLICK_HOLD_TIME - [ms] the maximum time between mousedown and mouseup still considered as click */
 export const CLICK_HOLD_TIME = 240;
 
@@ -160,3 +157,15 @@ export const VERTEX_DELIM = ';';
 
 /** @constant {string} EDGE_DELIM - delimiter for edges in a permalink  */
 export const EDGE_DELIM = '~';
+
+/** @constant {int} DRAW_ARROW_RADIUS - delimiter for edges in a permalink  */
+export const DRAW_ARROW_RADIUS = 25;
+
+/** @constant {string} SECOND_BAR_COLOR - color of second bar, specifically homepage  */
+export const SECOND_BAR_COLOR = 'rgb(39, 52, 92)';
+
+/** @constant {string} ACCEPT_COLOR - color of machine input when accepted  */
+export const ACCEPT_COLOR = 'green';
+
+/** @constant {string} REJECT_COLOR - color of machine input when rejected  */
+export const REJECT_COLOR = 'darkRed';
