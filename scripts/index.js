@@ -229,6 +229,7 @@ export function bind_run_input() {
   const run_btn = new_input.querySelector('.run_btn');
   run_btn.addEventListener('click', () => {
     new_input.style.backgroundColor = consts.SECOND_BAR_COLOR;
+    drawing.highlight_states(graph, []);  // clear the highlighting
     computations[new_input_idx] = compute.run_input(graph, menus.machine_type(), textbox.value);  // noninteractive
     // eslint-disable-next-line no-unused-vars
     const { value: output, _ } = computations[new_input_idx].next();  // second value always true when noninteractive
