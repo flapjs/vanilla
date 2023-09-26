@@ -347,12 +347,10 @@ export function over_trash(e) {
     y >= canvas_height - (trash.height + 30) &&
     y <= canvas_height - (trash.width + 30) + trash_dims.Height
   ) {
-    get_canvas().style.cursor = 'pointer';
     trash = red_trash;
     draw_trash();
     return true;
   } else {
-    get_canvas().style.cursor = 'auto';
     trash = normal_trash;
     draw_trash();
     return false;

@@ -388,6 +388,20 @@ function bind_permalink() {
   window.addEventListener('hashchange', hash_change_handler);
 }
 
+/** change cursor style when hovering over certain elements */
+function bind_mousemove() {
+  const canvas = drawing.get_canvas();
+  canvas.addEventListener('mousemove', e => {
+    const [x, y] = drawing.event_position_on_canvas(e);
+    if (drawing.in_edge_text(graph, x, y) !== null || drawing.in_any_vertex(graph, x, y) !== null ||
+        drawing.over_trash(e)) {
+      canvas.style.cursor = 'pointer';
+    } else {
+      canvas.style.cursor = 'auto';
+    }
+  });
+}
+
 /** run after all the contents are loaded to hook up callbacks */
 function init() {
   bind_switch_machine();
@@ -400,6 +414,7 @@ function init() {
   bind_scroll();
   bind_dd();
   bind_permalink();
+  bind_mousemove();
   ui_setup.bind_plus_minus();
   ui_setup.add_input_bar(); // called so one input bar appears on opening of homepage
   ui_setup.htmlSetUp(); // initiate eventlisteners for sidenavbar, second sidenavbar, and popup tutorial
