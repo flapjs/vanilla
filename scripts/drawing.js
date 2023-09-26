@@ -116,7 +116,7 @@ export function draw_vertex(vertex) {
     text += ` / ${vertex.moore_output}`;
   }
   // find an appropriate text size and draw the text inside the vertex
-  const text_size = text_size_huristic(vertex.r, text)
+  const text_size = text_size_huristic(vertex.r, text);
   draw_text(text, [vertex.x, vertex.y], text_size);
   if (vertex.is_start) {  // it is the starting vertex
     const tip1 = [vertex.x-vertex.r, vertex.y],
@@ -152,6 +152,7 @@ export function draw_triangle(tip1, tip2, tip3) {
  * @param {string} edge_text - the text to display on the edge
  * @param {float} text_size - the size of the text
  */
+// eslint-disable-next-line no-unused-vars
 export function draw_arrow(start, end, mid, edge_text, text_size) {
   if (!mid) {
     mid = linalg.scale(1/2, linalg.add(start, end));
@@ -184,6 +185,8 @@ export function draw_arrow(start, end, mid, edge_text, text_size) {
  * @param {string} edge_text - the text to display on the edge
  * @param {float} text_size - the size of the text
  */
+
+// eslint-disable-next-line no-unused-vars
 function drawSplit(start, end, mid, radius, edge_text, text_size) {
   // alert(end);
   // alert(linalg.scale(t**2, end));
@@ -321,7 +324,7 @@ export function draw_edge(graph, edge, text_size) {
   } else if (menus.is_Turing()) {  // append push and left/right if we have turing
     edge_text += consts.ARROW_SYMBOL+push_symbol+','+move;
   } else if (menus.is_Mealy()) {
-    edge_text += " / " + mealy_output;
+    edge_text += ' / ' + mealy_output;
   }
   draw_text(edge_text, mid, text_size);
 }
@@ -367,7 +370,7 @@ export function draw_trash() {
       ctx.drawImage(trash, x, y);
       canvas.addEventListener('mousemove', over_trash);  // constantly check if mouse is over trash
       trash_inited = true;
-    }
+    };
   } else {
     const [canvas_width, canvas_height] = canvas_size();
     const x = canvas_width - (trash.width + 30);

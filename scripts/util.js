@@ -58,15 +58,15 @@ export function deep_equal(obj1, obj2) {
  * @param {Function} callback - a function to be called when double click happens
  */
 export function on_double_press(key, callback) {
- let last_time = 0;
- document.addEventListener('keypress', e => {
-   if (e.code === key) {
-     if (e.timeStamp-last_time < consts.DOUBLE_PRESS_TIME) {
-       callback();
-       last_time = 0;  // prevent triple click
-     } else {
-       last_time = e.timeStamp;
-     }
-   }
- });
+  let last_time = 0;
+  document.addEventListener('keypress', e => {
+    if (e.code === key) {
+      if (e.timeStamp-last_time < consts.DOUBLE_PRESS_TIME) {
+        callback();
+        last_time = 0;  // prevent triple click
+      } else {
+        last_time = e.timeStamp;
+      }
+    }
+  });
 }

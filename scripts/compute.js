@@ -439,7 +439,7 @@ export function is_DFA(NFA, input) {
         }
       }
 
-      alert("Missing transitions " + missing_transitions.substring(0, missing_transitions.length - 2) + " for " + vertex.name);
+      alert('Missing transitions ' + missing_transitions.substring(0, missing_transitions.length - 2) + ' for ' + vertex.name);
       return false;
     } else if(outgoing.length > alphabet.size) {
       let extra_transitions = '';
@@ -449,7 +449,7 @@ export function is_DFA(NFA, input) {
         }
       }
 
-      alert("Extra transitions " + extra_transitions.substring(0, extra_transitions.length - 2) + " for " + vertex.name);
+      alert('Extra transitions ' + extra_transitions.substring(0, extra_transitions.length - 2) + ' for ' + vertex.name);
       return false;
     }
   }
