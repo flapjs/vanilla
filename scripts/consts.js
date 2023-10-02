@@ -157,3 +157,15 @@ export const VERTEX_DELIM = ';';
 
 /** @constant {string} EDGE_DELIM - delimiter for edges in a permalink  */
 export const EDGE_DELIM = '~';
+
+/** @constant {int} DRAW_ARROW_RADIUS - delimiter for edges in a permalink  */
+export const DRAW_ARROW_RADIUS = 25;
+
+/** @constant {string} SECOND_BAR_COLOR - color of second bar, specifically homepage  */
+export const SECOND_BAR_COLOR = 'rgb(39, 52, 92)';
+
+/** @constant {string} ACCEPT_COLOR - color of machine input when accepted  */
+export const ACCEPT_COLOR = 'green';
+
+/** @constant {string} REJECT_COLOR - color of machine input when rejected  */
+export const REJECT_COLOR = 'darkRed';

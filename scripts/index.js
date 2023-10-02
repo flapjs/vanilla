@@ -8,6 +8,8 @@ import * as compute from './compute.js';
 import * as graph_ops from './graph_ops.js';
 import * as menus from './menus.js';
 import * as permalink from './permalink.js';
+import * as util from './util.js';
+import * as ui_setup from './ui_setup.js';
 
 // if not in browser, don't run
 if (typeof document !== 'undefined') {
@@ -46,8 +48,8 @@ function bind_double_click() {
 function drag_scene(e) {
   const dx = e.movementX, dy = e.movementY;
   for (const vertex of Object.values(graph)) {
-    vertex.x += dx;
-    vertex.y += dy;
+    vertex.x += dx*window.devicePixelRatio;
+    vertex.y += dy*window.devicePixelRatio;  // calculated in canvas pixel, which is some multiple of window pixel
   }
   drawing.draw(graph);
 }
@@ -145,7 +147,7 @@ function higher_order_drag_edge(edge) {
   };
 }
 
-/** binds callback functions to the mouse dragging behavior */
+/** binds callback functions to the mouse dragging behavior and deletes if event is dropped over trash*/
 function bind_drag() {
   let mutex = false;  // drag lock not activiated
   // declare the callbacks as empty function so that intellisense recognizes them as function
@@ -159,12 +161,12 @@ function bind_drag() {
     const [x, y] = drawing.event_position_on_canvas(e);
     const clicked_vertex = drawing.in_any_vertex(graph, x, y);
     const clicked_edge = drawing.in_edge_text(graph, x, y);
-    if ((e.button === consts.RIGHT_BTN || e.ctrlKey) && clicked_vertex) {  // right create edge
+    if ((e.button === consts.RIGHT_BTN || e.ctrlKey || e.metaKey) && clicked_vertex) {  // right create edge
       edge_animation = higher_order_edge_animation(clicked_vertex);
       canvas.addEventListener('mousemove', edge_animation);
     } else if (e.button === consts.LEFT_BTN) {  // left drag
-      if (clicked_edge) {  // left drag edge
-        drag_edge = higher_order_drag_edge(clicked_edge);
+      if (clicked_edge) {   // left drag edge
+        drag_edge = higher_order_drag_edge(clicked_edge);        
         canvas.addEventListener('mousemove', drag_edge);
       } else if (clicked_vertex) {  // vertex has lower priority than edge
         drag_vertex = higher_order_drag_vertex(clicked_vertex);  // create the function
@@ -174,7 +176,18 @@ function bind_drag() {
       }
     }
   });
-  canvas.addEventListener('mouseup', () => {
+  canvas.addEventListener('mouseup', e => {
+    const [x, y] = drawing.event_position_on_canvas(e);
+    const drop_vertex = drawing.in_any_vertex(graph, x, y);
+    const drop_edge = drawing.in_edge_text(graph, x, y);
+    if (drop_vertex && drawing.over_trash(e)) { // delete vertex if dropped over trash
+      graph_ops.delete_vertex(graph, drop_vertex);
+    } else if (drop_edge && drawing.over_trash(e)) { // delete edge if dropped over trash
+      graph_ops.delete_edge(graph, drop_edge);
+    } else if (drawing.over_trash(e)) {
+      delete_graph();  // delete the entire graph if dropped over trash
+    }
+    
     canvas.removeEventListener('mousemove', drag_scene);
     canvas.removeEventListener('mousemove', drag_vertex);
     canvas.removeEventListener('mousemove', drag_edge);
@@ -209,64 +222,66 @@ function bind_context_menu() {
   });
 }
 
+const computations = [];  // we want the computations to be persistent
 /** binds each machine input to the run_input function */
-function bind_run_input() {
+export function bind_run_input() {
   const input_divs = document.getElementsByClassName('machine_input');
-  const computations = Array(input_divs.length);  // stores generators of the computation half evaluated
-  for (let i = 0; i < input_divs.length; i++) {
-    const textbox = input_divs[i].querySelector('input');
-
-    const run_btn = input_divs[i].querySelector('.run_btn');
-    run_btn.addEventListener('click', () => {
-      computations[i] = compute.run_input(graph, menus.machine_type(), textbox.value);  // noninteractive computation
-      // eslint-disable-next-line no-unused-vars
-      const { value: output, _ } = computations[i].next();  // second value is always true since it is noninteractive
+  const new_input_idx = input_divs.length - 1;
+  const new_input = input_divs[new_input_idx];
+  
+  const textbox = new_input.querySelector('.machine_input_text');
+  const run_btn = new_input.querySelector('.run_btn');
+  run_btn.addEventListener('click', () => {
+    new_input.style.backgroundColor = consts.SECOND_BAR_COLOR;
+    drawing.highlight_states(graph, []);  // clear the highlighting
+    computations[new_input_idx] = compute.run_input(graph, menus.machine_type(), textbox.value);  // noninteractive
+    // eslint-disable-next-line no-unused-vars
+    const { value: output, _ } = computations[new_input_idx].next();  // second value always true when noninteractive
+    if(menus.machine_type() === consts.MACHINE_TYPES.Moore || menus.machine_type() === consts.MACHINE_TYPES.Mealy) {
+      window.setTimeout(() => alert(output), 0);  // alert after the color change
+    } else {
+      new_input.style.backgroundColor = output ? consts.ACCEPT_COLOR : consts.REJECT_COLOR;
+    }
+    computations[new_input_idx] = undefined;
+  });
+    
+  const step_btn = new_input.querySelector('.step_btn');
+  step_btn.addEventListener('click', () => {
+    new_input.style.backgroundColor = consts.SECOND_BAR_COLOR;
+    if (!computations[new_input_idx]) {
+      // last param true for interactive computation
+      computations[new_input_idx] = compute.run_input(graph, menus.machine_type(), textbox.value, true);
+    }
+    const { value: output, done } = computations[new_input_idx].next();
+    if (done) {
       if(menus.machine_type() === consts.MACHINE_TYPES.Moore || menus.machine_type() === consts.MACHINE_TYPES.Mealy) {
-        alert(output);
+        window.setTimeout(() => alert(output), 0);  // alert after the color change
       } else {
-        alert(output ? 'Accepted' : 'Rejected');
+        new_input.style.backgroundColor = output ? consts.ACCEPT_COLOR : consts.REJECT_COLOR;
       }
-      computations[i] = undefined;
-    });
+      computations[new_input_idx] = undefined;
+    }
+  });
 
-    const step_btn = input_divs[i].querySelector('.step_btn');
-    step_btn.addEventListener('click', () => {
-      if (!computations[i]) {
-        computations[i] = compute.run_input(graph, menus.machine_type(), textbox.value, true);  // true for interactive
-      }
-      const { value: accepted, done } = computations[i].next();
-      if (done) {
-        // whether true or false. We wrap this in timeout to execute after the vertex coloring is done
-        if(menus.machine_type() === consts.MACHINE_TYPES.Moore || menus.machine_type() === consts.MACHINE_TYPES.Mealy) {
-          setTimeout(() => alert(accepted));
-        } else {
-          setTimeout(() => alert(accepted ? 'Accepted' : 'Rejected'));
-        }
-        computations[i] = undefined;
-      }
-    });
-
-    const reset_btn = input_divs[i].querySelector('.reset_btn');
-    reset_btn.addEventListener('click', () => {
-      computations[i] = undefined;
-      drawing.highlight_states(graph, []);  // clear the highlighting
-    });
-  }
-  // clear the partial computations when user switches machines
-  document.getElementById('select_machine').addEventListener('change', () => computations.fill(undefined));
+  const reset_btn = new_input.querySelector('.reset_btn');
+  reset_btn.addEventListener('click', () => {
+    computations[new_input_idx] = undefined;
+    new_input.style.backgroundColor = consts.SECOND_BAR_COLOR;
+    drawing.highlight_states(graph, []);  // clear the highlighting
+  });
 }
 
 /** offers ctrl-z and ctrl-shift-z features */
 function bind_undo_redo() {
   document.addEventListener('keydown', e => {
-    if (e.code !== 'KeyZ' || e.metaKey || e.altKey) {
+    if (e.code !== 'KeyZ' || e.altKey) {  // must not have alt pressed but must have 'z' pressed
       return;
     }
     e.preventDefault();  // prevent input undo
-    if (e.ctrlKey && e.shiftKey) {
-      graph = hist.redo();
-    } else if (e.ctrlKey) {
-      graph = hist.undo();
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
+      graph = hist.redo(); 
+    } else if ((e.ctrlKey || e.metaKey)) {
+      graph = hist.undo(); 
     }
     drawing.draw(graph);
   });
@@ -287,35 +302,18 @@ function bind_scroll() {
   });
 }
 
-/**
- * helper function to abstract away double clicking
- * @param {string} key - ex. KeyZ, KeyA
- * @param {Function} callback - a function to be called when double click happens
- */
-function on_double_press(key, callback) {
-  let last_time = 0;
-  document.addEventListener('keypress', e => {
-    if (e.code === key) {
-      if (e.timeStamp-last_time < consts.DOUBLE_PRESS_TIME) {
-        callback();
-        last_time = 0;  // prevent triple click
-      } else {
-        last_time = e.timeStamp;
-      }
-    }
-  });
+function delete_graph() {
+  if (!Object.keys(graph).length) {  // nothing to delete
+    return;
+  }
+  graph = {};
+  drawing.draw(graph);
+  hist.push_history(graph);
 }
 
 /** press dd does delete */
 function bind_dd() {
-  on_double_press('KeyD', () => {
-    if (!Object.keys(graph).length) {  // nothing to delete
-      return;
-    }
-    graph = {};
-    drawing.draw(graph);
-    hist.push_history(graph);
-  });
+  util.on_double_press('KeyD', delete_graph);
 }
 
 function hash_change_handler() {
@@ -361,11 +359,13 @@ function bind_switch_machine() {
     menus.display_UI_for(e.target.value);
     history.replaceState(undefined, undefined, '#');  // clear the permalink
   });
+  // clear the partial computations when user switches machines
+  document.getElementById('select_machine').addEventListener('change', () => computations.fill(undefined));
 }
 
 /** handles the NFA to DFA button */
 function bind_machine_transform() {
-  const NFA_2_DFA_btn = document.getElementById('NFA_2_DFA');
+  const NFA_2_DFA_btn = document.getElementById('NFA_to_DFA');
   NFA_2_DFA_btn.addEventListener('click', () => {
     graph = graph_ops.NFA_to_DFA(graph);
     drawing.draw(graph);
@@ -377,16 +377,6 @@ function bind_machine_transform() {
 function bind_save_drawing() {
   const save_btn = document.getElementById('save_machine');
   save_btn.addEventListener('click', () => drawing.save_as_png(graph));
-}
-
-/** dynamically change the length of textboxes */
-export function bind_elongate_textbox() {
-  const change_width_func = e => {  // minimum width of 4ch
-    e.target.style.width = `${Math.max(4, e.target.value.length)}ch`;
-  };
-  document.querySelectorAll('input[type=text]').forEach(textbox => {
-    textbox.addEventListener('input', change_width_func);
-  });
 }
 
 /** button to generate permanent link */
@@ -402,19 +392,35 @@ function bind_permalink() {
   window.addEventListener('hashchange', hash_change_handler);
 }
 
+/** change cursor style when hovering over certain elements */
+function bind_mousemove() {
+  const canvas = drawing.get_canvas();
+  canvas.addEventListener('mousemove', e => {
+    const [x, y] = drawing.event_position_on_canvas(e);
+    if (drawing.in_edge_text(graph, x, y) !== null || drawing.in_any_vertex(graph, x, y) !== null ||
+        drawing.over_trash(e)) {
+      canvas.style.cursor = 'pointer';
+    } else {
+      canvas.style.cursor = 'auto';
+    }
+  });
+}
+
 /** run after all the contents are loaded to hook up callbacks */
 function init() {
   bind_switch_machine();
   bind_double_click();
   bind_drag();
   bind_context_menu();
-  bind_run_input();
   bind_machine_transform();
   bind_save_drawing();
   bind_undo_redo();
   bind_scroll();
   bind_dd();
-  bind_elongate_textbox();
   bind_permalink();
+  bind_mousemove();
+  ui_setup.bind_plus_minus(``);
+  ui_setup.add_input_bar(); // called so one input bar appears on opening of homepage
+  ui_setup.htmlSetUp(); // initiate eventlisteners for sidenavbar, second sidenavbar, and popup tutorial
   init_graph();  // leave this last since we want it to override some of the above
 }
