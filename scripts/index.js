@@ -409,12 +409,6 @@ function bind_regex() {
   
 }
 
-function bind_regex() {
-  let [input_field, open_btn, close_btn, union_btn, concat_btn, kleene_btn, sigma_btn, empty_btn, submit_btn, convert] = regex.create_buttons();
-
-  
-}
-
 /** run after all the contents are loaded to hook up callbacks */
 function init() {
   bind_switch_machine();
