@@ -12,9 +12,6 @@ export const RIGHT_BTN = 2;
 /** @constant {function} EMPTY_FUNCTION - place holder function */
 export const EMPTY_FUNCTION = () => {};
 
-/** @constant {Object} EMPTY_GRAPH - empty graph object */
-export const EMPTY_GRAPH = {};
-
 /** @constant {float} CLICK_HOLD_TIME - [ms] the maximum time between mousedown and mouseup still considered as click */
 export const CLICK_HOLD_TIME = 240;
 
@@ -73,6 +70,15 @@ export const EMPTY_SYMBOL = 'ε';
 /** @constant {string} EMPTY_TYPE - symbol for an empty cell of a Turing Machine */
 export const EMPTY_TAPE = '☐';
 
+/** @constant {string} DEFAULT_MOORE_OUTPUT - prepopulate moore output with this */
+export const DEFAULT_MOORE_OUTPUT = '0';
+
+/** @constant {string} DEFAULT_MEALY_OUTPUT - prepopulate mealy output with this */
+export const DEFAULT_MEALY_OUTPUT = '0';
+
+/** @constant {string} DEFAULT_MOORE_MEALY_TRANSITION - prepopulate transitions for Moore / Mealy machines with this */
+export const DEFAULT_MOORE_MEALY_TRANSITION = '0';
+
 /** @constant {string} ARROW_SYMBOL - arrow symbol */
 export const ARROW_SYMBOL = '→';
 
@@ -81,6 +87,8 @@ export const MACHINE_TYPES = {
   NFA: 'NFA',
   PDA: 'PDA',
   Turing: 'Turing',
+  Moore: 'Moore',
+  Mealy: 'Mealy',
   Regex: 'Regex'
 };
 
@@ -92,6 +100,8 @@ export const HIST_KEYS = {
   NFA: '%nfa_history',
   PDA: '%PDA_history',
   Turing: '%turing_history',
+  Moore: '%moore_history',
+  Mealy: '%mealy_history',
   Regex: '%regex_history'
 };
 
@@ -100,6 +110,8 @@ export const HIST_TIP_KEYS = {
   NFA: '%nfa_hist_tip',
   PDA: '%PDA_hist_tip',
   Turing: '%turing_hist_tip',
+  Moore: '%moore_hist_tip',
+  Mealy: '%mealy_history_tip',
   Regex: '%regex_hist_tip'
 };
 
@@ -108,6 +120,8 @@ export const HIST_PTR_KEYS = {
   NFA: '%nfa_hist_ptr',
   PDA: '%PDA_hist_ptr',
   Turing: '%turing_hist_ptr',
+  Moore: '%moore_hist_ptr',
+  Mealy: '%mealy_history_ptr',
   Regex: '%regex_hist_ptr'
 };
 
@@ -148,6 +162,17 @@ export const VERTEX_DELIM = ';';
 /** @constant {string} EDGE_DELIM - delimiter for edges in a permalink  */
 export const EDGE_DELIM = '~';
 
+/** @constant {int} DRAW_ARROW_RADIUS - delimiter for edges in a permalink  */
+export const DRAW_ARROW_RADIUS = 25;
+
+/** @constant {string} SECOND_BAR_COLOR - color of second bar, specifically homepage  */
+export const SECOND_BAR_COLOR = 'rgb(39, 52, 92)';
+
+/** @constant {string} ACCEPT_COLOR - color of machine input when accepted  */
+export const ACCEPT_COLOR = 'green';
+
+/** @constant {string} REJECT_COLOR - color of machine input when rejected  */
+export const REJECT_COLOR = 'darkRed';
 /** @constant {string} OPEN - opening parentheses for regular expressions */
 export const OPEN = '(';
 

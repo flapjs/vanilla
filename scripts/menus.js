@@ -2,7 +2,6 @@
 
 import * as consts from './consts.js';
 import * as graph_ops from './graph_ops.js';
-import { bind_elongate_textbox } from './index.js';
 
 export function machine_type() {
   return document.getElementById('select_machine').value;
@@ -30,6 +29,31 @@ export function is_PDA() {
  */
 export function is_Turing() {
   return machine_type() === consts.MACHINE_TYPES.Turing;
+}
+
+/** dynamically change the length of textboxes inside the container */
+function bind_elongate_textbox(container) {
+  const minimum_width = 4;  // minimum width of 4ch
+  const change_width_func = e => {
+    e.target.style.width = `${Math.max(minimum_width, e.target.value.length)}ch`;
+  };
+  const text_boxes = container.querySelectorAll('input[type="text"]');
+  for (const text_box of text_boxes) {
+    text_box.style.width = `${Math.max(minimum_width, text_box.value.length)}ch`;  // set initial width
+    text_box.addEventListener('input', change_width_func);
+  }
+}
+
+export function is_Mealy() {
+  return machine_type() === consts.MACHINE_TYPES.Mealy;
+}
+
+/**
+ * reports the type of machine the user is working on
+ * @returns {boolean} true or false 
+ */
+export function is_Moore() {
+  return machine_type() === consts.MACHINE_TYPES.Moore;
 }
 
 /**
@@ -60,27 +84,41 @@ export function display_vertex_menu(graph, v, x, y) {
   container.appendChild(buttons_div);
   container.appendChild(delete_div);
   const rename = document.createElement('input');
+  bind_elongate_textbox(rename);
   rename.type = 'text';
   rename.value = v;  // prepopulate vertex name
   rename_div.appendChild(rename);
+  let moore_output;
+  if (is_Moore()) {
+    moore_output = document.createElement('input');
+    moore_output.type = 'text';
+    moore_output.value = graph[v].moore_output;
+    rename_div.appendChild(moore_output);
+  }
   const start_btn = document.createElement('button');
   start_btn.innerText = 'make start';
+  start_btn.className = 'start';
   start_btn.addEventListener('click', () => graph_ops.set_start(graph, v));
   const final_btn = document.createElement('button');
   final_btn.innerText = 'toggle final';
+  final_btn.className = 'final';
   final_btn.addEventListener('click', () => graph_ops.toggle_final(graph, v));
   buttons_div.appendChild(start_btn);
   buttons_div.appendChild(final_btn);
   container.style = `left:${x}px; top:${y}px`;
   container.addEventListener('keyup', e => {
     if (e.key === 'Enter') {
-      graph_ops.rename_vertex(graph, v, rename.value);
+      if (is_Moore()) {
+        graph_ops.rename_vertex(graph, v, rename.value, moore_output.value);
+      } else {
+        graph_ops.rename_vertex(graph, v, rename.value);
+      }
     }
   });
   document.querySelector('body').appendChild(container);
   rename.focus();  // focus on the first text box
   rename.select();  // select all text
-  bind_elongate_textbox();
+  bind_elongate_textbox(container);
 }
 
 /**
@@ -113,6 +151,9 @@ export function display_edge_menu(graph, edge, x, y) {
   left_right_choice.type = 'checkbox';
   left_right_choice.className = 'L_R_toggle';
   left_right_choice.checked = edge.move === consts.LEFT;
+  const m_output = document.createElement('input');
+  m_output.type = 'text';
+  m_output.value = edge.mealy_output;
   rename_div.appendChild(transition);
   if (is_PDA()) {
     rename_div.appendChild(pop);
@@ -120,19 +161,21 @@ export function display_edge_menu(graph, edge, x, y) {
   } else if (is_Turing()) {
     rename_div.appendChild(push);
     rename_div.appendChild(left_right_choice);
+  } else if (is_Mealy()) {
+    rename_div.appendChild(m_output);
   }
   container.style = `left:${x}px; top:${y}px`;
   container.addEventListener('keyup', e => {
     if (e.key === 'Enter') {
       graph_ops.rename_edge(graph, edge,
         transition.value, pop.value, push.value,
-        left_right_choice.checked ? consts.LEFT : consts.RIGHT);
+        left_right_choice.checked ? consts.LEFT : consts.RIGHT, m_output.value);
     }
   });
   document.querySelector('body').appendChild(container);
   transition.focus();  // focus on the first text box
   transition.select();  // select all text
-  bind_elongate_textbox();
+  bind_elongate_textbox(container);
 }
 
 /** wipes the context menu; does nothing if none exists */
