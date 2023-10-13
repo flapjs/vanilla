@@ -1,14 +1,14 @@
 # Usage
 
 ## Welcome to [`flap.js`](https://flapjs.web.app)
-This is a minimal [JFLAP](https://www.jflap.org/) clone in javscript so people can draw and interact with finite automatons in their browsers. The notations used throughout the project is chosen to be compatible with CSE 105 at UCSD.
+This is a minimal [JFLAP](https://www.jflap.org/) clone in javscript so people can draw and interact with finite automata in their browsers. The notations used throughout the project are chosen to be compatible with CSE 105 at UC San Diego.
 
 ## The Basics
-TLDR: double click to create vertices and right click drag to make edges.
+TL;DR: double click to create vertices and right click + drag to make edges.
 
-Additionally, dragging vertices and edges are supported and if you want to edit anything, simply right click on a vertex or **the text** on an edge. You will be prompted with a floating menu. After editing, press enter to confirm the change.
+Additionally, dragging vertices and edges is supported and if you want to edit anything, simply right click on a vertex or **the text** on an edge. You will be prompted with a floating menu. After editing, press enter to confirm the change.
 
-A shortcut to making a vertex final is to double click on it.
+A shortcut to making a vertex final (accepting) is to double click on it.
 
 ![basics.gif](assets/basics.gif)
 

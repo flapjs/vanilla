@@ -419,15 +419,15 @@ export function run_input(graph, machine_type, input, interactive=false) {
 
 /** given an NFA, check if it is in fact deterministic */
 export function is_DFA(NFA, input) {
-  let alphabet = compute_alphabet(NFA, input);
+  const alphabet = compute_alphabet(NFA, input);
 
   for(const vertex of Object.values(NFA)) {
-    let outgoing = [];
+    const outgoing = [];
     for(const e of vertex.out) {
       outgoing.push(e.transition);
     }
 
-    if(outgoing.has(consts.EMPTY_SYMBOL)) {
+    if(outgoing.includes(consts.EMPTY_SYMBOL)) {
       return false;
     }
 
@@ -440,7 +440,7 @@ export function is_DFA(NFA, input) {
         }
       }
 
-      alert("Missing transitions " + missing_transitions.substring(0, missing_transitions.length - 2) + " for " + vertex.name);
+      alert('Missing transitions ' + missing_transitions.substring(0, missing_transitions.length - 2) + ' for ' + vertex.name);
       return false;
     } else if(outgoing.length > alphabet.size) {
       let extra_transitions = '';
@@ -450,7 +450,7 @@ export function is_DFA(NFA, input) {
         }
       }
 
-      alert("Extra transitions " + extra_transitions.substring(0, extra_transitions.length - 2) + " for " + vertex.name);
+      alert('Extra transitions ' + extra_transitions.substring(0, extra_transitions.length - 2) + ' for ' + vertex.name);
       return false;
     }
   }

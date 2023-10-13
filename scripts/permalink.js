@@ -27,7 +27,7 @@ function char_url_compliance(c) {
  */
 function to_string_field(field) {
   // backward compatibility for users who have saved graphs on localstore without mealy or moore outputs
-  if (field == undefined) {
+  if (field === undefined) {
     return consts.EMPTY_SYMBOL;
   }
   const field_str = field.toString();
@@ -121,8 +121,8 @@ export function deserialize(graph_str) {
     const x             = parseFloat(fields[2]);
     const r             = parseFloat(fields[3]);
     // backwards compatibility (in case an older permalink doesn't contain this field)
-    const moore_output  = (fields.length == 6) ? fields[4] : consts.DEFAULT_MOORE_OUTPUT;
-    const composite_bit = (fields.length == 6) ? parseInt(fields[5]) : parseInt(fields[4]);
+    const moore_output  = (fields.length === 6) ? fields[4] : consts.DEFAULT_MOORE_OUTPUT;
+    const composite_bit = (fields.length === 6) ? parseInt(fields[5]) : parseInt(fields[4]);
     graph[name] = graph_components.make_vertex(name, x, y, r, composite_bit&1, composite_bit&2, undefined, moore_output);
     vertex_id_to_name.push(name);  // construct the mapping from id to name
   }
@@ -141,8 +141,8 @@ export function deserialize(graph_str) {
     const pop_symbol    = composite_str.charAt(1);
     const push_symbol   = composite_str.charAt(2);
     // backwards compatibility (in case an older permalink doesn't contain this field)
-    const mealy_output  = (composite_str.length == 5) ? composite_str.charAt(3) : consts.DEFAULT_MEALY_OUTPUT;
-    const move          = (composite_str.length == 5) ? composite_str.charAt(4) : composite_str.charAt(3);
+    const mealy_output  = (composite_str.length === 5) ? composite_str.charAt(3) : consts.DEFAULT_MEALY_OUTPUT;
+    const move          = (composite_str.length === 5) ? composite_str.charAt(4) : composite_str.charAt(3);
     const a1            = parseFloat(fields[3])/10.0;
     const a2            = parseFloat(fields[4])/10.0;
     const angle1        = parseFloat(fields[5])/10.0;

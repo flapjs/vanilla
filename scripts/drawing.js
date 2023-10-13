@@ -24,6 +24,11 @@ export function event_position_on_canvas(e) {
   return [x, y];
 }
 
+function canvas_size() {
+  const rect = get_canvas().getBoundingClientRect();
+  return [rect.right*window.devicePixelRatio, rect.bottom*window.devicePixelRatio];
+}
+
 /**
  * get the position of the mouseclick event wrt canvas
  * @param {Array<float>} canvas_pt - the [x, y] position wrt canvas 
@@ -63,7 +68,6 @@ export function draw_text(text, pos, size, color_map, text_align='center') {
     ctx.fillText(text, ...pos);
   } else {  // we want to control the individual character color
     for (let i = 0; i < text.length; ++i) {
-      console.log(color_map[i]);
       ctx.fillStyle = color_map[i];
       ctx.fillText(text.charAt(i), pos[0]+i*consts.DEFAULT_VIZ_SIZE, pos[1]);
     }
@@ -112,7 +116,7 @@ export function draw_vertex(vertex) {
     text += ` / ${vertex.moore_output}`;
   }
   // find an appropriate text size and draw the text inside the vertex
-  const text_size = text_size_huristic(vertex.r, text)
+  const text_size = text_size_huristic(vertex.r, text);
   draw_text(text, [vertex.x, vertex.y], text_size);
   if (vertex.is_start) {  // it is the starting vertex
     const tip1 = [vertex.x-vertex.r, vertex.y],
@@ -145,8 +149,11 @@ export function draw_triangle(tip1, tip2, tip3) {
  * @param {Array<float>} start - where to begin
  * @param {Array<float>} end - where to end
  * @param {Array<float>} mid - control point for quadratic bezier curve
+ * @param {string} edge_text - the text to display on the edge
+ * @param {float} text_size - the size of the text
  */
-export function draw_arrow(start, end, mid) {
+// eslint-disable-next-line no-unused-vars
+export function draw_arrow(start, end, mid, edge_text, text_size) {
   if (!mid) {
     mid = linalg.scale(1/2, linalg.add(start, end));
   }  // find mid if DNE
@@ -158,6 +165,7 @@ export function draw_arrow(start, end, mid) {
   ctx.moveTo(...start);
   // we boost the curve by the orthogonal component of v1 wrt v2
   ctx.quadraticCurveTo(...linalg.add(mid, ortho_comp), ...end);
+  // drawSplit(start, end, mid, consts.DRAW_ARROW_RADIUS, "1", 10);
   ctx.stroke();
   const arrow_tip = linalg.normalize(linalg.sub(mid_to_end, ortho_comp), consts.ARROW_LENGTH);  
   const normal_to_tip = linalg.normalize(linalg.normal_vec(arrow_tip), consts.ARROW_WIDTH/2);  // half the total width
@@ -165,6 +173,41 @@ export function draw_arrow(start, end, mid) {
     tip2 = linalg.add(linalg.sub(end, arrow_tip), normal_to_tip),
     tip3 = linalg.sub(linalg.sub(end, arrow_tip), normal_to_tip);
   draw_triangle(tip1, tip2, tip3);
+}
+
+/**
+ * draw a split arrow with start, end and a mid
+ * do not draw points if the distance from point to mid is less than radius
+ * @param {Array<float>} start - where to begin
+ * @param {Array<float>} end - where to end
+ * @param {Array<float>} mid - control point for quadratic bezier curve
+ * @param {float} radius - radius of the midpoint text that we avoid
+ * @param {string} edge_text - the text to display on the edge
+ * @param {float} text_size - the size of the text
+ */
+
+// eslint-disable-next-line no-unused-vars
+function drawSplit(start, end, mid, radius, edge_text, text_size) {
+  // alert(end);
+  // alert(linalg.scale(t**2, end));
+  // console.log(start);
+  const iterations = 20;
+  const ctx = get_canvas().getContext('2d');
+  const estimated_pixels_of_text = edge_text.length * text_size * 0.6; 
+  ctx.lineWidth = 0.1;
+  for (let i = 0; i <= iterations; i++) {
+    let t = i/iterations;
+    let point = linalg.add(linalg.scale((1-t)**2, start), linalg.add(linalg.scale(2*(1-t)*t, mid), linalg.scale(t**2, end)));
+    //alert(point);
+    //if (linalg.vec_len(linalg.sub(point, mid)) > radius) 
+    //if the x distance is less than estimated_pixels / 2 OR the y distance is less than radius, we dont draw
+    if (Math.abs(point[0] - mid[0]) > estimated_pixels_of_text/2 || Math.abs(point[1] - mid[1]) > radius) {
+      ctx.lineTo(...point);
+      ctx.stroke();
+    } else {
+      ctx.moveTo(...point);
+    }
+  }
 }
 
 /**
@@ -273,16 +316,65 @@ export function compute_edge_geometry(graph, edge) {
 export function draw_edge(graph, edge, text_size) {
   let {transition, pop_symbol, push_symbol, move, mealy_output} = edge;
   const [start, end, mid] = compute_edge_geometry(graph, edge);
-  draw_arrow(start, end, mid);
   let edge_text = transition;  // vanilla NFA only uses transition
+  draw_arrow(start, end, mid, edge_text, text_size);
+  
   if (menus.is_PDA()) {  // append pop and push if we have PDA
     edge_text += ','+pop_symbol+consts.ARROW_SYMBOL+push_symbol;
   } else if (menus.is_Turing()) {  // append push and left/right if we have turing
     edge_text += consts.ARROW_SYMBOL+push_symbol+','+move;
   } else if (menus.is_Mealy()) {
-    edge_text += " / " + mealy_output;
+    edge_text += ' / ' + mealy_output;
   }
   draw_text(edge_text, mid, text_size);
+}
+
+/* load the asset before it is drawn */
+const normal_trash = new Image();
+normal_trash.src = '../assets/icon-trash.svg';
+const red_trash = new Image();
+red_trash.src = '../assets/icon-hover-trash.svg';
+let trash = normal_trash;
+let trash_inited = false;
+
+export function over_trash(e) {
+  const [x, y] = event_position_on_canvas(e);
+  const trash_dims = { X: 1830, Y: 740, Width: 50, Height: 50 };
+  const [canvas_width, canvas_height] = canvas_size();
+  if (
+    x >= canvas_width - (trash.width + 30) &&
+    x <= canvas_width - (trash.width + 30) + trash_dims.Width &&
+    y >= canvas_height - (trash.height + 30) &&
+    y <= canvas_height - (trash.width + 30) + trash_dims.Height
+  ) {
+    trash = red_trash;
+    draw_trash();
+    return true;
+  } else {
+    trash = normal_trash;
+    draw_trash();
+    return false;
+  }
+}
+
+export function draw_trash() {
+  const canvas = get_canvas();
+  const ctx = canvas.getContext('2d');
+  if (!trash_inited) {
+    trash.onload = () => {
+      const [canvas_width, canvas_height] = canvas_size();  // duplicate logic here because canvas size may change
+      const x = canvas_width - (trash.width + 30);
+      const y = canvas_height - (trash.height + 30);
+      ctx.drawImage(trash, x, y);
+      canvas.addEventListener('mousemove', over_trash);  // constantly check if mouse is over trash
+      trash_inited = true;
+    };
+  } else {
+    const [canvas_width, canvas_height] = canvas_size();
+    const x = canvas_width - (trash.width + 30);
+    const y = canvas_height - (trash.height + 30);
+    ctx.drawImage(trash, x, y);
+  }
 }
 
 /**
@@ -302,6 +394,7 @@ export function draw(graph) {
       draw_edge(graph, edge, consts.EDGE_TEXT_SACALING*vertex.r);
     }
   }
+  draw_trash();
 }
 
 /**

@@ -26,7 +26,7 @@ export function set_history_keys(machine) {
 export function get_history() {
   if (!localStorage.getItem(hist_key)) {
     hist_ptr = -1, hist_tip = -1;  // initialize ptrs
-    push_history(consts.EMPTY_GRAPH, []);  // initialize history
+    push_history({}, []);  // initialize history
   }
   // otherwise, already have history written to localstore
   hist_tip = localStorage.getItem(hist_tip_key);
