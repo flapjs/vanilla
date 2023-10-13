@@ -100,6 +100,10 @@ export function deserialize(graph_str) {
   const graph = {};
   const [type, typeless_graph_str] = parse_type(graph_str);
 
+  if (type === consts.MACHINE_TYPES.CFG) {
+    return [type, cfg_deserialize(typeless_graph_str)];
+  }
+
   if (typeless_graph_str.length === 0) {  // the degenerate case when there is no vertex
     return [type, graph];
   }
@@ -149,4 +153,13 @@ export function deserialize(graph_str) {
   }
 
   return [type, graph];
+}
+
+/**
+ * basically the 'fromString' method for the graph
+ * @param {string} graph_str - the string representation of the graph
+ * @returns {Array<string|Object>} type of the graph in {'NFA', 'PDA', 'Turing'} and the graph
+ */
+export function cfg_deserialize(rules) {
+  
 }

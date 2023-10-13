@@ -153,10 +153,14 @@ export function CFG_to_PDA(CFG) {
     const start = start_symbol.value;
     if (start == " " || start.length < 1) {
         alert("Invalid symbol or no starting symbol");
-        return [];
+        return false;
     }
     
-    make_edges();
+    const can_not_run = make_edges();
+
+    if (can_not_run) {
+        return false;
+    }
 
     return graph;
 }
@@ -179,19 +183,24 @@ function make_edges() {
     let longest = 1;
     let row = 0;
     const strs = [];
+    let failed = false;
 
-    list_of_rules.forEach(ruleObj => {
+    for (let i = 0; i < list_of_rules.length; i++) {
+        
+        const ruleObj = list_of_rules[i];
         const l = ruleObj.symbol.value;
-        if (l.length == 0) {
+        if (l.length != 1) {
             alert("One of the rules does not have a symbol");
+            return true;
         }
         if (!alphabet.has(l)) {
             alphabet.add(l);
         }
         if (terminal_symbols.indexOf(l) < 0) {
+            console.log(terminal_symbols);
             terminal_symbols.push(l);
         }
-
+        
         ruleObj.rules.forEach(str => {
             strs.push({symbol: l, str: str});
 
@@ -239,15 +248,15 @@ function make_edges() {
             }
             vertexCnt += rule.length;
         });
-    });
+    }
 
-    graph['EMPTY'] = graph_components.make_vertex('EMPTY', (longest + 3)*consts.CFG_EDGE_X_DISTANCE, row/2 *consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false,
+    graph['EMPTY'] = graph_components.make_vertex('EMPTY', (longest + 3)*consts.CFG_EDGE_X_DISTANCE, (row/2 + 1) *consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false,
         [graph_components.make_edge('EMPTY', 'loop', undefined, 0.5, 8.55)]);
 
     const start = start_symbol.value;
     if (terminal_symbols.indexOf(start) < 0) {
         alert("No rule has the starting symbol");
-        return [];
+        failed = true;
     }
 
     terminal_symbols.forEach(symbol => {
@@ -258,6 +267,7 @@ function make_edges() {
 
     graph['push$'].out.push(graph_components.make_edge('push$', 'loop', undefined,
     undefined, undefined, undefined, undefined, undefined, start));
+    return failed;
 }
 
 function push_to_history() {

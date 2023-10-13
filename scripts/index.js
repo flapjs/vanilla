@@ -217,6 +217,10 @@ function bind_run_input() {
     run_btn.addEventListener('click', () => {
       if (menus.machine_type() === consts.MACHINE_TYPES.CFG) {
         graph = cfg.CFG_to_PDA();
+        console.log(graph);
+        if (graph == false) {
+          return;
+        }
       }
       computations[i] = compute.run_input(graph, menus.machine_type(), textbox.value);  // noninteractive computation
       // eslint-disable-next-line no-unused-vars
@@ -340,6 +344,11 @@ function hash_change_handler() {
     hist.set_history_keys(type);  // set the history keys to the correct machine type
     hist.push_history(graph);     // save the graph to history
     menus.display_UI_for(type);   // change the UI elements manually
+    if (type == consts.MACHINE_TYPES.CFG) {
+      drawing.get_canvas().hidden = true;
+    } else {
+      drawing.get_canvas().hidden = false;
+    }
     refresh_graph();              // draw the graph
   }
 }
@@ -396,6 +405,9 @@ function bind_cfg_buttons() {
   const CFG_2_PDA_btn = document.getElementById('CFG_2_PDA');
   CFG_2_PDA_btn.addEventListener('click', () => {
     graph = cfg.CFG_to_PDA(graph);
+    if (!graph) {
+      return;
+    }
     drawing.draw(graph);
     document.getElementsByClassName("step_btn")[0].hidden = false;
     document.getElementsByClassName("reset_btn")[0].hidden = false;
