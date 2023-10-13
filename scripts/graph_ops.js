@@ -69,35 +69,41 @@ export function delete_vertex(graph, v) {
  * @param {Object} graph - the graph containing the vertex v
  * @param {string} v - the vertex to rename
  * @param {*} new_name - new name of the vertex
+ * @param {string} new_moore_output - side effect of entering the state
  */
-export function rename_vertex(graph, v, new_name, no_gui) {
-  if (!no_gui) {
-    menus.remove_context_menu();
-  }
-  if (v === new_name) {  // nothing to do
+export function rename_vertex(graph, v, new_name, new_moore_output) {
+  menus.remove_context_menu();
+  if (v === new_name && graph[v].moore_output === new_moore_output) {  // nothing to do
     return;
-  } else if (new_name in graph) {
+  } else if (new_name in graph && new_moore_output === undefined) {  // not moore and name already exists
     alert(new_name + ' already exists');
   } else if (new_name === '') {
     alert('vertex name cannot be empty');
+  } else if (new_moore_output === '') {
+    alert('vertex name cannot be empty');
   } else {
-    graph[new_name] = graph[v];  // duplicate
-    graph[new_name].name = new_name;
-    delete graph[v];  // remove old
-    for (const vertex of Object.values(graph)) {
-      for (const edge of vertex.out) {
-        if (edge.from === v) {
-          edge.from = new_name;
-        }
-        if (edge.to === v) {
-          edge.to = new_name;
+    if (v !== new_name) {  // purely renaming
+      graph[new_name] = graph[v];  // duplicate
+      graph[new_name].name = new_name;
+      delete graph[v];  // remove old
+      for (const vertex of Object.values(graph)) {
+        for (const edge of vertex.out) {
+          if (edge.from === v) {
+            edge.from = new_name;
+          }
+          if (edge.to === v) {
+            edge.to = new_name;
+          }
         }
       }
     }
-    if (!no_gui) {
-      drawing.draw(graph);
-      hist.push_history(graph);
+  
+    if (new_moore_output !== undefined) {  // purely changing the moore output
+      graph[new_name].moore_output = new_moore_output;
     }
+  
+    drawing.draw(graph);
+    hist.push_history(graph);
   }
 }
 
@@ -196,13 +202,16 @@ export function delete_edge(graph, edge) {
  * @param {string} new_push - new push symbol
  * @param {string} new_left_right - new move (left or right)
  */
-export function rename_edge(graph, edge, new_transition, new_pop, new_push, new_left_right) {
+export function rename_edge(graph, edge, new_transition, new_pop, new_push, new_left_right, new_mealy_output) {
   menus.remove_context_menu();
   const new_edge = {...edge,
     transition: new_transition ? new_transition : graph_components.get_empty_symbol(),
     pop_symbol: new_pop ? new_pop : graph_components.get_empty_symbol(),
     push_symbol: new_push ? new_push : graph_components.get_empty_symbol(),
-    move: new_left_right};
+    move: new_left_right,
+    mealy_output: new_mealy_output ? new_mealy_output : graph_components.get_empty_symbol()
+  };
+  
   if (compute.edge_has_equiv_edge_in_graph(graph, new_edge)) {  // new edge clashes with old
     alert('an equivalent edge already exists');
     return;
@@ -222,14 +231,7 @@ export function rename_edge(graph, edge, new_transition, new_pop, new_push, new_
  */
 function combine_state_labels(states) {
   // convert to array and sort
-  states = [...states].sort((u, v) => {
-    // u, v of the form qn, qm where n, m integers
-    if (u.substring(0, 1) === v.substring(0, 1) && !isNaN(u.substring(1)) && !isNaN(v.substring(1))) {
-      return parseInt(u.substring(1)) - parseInt(v.substring(1));  // return the numeric comparison
-    } else {
-      return u < v;  // use the string comparisn
-    }
-  });
+  states = [...states].sort();
   return '{'+ states.join(',') +'}';
 }
 
