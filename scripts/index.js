@@ -402,6 +402,14 @@ function bind_mousemove() {
   });
 }
 
+function bind_rearrange_graph() {
+  const rearrange_menu = document.getElementById('rearrange_graph_menu');
+  rearrange_menu.addEventListener('change', () => {
+    graph_ops.rearrange_graph(graph);
+    console.log('FUUUUUCK');
+  });
+}
+
 /** run after all the contents are loaded to hook up callbacks */
 function init() {
   bind_switch_machine();

@@ -291,3 +291,61 @@ export function NFA_to_DFA(NFA) {
   }
   return DFA;
 }
+
+export function rearrange_graph(graph) {
+  const forceMap = new Map();
+  const speedMap = new Map();
+
+  for(const vertex of Object.values(graph)) {
+    let force = [0, 0];
+    // Compute net forces on all vertices
+    for(const edge of vertex.out) {
+      const [start, end, mid] = drawing.compute_edge_geometry(graph, edge);
+      force = linalg.add(force, [end[0] - vertex.x, end[1] - vertex.y]);
+    }
+
+    forceMap.set(vertex, force);
+    speedMap.set(vertex, [0, 0]);
+  }
+
+  for(const vertex of Object.values(graph)) {
+    console.log(vertex.x + " " + vertex.y);
+  }
+
+  // Run the simulation for 500 iterations
+  for(let i = 0; i < 100; i++) {
+    // Update each vertex's speed according to the net force acting on it
+    for(const vertex of Object.values(graph)) {
+      const newX = Math.random() * 1500;
+      const newY = Math.random() * 1000;
+      vertex.x = newX;
+      vertex.y = newY;
+    }
+
+    for(const vertex of Object.values(graph)) {
+      let force = forceMap.get(vertex);
+      let speed = speedMap.get(vertex);
+      // console.log(force);
+      // console.log(speed);
+      speed = linalg.add(speed, linalg.scale(0.005, force));
+
+      // Recompute net force
+      for(const edge of vertex.out) {
+        const [start, end, mid] = drawing.compute_edge_geometry(graph, edge);
+        force = linalg.add(force, [end[0] - vertex.x, end[1] - vertex.y]);
+      }
+
+      forceMap.set(vertex, force);
+      speedMap.set(vertex, speed);
+      vertex.x += 0.001*speed[0];
+      vertex.y += 0.001*speed[1];
+
+      drawing.draw(graph);
+    }
+  }
+
+  console.log("AFTER REARRANGE");
+  for(const vertex of Object.values(graph)) {
+    console.log(vertex.x + " " + vertex.y);
+  }
+}
