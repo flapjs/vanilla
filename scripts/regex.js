@@ -306,41 +306,76 @@ export function thompson(regex) {
 export function create_buttons() {
   let input_field = document.getElementById('regex_string');
 
+  const insertChar = (char) => {
+    if (input_field.selectionStart || input_field.selectionStart == '0') {
+      var startPos = input_field.selectionStart;
+      var endPos = input_field.selectionEnd;
+      input_field.value = input_field.value.substring(0, startPos)
+          + char
+          + input_field.value.substring(endPos, input_field.value.length);
+    } else {
+        input_field.value += char;
+    }
+  }
+
+  const setCaretPosition = (ctrl, pos) => {
+    // Modern browsers
+    if (ctrl.setSelectionRange) {
+      ctrl.focus();
+      ctrl.setSelectionRange(pos, pos);
+    
+    // IE8 and below
+    } else if (ctrl.createTextRange) {
+      var range = ctrl.createTextRange();
+      range.collapse(true);
+      range.moveEnd('character', pos);
+      range.moveStart('character', pos);
+      range.select();
+    }
+  }
+
   let open_btn = document.getElementById('OPEN');
   open_btn.addEventListener('click', () => {
-    input_field.value += consts.OPEN;
-    input_field.focus();
+    const idx = input_field.selectionStart + 1;
+    insertChar(consts.OPEN);
+    setCaretPosition(input_field, idx);
   });
   let close_btn = document.getElementById('CLOSE');
   close_btn.addEventListener('click', () => {
-    input_field.value += consts.CLOSE;
-    input_field.focus();
+    const idx = input_field.selectionStart + 1;
+    insertChar(consts.CLOSE);
+    setCaretPosition(input_field, idx);
   });
   let union_btn = document.getElementById('UNION');
   union_btn.addEventListener('click', () => {
-    input_field.value += consts.UNION;
-    input_field.focus();
+    const idx = input_field.selectionStart + 1;
+    insertChar(consts.UNION);
+    setCaretPosition(input_field, idx);
   });
   let concat_btn = document.getElementById('CONCAT');
   concat_btn.addEventListener('click', () => {
-    input_field.value += consts.CONCAT;
-    input_field.focus();
+    const idx = input_field.selectionStart + 1;
+    insertChar(consts.CONCAT);
+    setCaretPosition(input_field, idx);
   });
   let kleene_btn = document.getElementById('KLEENE');
   kleene_btn.addEventListener('click', () => {
-    input_field.value += consts.KLEENE;
-    input_field.focus();
+    const idx = input_field.selectionStart + 1;
+    insertChar(consts.KLEENE);
+    setCaretPosition(input_field, idx);
   });
   // const plus_btn = document.getElementById('PLUS');
   let sigma_btn = document.getElementById('SIGMA');
   sigma_btn.addEventListener('click', () => {
-    input_field.value += consts.SIGMA;
-    input_field.focus();
+    const idx = input_field.selectionStart + 1;
+    insertChar(consts.SIGMA);
+    setCaretPosition(input_field, idx);
   });
   let empty_btn = document.getElementById('EMPTY_SET');
   empty_btn.addEventListener('click', () => {
-    input_field.value += consts.EMPTY_SET;
-    input_field.focus();
+    const idx = input_field.selectionStart + 1;
+    insertChar(consts.EMPTY_SET);
+    setCaretPosition(input_field, idx);
   });
 
   let submit_btn = document.getElementById('regex_submit');
@@ -366,7 +401,7 @@ export function process_string(string) {
   let postfix = shunting_yard(injectedConcat);
   let finalGraph = thompson(postfix);
 
-  return permalink.serialize('NFA', finalGraph)
+  return finalGraph
 }
 
 function regexTest(regex) {
