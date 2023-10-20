@@ -326,6 +326,15 @@ ul {
 }
 /***** End Styling for the pop-up *****/
 
+/* Regex Page Styling */
+.regex {
+
+}
+
+.regex-content {
+  
+}
+
 /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
 @media (max-width: 700px) { 
   #menu-container {
