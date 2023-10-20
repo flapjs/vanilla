@@ -174,7 +174,7 @@ export function draw_arrow(start, end, mid, edge_text, text_size) {
   ctx.moveTo(...start);
   // we boost the curve by the orthogonal component of v1 wrt v2
   // ctx.quadraticCurveTo(...linalg.add(mid, ortho_comp), ...end);
-  drawSplit(start, end, mid, consts.DRAW_ARROW_RADIUS, "1", 10);
+  drawSplit(start, end, mid);
   ctx.stroke();
   const arrow_tip = linalg.normalize(linalg.sub(mid_to_end, ortho_comp), consts.ARROW_LENGTH);
   const normal_to_tip = linalg.normalize(linalg.normal_vec(arrow_tip), consts.ARROW_WIDTH/2);  // half the total width
@@ -190,32 +190,24 @@ export function draw_arrow(start, end, mid, edge_text, text_size) {
  * @param {Array<float>} start - where to begin
  * @param {Array<float>} end - where to end
  * @param {Array<float>} mid - control point for quadratic bezier curve
- * @param {float} radius - radius of the midpoint text that we avoid
- * @param {string} edge_text - the text to display on the edge
- * @param {float} text_size - the size of the text
  */
 
 // eslint-disable-next-line no-unused-vars
-function drawSplit(start, end, mid, radius, edge_text, text_size) {
+function drawSplit(start, end, mid) {
   // alert(end);
   // alert(linalg.scale(t**2, end));
   // console.log(start);
   const iterations = 20;
   const ctx = get_canvas().getContext('2d');
-  const estimated_pixels_of_text = edge_text.length * text_size * 0.6;
-  ctx.lineWidth = 0.1;
+  ctx.lineWidth = 1;
   for (let i = 0; i <= iterations; i++) {
     let t = i/iterations;
     let point = linalg.add(linalg.scale((1-t)**2, start), linalg.add(linalg.scale(2*(1-t)*t, mid), linalg.scale(t**2, end)));
     //alert(point);
     //if (linalg.vec_len(linalg.sub(point, mid)) > radius)
     //if the x distance is less than estimated_pixels / 2 OR the y distance is less than radius, we dont draw
-    if (Math.abs(point[0] - mid[0]) > estimated_pixels_of_text/2 || Math.abs(point[1] - mid[1]) > radius) {
-      ctx.lineTo(...point);
-      ctx.stroke();
-    } else {
-      ctx.moveTo(...point);
-    }
+    ctx.lineTo(...point);
+    ctx.stroke();
   }
 }
 
