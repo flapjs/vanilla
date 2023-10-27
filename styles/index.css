@@ -328,11 +328,25 @@ ul {
 
 /* Regex Page Styling */
 .regex {
-
+  position: fixed;
+  left:30%;
+  top: 30%;
+  z-index: -1;
+  
 }
 
+.regex button{
+  font-size:20px;
+}
+.regex label{
+  font-size:20px;
+}
+.regex input{
+  font-size:20px;
+}
+
+
 .regex-content {
-  
 }
 
 /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
