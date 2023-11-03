@@ -406,15 +406,15 @@ function bind_mousemove() {
 function bind_regex() {
   // let [input_field, open_btn, close_btn, union_btn, concat_btn, kleene_btn, sigma_btn, empty_btn, convert] = regex.create_buttons();
   regex.create_buttons();
-  const convert_to_nfa_btn = document.getElementById("convert_to_nfa");
-  convert_to_nfa_btn.addEventListener("click", () => {
-    console.log(document.getElementById("regex_string").value)
-    graph = regex.process_string(document.getElementById("regex_string").value)
-    menus.display_UI_for("NFA");
-    document.getElementById("select_machine").value = "NFA"
+  const convert_to_nfa_btn = document.getElementById('convert_to_nfa');
+  convert_to_nfa_btn.addEventListener('click', () => {
+    console.log(document.getElementById('regex_string').value);
+    graph = regex.process_string(document.getElementById('regex_string').value);
+    menus.display_UI_for('NFA');
+    document.getElementById('select_machine').value = 'NFA';
     drawing.draw(graph);
     // hist.push_history(graph); NEED TO IMPLEMENT HISTORY BEFORE UNCOMMENTING
-  })
+  });
   
 }
 

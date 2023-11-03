@@ -1,7 +1,6 @@
 /** @module regex */
 
 import * as util from './util.js';
-import * as permalink from './permalink.js';
 import * as consts from './consts.js';
 import * as graph_components from './graph_components.js';
 import * as graph_ops from './graph_ops.js';
@@ -11,26 +10,22 @@ import * as graph_ops from './graph_ops.js';
  * @param {string} expressionString - the string to inject concatenation symbols in
  * @returns {string} the string with concatenation symbols inserted
  */
-export function injectConcatSymbols(expressionString)
-{
-    let result = '';
-    for (let i = 0; i < expressionString.length; i++)
-    {
-        let currChar = expressionString.charAt(i);
-        result += currChar;
-        if (i + 1 < expressionString.length)
-        {
-            let nextChar = expressionString.charAt(i + 1);
-            if (currChar != consts.OPEN && currChar != consts.UNION
+export function injectConcatSymbols(expressionString) {
+  let result = '';
+  for (let i = 0; i < expressionString.length; i++) {
+    let currChar = expressionString.charAt(i);
+    result += currChar;
+    if (i + 1 < expressionString.length) {
+      let nextChar = expressionString.charAt(i + 1);
+      if (currChar != consts.OPEN && currChar != consts.UNION
                 && currChar != consts.CONCAT && nextChar != consts.CLOSE
                 && nextChar != consts.UNION && nextChar != consts.KLEENE
-                && nextChar != consts.PLUS && nextChar != consts.CONCAT)
-            {
-                result += consts.CONCAT;
-            }
-        }
+                && nextChar != consts.PLUS && nextChar != consts.CONCAT) {
+        result += consts.CONCAT;
+      }
     }
-    return result;
+  }
+  return result;
 }
 
 /**
@@ -40,14 +35,14 @@ export function injectConcatSymbols(expressionString)
  */
 export function getPrecendence(key) {
   switch (key) {
-    case consts.KLEENE:
-      return 3;
-    case consts.CONCAT:
-      return 2;
-    case consts.UNION:
-      return 1;
-    default:
-      return 0;         
+  case consts.KLEENE:
+    return 3;
+  case consts.CONCAT:
+    return 2;
+  case consts.UNION:
+    return 1;
+  default:
+    return 0;         
   }
 }
 
@@ -92,7 +87,7 @@ export function shunting_yard(string) {
   }
 
   // put resulting string together
-  let result = "";
+  let result = '';
   while (queue.length > 0) {
     result += queue.dequeue();
   }
@@ -108,17 +103,17 @@ export function shunting_yard(string) {
  */
 export function union(graph1, graph2) {
   let graph = {};
-  graph["q0"] = graph_components.make_vertex("q0", 300, 300, consts.DEFAULT_VERTEX_RADIUS, true, false, []);
+  graph['q0'] = graph_components.make_vertex('q0', 300, 300, consts.DEFAULT_VERTEX_RADIUS, true, false, []);
 
-  let graph1start = "";
-  let graph2start = "";
+  let graph1start = '';
+  let graph2start = '';
 
   // rename all nodes in graph1
   for (let node of Object.keys(graph1)) {
     // add a check for if the new name is already in the graph
-    let new_name = node + ",1";
+    let new_name = node + ',1';
     if (new_name in graph1) {
-      new_name = new_name + ",n";
+      new_name = new_name + ',n';
     }
 
     graph_ops.rename_vertex(graph1, node, new_name, true);
@@ -132,9 +127,9 @@ export function union(graph1, graph2) {
 
   // rename all nodes in graph2
   for (let node of Object.keys(graph2)) {
-    let new_name = node + ",2";
+    let new_name = node + ',2';
     if (new_name in graph2) {
-      new_name = new_name + ",n";
+      new_name = new_name + ',n';
     }
 
     graph_ops.rename_vertex(graph2, node, new_name, true);
@@ -155,10 +150,10 @@ export function union(graph1, graph2) {
   }
 
   // add epsilon transitions from new start to old starts
-  graph["q0"].out.push(graph_components.make_edge("q0", graph1start, consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, 
-                      consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
-  graph["q0"].out.push(graph_components.make_edge("q0", graph2start, consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, 
-                      consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
+  graph['q0'].out.push(graph_components.make_edge('q0', graph1start, consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, 
+    consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
+  graph['q0'].out.push(graph_components.make_edge('q0', graph2start, consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, 
+    consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
 
   return graph;
 }
@@ -171,13 +166,13 @@ export function union(graph1, graph2) {
  */
 export function concat(graph1, graph2) {
   let graph1accept = [];
-  let graph2start = "";
+  let graph2start = '';
 
   // modify names of all nodes in graph1
   for (let node of Object.keys(graph1)) {
-    let new_name = node + ",1";
+    let new_name = node + ',1';
     if (new_name in graph1) {
-      new_name = new_name + ",n";
+      new_name = new_name + ',n';
     }
 
     graph_ops.rename_vertex(graph1, node, new_name, true);
@@ -191,9 +186,9 @@ export function concat(graph1, graph2) {
 
   // modify names of all nodes in graph2
   for (let node of Object.keys(graph2)) {
-    let new_name = node + ",2";
+    let new_name = node + ',2';
     if (new_name in graph2) {
-      new_name = new_name + ",n";
+      new_name = new_name + ',n';
     }
 
     graph_ops.rename_vertex(graph2, node, new_name, true);
@@ -217,7 +212,7 @@ export function concat(graph1, graph2) {
   // create edges from all accept nodes in graph1 to the start node in graph2
   for (let node of graph1accept) {
     graph[node].out.push(graph_components.make_edge(node, graph2start, consts.EMPTY_SYMBOL, 
-                        0.5, 0, 0, 0, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
+      0.5, 0, 0, 0, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
   }
 
   return graph;
@@ -230,27 +225,27 @@ export function concat(graph1, graph2) {
  */
 export function kleene(graph) {
   // make new start and end states
-  graph["new start"] = graph_components.make_vertex("new start", 300, 300, consts.DEFAULT_VERTEX_RADIUS, true, false, []);
-  graph["new end"] = graph_components.make_vertex("new end", 1000, 300, consts.DEFAULT_VERTEX_RADIUS, false, true, []);
+  graph['new start'] = graph_components.make_vertex('new start', 300, 300, consts.DEFAULT_VERTEX_RADIUS, true, false, []);
+  graph['new end'] = graph_components.make_vertex('new end', 1000, 300, consts.DEFAULT_VERTEX_RADIUS, false, true, []);
 
-  graph["new start"].out.push(graph_components.make_edge("new start", "new end", consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
+  graph['new start'].out.push(graph_components.make_edge('new start', 'new end', consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
 
-  let oldStart = "";
+  let oldStart = '';
 
   for (let node of Object.keys(graph)) {
     // for each start state in original graph, create an edge from new start state to original start state
     // set node to not be a start state
-    if (graph[node].is_start && node !== "new start") {
+    if (graph[node].is_start && node !== 'new start') {
       oldStart = node;
       graph[node].is_start = false;
-      graph["new start"].out.push(graph_components.make_edge("new start", node, consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
+      graph['new start'].out.push(graph_components.make_edge('new start', node, consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
     }
     // for each accept state in original graph, create an edge from that node to new accept state
     // set each node to not be an accept state
-    if (graph[node].is_final && node !== "new end") {
+    if (graph[node].is_final && node !== 'new end') {
       graph[node].is_final = false;
       graph[node].out.push(graph_components.make_edge(node, oldStart, consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
-      graph[node].out.push(graph_components.make_edge(node, "new end", consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
+      graph[node].out.push(graph_components.make_edge(node, 'new end', consts.EMPTY_SYMBOL, 0.5, 0, 0, 0, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
     }
   }
 
@@ -259,10 +254,10 @@ export function kleene(graph) {
 
 function single_transition(char) {
   let graph = {};
-  graph["q0"] = graph_components.make_vertex("q0", 300, 300, consts.DEFAULT_VERTEX_RADIUS, true, false, []);
-  graph["q1"] = graph_components.make_vertex("q1", 300, 300, consts.DEFAULT_VERTEX_RADIUS, false, true, []);
+  graph['q0'] = graph_components.make_vertex('q0', 300, 300, consts.DEFAULT_VERTEX_RADIUS, true, false, []);
+  graph['q1'] = graph_components.make_vertex('q1', 300, 300, consts.DEFAULT_VERTEX_RADIUS, false, true, []);
 
-  graph["q0"].out.push(graph_components.make_edge("q0", "q1", char, 0.5, 0, 0, 0, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
+  graph['q0'].out.push(graph_components.make_edge('q0', 'q1', char, 0.5, 0, 0, 0, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL, consts.EMPTY_SYMBOL));
 
   return graph;
 }
@@ -275,24 +270,21 @@ export function thompson(regex) {
     if (c.match(/[a-z]/i) || c === consts.EMPTY || c === consts.SIGMA) {
       // make graph of single vertex
       stack.push(single_transition(c));
-    }
-    else if (c === consts.UNION) {
+    } else if (c === consts.UNION) {
       let g2 = stack.pop();
       let g1 = stack.pop();
 
       let res = union(g1, g2);
 
       stack.push(res);
-    }
-    else if (c === consts.CONCAT) {
+    } else if (c === consts.CONCAT) {
       let g2 = stack.pop();
       let g1 = stack.pop();
 
       let res = concat(g1, g2);      
 
       stack.push(res);
-    }
-    else if (c === consts.KLEENE) {
+    } else if (c === consts.KLEENE) {
       let g = stack.pop();
 
       let res = kleene(g);
@@ -314,9 +306,9 @@ export function create_buttons() {
           + char
           + input_field.value.substring(endPos, input_field.value.length);
     } else {
-        input_field.value += char;
+      input_field.value += char;
     }
-  }
+  };
 
   const setCaretPosition = (ctrl, pos) => {
     // Modern browsers
@@ -332,7 +324,7 @@ export function create_buttons() {
       range.moveStart('character', pos);
       range.select();
     }
-  }
+  };
 
   let open_btn = document.getElementById('OPEN');
   open_btn.addEventListener('click', () => {
@@ -377,11 +369,4 @@ export function create_buttons() {
     insertChar(consts.EMPTY_SET);
     setCaretPosition(input_field, idx);
   });
-
-  let convert = document.getElementById("convert_to_nfa");
-  convert.addEventListener('click', () => {
-
-  })
-
-  // return [input_field, open_btn, close_btn, union_btn, concat_btn, kleene_btn, sigma_btn, empty_btn, convert];
 }
