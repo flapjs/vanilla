@@ -378,18 +378,12 @@ export function create_buttons() {
     setCaretPosition(input_field, idx);
   });
 
-  let submit_btn = document.getElementById('regex_submit');
-  submit_btn.addEventListener('click', () => {
-    let result = process_string(input_field.value);
-    console.log(result);
-  });
-
   let convert = document.getElementById("convert_to_nfa");
   convert.addEventListener('click', () => {
 
   })
 
-  return [input_field, open_btn, close_btn, union_btn, concat_btn, kleene_btn, sigma_btn, empty_btn, submit_btn, convert];
+  // return [input_field, open_btn, close_btn, union_btn, concat_btn, kleene_btn, sigma_btn, empty_btn, convert];
 }
 
 export function add_test_string() {
