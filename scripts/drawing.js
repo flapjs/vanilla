@@ -66,12 +66,10 @@ export function draw_text(text, pos, size, color_map, text_align='center') {
   ctx.textBaseline = 'middle';
   if (!color_map) {
     ctx.strokeStyle = 'white'; // draw white outline around text
-    let std_linewidth = ctx.lineWidth;
     ctx.lineWidth = 8;  // Set width for white outline around text
     ctx.strokeText(text, ...pos);
     ctx.fillStyle = 'black';
     ctx.fillText(text, ...pos);
-    ctx.lineWidth = std_linewidth;
     ctx.strokeStyle = consts.DEFAULT_INPUT_COLOR;
   } else {  // we want to control the individual character color
     for (let i = 0; i < text.length; ++i) {
