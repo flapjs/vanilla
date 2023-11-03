@@ -14,7 +14,7 @@ export function get_canvas() {
 
 /**
  * get the position of the mouseclick event wrt canvas
- * @param {Object} e 
+ * @param {Object} e
  * @returns {Array<float>} x and y position of the mouseclick wrt canvas
  */
 export function event_position_on_canvas(e) {
@@ -31,7 +31,7 @@ function canvas_size() {
 
 /**
  * get the position of the mouseclick event wrt canvas
- * @param {Array<float>} canvas_pt - the [x, y] position wrt canvas 
+ * @param {Array<float>} canvas_pt - the [x, y] position wrt canvas
  * @returns {Array<float>} x and y position wrt window
  */
 export function canvas_px_to_window_px(canvas_pt) {
@@ -42,10 +42,10 @@ export function canvas_px_to_window_px(canvas_pt) {
 /**
  * computes an appropriate text size to display the label
  * @param {int} textbox_width - width of textbox in pxiels
- * @param {string} text - the text message to display 
+ * @param {string} text - the text message to display
  * @returns {int} fontsize in pixels
  */
-function text_size_huristic(textbox_width, text) {
+function text_size_heuristic(textbox_width, text) {
   const default_size = consts.TEXT_SIZING_CONSTS.b+
                        Math.exp(consts.TEXT_SIZING_CONSTS.k*text.length+consts.TEXT_SIZING_CONSTS.a);
   return textbox_width/consts.DEFAULT_VERTEX_RADIUS*default_size;
@@ -65,12 +65,19 @@ export function draw_text(text, pos, size, color_map, text_align='center') {
   ctx.textAlign = text_align;
   ctx.textBaseline = 'middle';
   if (!color_map) {
+    ctx.strokeStyle = 'white'; // draw white outline around text
+    ctx.lineWidth = 8;  // Set width for white outline around text
+    ctx.strokeText(text, ...pos);
+    ctx.fillStyle = 'black';
     ctx.fillText(text, ...pos);
+    ctx.strokeStyle = consts.DEFAULT_INPUT_COLOR;
   } else {  // we want to control the individual character color
     for (let i = 0; i < text.length; ++i) {
       ctx.fillStyle = color_map[i];
       ctx.fillText(text.charAt(i), pos[0]+i*consts.DEFAULT_VIZ_SIZE, pos[1]);
+      ctx.fillStyle = consts.DEFAULT_INPUT_COLOR;
     }
+    ctx.strokeStyle = consts.DEFAULT_INPUT_COLOR;
     ctx.fillStyle = consts.DEFAULT_INPUT_COLOR;  // reset to default fill style
   }
 }
@@ -83,7 +90,7 @@ export function draw_text(text, pos, size, color_map, text_align='center') {
  * @param {boolean} highlighted - if true, fill the circle with color
  * @param {float} thickness - line width
  */
-export function draw_cricle(x, y, r, highlighted=false, thickness=1) {
+export function draw_circle(x, y, r, highlighted=false, thickness=1) {
   const ctx = get_canvas().getContext('2d');
   ctx.beginPath();
   ctx.arc(x, y, r, 0, 2*Math.PI);
@@ -101,7 +108,7 @@ export function draw_cricle(x, y, r, highlighted=false, thickness=1) {
  * @param {Object} vertex - the vertex object in which we want to draw a circle
  */
 export function draw_final_circle(vertex) {
-  draw_cricle(vertex.x, vertex.y, vertex.r*consts.FINAL_CIRCLE_SIZE);
+  draw_circle(vertex.x, vertex.y, vertex.r*consts.FINAL_CIRCLE_SIZE);
 }
 
 /**
@@ -110,13 +117,13 @@ export function draw_final_circle(vertex) {
  */
 export function draw_vertex(vertex) {
   // draw the circle
-  draw_cricle(vertex.x, vertex.y, vertex.r, vertex.highlighted);
+  draw_circle(vertex.x, vertex.y, vertex.r, vertex.highlighted);
   let text = vertex.name;
   if (menus.is_Moore()) {
     text += ` / ${vertex.moore_output}`;
   }
   // find an appropriate text size and draw the text inside the vertex
-  const text_size = text_size_huristic(vertex.r, text);
+  const text_size = text_size_heuristic(vertex.r, text);
   draw_text(text, [vertex.x, vertex.y], text_size);
   if (vertex.is_start) {  // it is the starting vertex
     const tip1 = [vertex.x-vertex.r, vertex.y],
@@ -131,9 +138,9 @@ export function draw_vertex(vertex) {
 
 /**
  * draw a triangle with three tips provided
- * @param {Array<float>} tip1 
- * @param {Array<float>} tip2 
- * @param {Array<float>} tip3 
+ * @param {Array<float>} tip1
+ * @param {Array<float>} tip2
+ * @param {Array<float>} tip3
  */
 export function draw_triangle(tip1, tip2, tip3) {
   const ctx = get_canvas().getContext('2d');
@@ -164,10 +171,10 @@ export function draw_arrow(start, end, mid, edge_text, text_size) {
   ctx.beginPath();
   ctx.moveTo(...start);
   // we boost the curve by the orthogonal component of v1 wrt v2
-  ctx.quadraticCurveTo(...linalg.add(mid, ortho_comp), ...end);
-  // drawSplit(start, end, mid, consts.DRAW_ARROW_RADIUS, "1", 10);
+  // ctx.quadraticCurveTo(...linalg.add(mid, ortho_comp), ...end);
+  drawSplit(start, end, mid);
   ctx.stroke();
-  const arrow_tip = linalg.normalize(linalg.sub(mid_to_end, ortho_comp), consts.ARROW_LENGTH);  
+  const arrow_tip = linalg.normalize(linalg.sub(mid_to_end, ortho_comp), consts.ARROW_LENGTH);
   const normal_to_tip = linalg.normalize(linalg.normal_vec(arrow_tip), consts.ARROW_WIDTH/2);  // half the total width
   const tip1 = end,
     tip2 = linalg.add(linalg.sub(end, arrow_tip), normal_to_tip),
@@ -181,32 +188,24 @@ export function draw_arrow(start, end, mid, edge_text, text_size) {
  * @param {Array<float>} start - where to begin
  * @param {Array<float>} end - where to end
  * @param {Array<float>} mid - control point for quadratic bezier curve
- * @param {float} radius - radius of the midpoint text that we avoid
- * @param {string} edge_text - the text to display on the edge
- * @param {float} text_size - the size of the text
  */
 
 // eslint-disable-next-line no-unused-vars
-function drawSplit(start, end, mid, radius, edge_text, text_size) {
+function drawSplit(start, end, mid) {
   // alert(end);
   // alert(linalg.scale(t**2, end));
   // console.log(start);
   const iterations = 20;
   const ctx = get_canvas().getContext('2d');
-  const estimated_pixels_of_text = edge_text.length * text_size * 0.6; 
-  ctx.lineWidth = 0.1;
+  ctx.lineWidth = 1;
   for (let i = 0; i <= iterations; i++) {
     let t = i/iterations;
     let point = linalg.add(linalg.scale((1-t)**2, start), linalg.add(linalg.scale(2*(1-t)*t, mid), linalg.scale(t**2, end)));
     //alert(point);
-    //if (linalg.vec_len(linalg.sub(point, mid)) > radius) 
+    //if (linalg.vec_len(linalg.sub(point, mid)) > radius)
     //if the x distance is less than estimated_pixels / 2 OR the y distance is less than radius, we dont draw
-    if (Math.abs(point[0] - mid[0]) > estimated_pixels_of_text/2 || Math.abs(point[1] - mid[1]) > radius) {
-      ctx.lineTo(...point);
-      ctx.stroke();
-    } else {
-      ctx.moveTo(...point);
-    }
+    ctx.lineTo(...point);
+    ctx.stroke();
   }
 }
 
@@ -215,7 +214,7 @@ function drawSplit(start, end, mid, radius, edge_text, text_size) {
  * @param {Object} graph - the graph of interest
  * @param {float} x - x position
  * @param {float} y - y position
- * @param {string} v - name of the vertex 
+ * @param {string} v - name of the vertex
  * @returns {boolean} whether (x, y) is in v
  */
 export function in_vertex(graph, x, y, v) {
@@ -227,7 +226,7 @@ export function in_vertex(graph, x, y, v) {
 /**
  * detects if the current click is inside a vertex
  * @param {Object} graph - the graph of interest
- * @param {float} x - x position wrt canvas 
+ * @param {float} x - x position wrt canvas
  * @param {float} y - y position wrt canvas
  * @returns {string} returns the first vertex in the graph that contains (x, y), null otherwise
  */
@@ -243,7 +242,7 @@ export function in_any_vertex(graph, x, y) {
 /**
  * detects if the current click is inside edge text
  * @param {Object} graph - the graph of interest
- * @param {float} x - x position wrt canvas 
+ * @param {float} x - x position wrt canvas
  * @param {float} y - y position wrt canvas
  * @returns {Object} returns the first edge in the graph that contains (x, y), null otherwise
  */
@@ -318,7 +317,7 @@ export function draw_edge(graph, edge, text_size) {
   const [start, end, mid] = compute_edge_geometry(graph, edge);
   let edge_text = transition;  // vanilla NFA only uses transition
   draw_arrow(start, end, mid, edge_text, text_size);
-  
+
   if (menus.is_PDA()) {  // append pop and push if we have PDA
     edge_text += ','+pop_symbol+consts.ARROW_SYMBOL+push_symbol;
   } else if (menus.is_Turing()) {  // append push and left/right if we have turing
@@ -422,7 +421,7 @@ function compute_machine_drawing_size(graph) {
   return [[min_x, min_y], [max_x, max_y]];
 }
 
-/** 
+/**
  * grab the current graph and download onto user's computer
  * @param {Object} graph - the graph object whose drawing is to be downloaded
  */
@@ -447,7 +446,7 @@ export function save_as_png(graph) {
 
 /**
  * remove old highlited vertexes and mark current vertexes as highlited
- * @param {Object} graph 
+ * @param {Object} graph
  * @param {Iterable<string>} cur_states - vertex names
  */
 export function highlight_states(graph, cur_states) {
