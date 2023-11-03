@@ -337,6 +337,7 @@ ul {
 
 .regex button{
   font-size:20px;
+  min-width:50px
 }
 .regex label{
   font-size:20px;
