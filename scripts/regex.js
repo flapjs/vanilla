@@ -370,3 +370,11 @@ export function create_buttons() {
     setCaretPosition(input_field, idx);
   });
 }
+
+export function process_string(string) {
+  let injectedConcat = injectConcatSymbols(string);
+  let postfix = shunting_yard(injectedConcat);
+  let finalGraph = thompson(postfix);
+
+  return finalGraph
+}
