@@ -415,7 +415,16 @@ function bind_regex() {
     drawing.draw(graph);
     // hist.push_history(graph); NEED TO IMPLEMENT HISTORY BEFORE UNCOMMENTING
   });
-  
+  const input_field = document.getElementById('regex_string');
+  input_field.addEventListener('keypress', (e) => {
+    if (e.key === "Enter") {
+      console.log(document.getElementById('regex_string').value);
+      graph = regex.process_string(document.getElementById('regex_string').value);
+      menus.display_UI_for('NFA');
+      document.getElementById('select_machine').value = 'NFA';
+      drawing.draw(graph);
+    }
+  })
 }
 
 /** run after all the contents are loaded to hook up callbacks */
