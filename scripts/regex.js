@@ -57,7 +57,7 @@ export function shunting_yard(string) {
 
   for (let ch of string) {
     // case if ch is a character or epsilon
-    if (ch.match(/[a-z]/i) || ch === consts.EMPTY || ch === consts.SIGMA) {
+    if (ch.match(/[a-zA-Z0-9]/i) || ch === consts.EMPTY || ch === consts.SIGMA) {
       queue.enqueue(ch);
     }
     // case if ch is an operator
@@ -267,7 +267,7 @@ export function thompson(regex) {
   let stack = new util.Stack();
 
   for (let c of regex) {
-    if (c.match(/[a-z]/i) || c === consts.EMPTY || c === consts.SIGMA) {
+    if (c.match(/[a-zA-Z0-9]/i) || c === consts.EMPTY || c === consts.SIGMA) {
       // make graph of single vertex
       stack.push(single_transition(c));
     } else if (c === consts.UNION) {
