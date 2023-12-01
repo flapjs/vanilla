@@ -292,60 +292,143 @@ export function NFA_to_DFA(NFA) {
   return DFA;
 }
 
+// don't look at this code if you care for your peace of mind
+/**
+ * TODO
+ *  1. Electrical repulsion forces
+ *  2. Gravity
+ *  3. More testing
+ */
 export function rearrange_graph(graph) {
+  arrange_vertices_initial(graph);
   const forceMap = new Map();
   const speedMap = new Map();
 
   for(const vertex of Object.values(graph)) {
-    let force = [0, 0];
-    // Compute net forces on all vertices
-    for(const edge of vertex.out) {
-      const [start, end, mid] = drawing.compute_edge_geometry(graph, edge);
-      force = linalg.add(force, [end[0] - vertex.x, end[1] - vertex.y]);
-    }
-
-    forceMap.set(vertex, force);
     speedMap.set(vertex, [0, 0]);
   }
 
-  for(const vertex of Object.values(graph)) {
-    console.log(vertex.x + " " + vertex.y);
-  }
+  init_forces(graph, forceMap);
+
+  // assign each vertex a new random position
+  /* for(const vertex of Object.values(graph)) {
+    const newX = Math.random() * 1500;             // replace with width and height of screen
+    const newY = Math.random() * 1000;
+    vertex.x = newX;
+    vertex.y = newY;
+  } */
 
   // Run the simulation for 500 iterations
-  for(let i = 0; i < 100; i++) {
+  for(let i = 0; i < 500; i++) {
     // Update each vertex's speed according to the net force acting on it
-    for(const vertex of Object.values(graph)) {
-      const newX = Math.random() * 1500;
-      const newY = Math.random() * 1000;
-      vertex.x = newX;
-      vertex.y = newY;
-    }
-
     for(const vertex of Object.values(graph)) {
       let force = forceMap.get(vertex);
       let speed = speedMap.get(vertex);
-      // console.log(force);
-      // console.log(speed);
-      speed = linalg.add(speed, linalg.scale(0.005, force));
+      speed = linalg.add(speed, linalg.scale(0.00005, force));
 
-      // Recompute net force
-      for(const edge of vertex.out) {
-        const [start, end, mid] = drawing.compute_edge_geometry(graph, edge);
-        force = linalg.add(force, [end[0] - vertex.x, end[1] - vertex.y]);
-      }
-
-      forceMap.set(vertex, force);
       speedMap.set(vertex, speed);
-      vertex.x += 0.001*speed[0];
-      vertex.y += 0.001*speed[1];
+      vertex.x += speed[0];
+      vertex.y += speed[1];
+    }
 
-      drawing.draw(graph);
+    // Recompute net forces
+    init_forces(graph, forceMap);
+  }
+
+  for(const vertex of Object.values(graph)) {
+    console.log(vertex.name + " " + speedMap.get(vertex));
+  }
+
+  /* let rangeX = [Infinity, -Infinity];
+  let rangeY = [Infinity, -Infinity];
+  for(const vertex of Object.values(graph)) {
+    rangeX[0] = Math.min(rangeX[0], vertex.x);
+    rangeX[1] = Math.max(rangeX[1], vertex.x);
+    rangeY[0] = Math.min(rangeY[0], vertex.y);
+    rangeY[1] = Math.max(rangeY[1], vertex.y);
+  }
+
+  let canvas_size = drawing.canvas_size();
+  let clampedX = [canvas_size[0]*0.25, canvas_size[0]*0.75];
+  let clampedY = [canvas_size[1]*0.25, canvas_size[1]*0.75];
+  for(const vertex of Object.values(graph)) {
+    vertex.x = convert_range(vertex.x, rangeX, clampedX);
+    vertex.y = convert_range(vertex.y, rangeY, clampedY);
+  } */
+
+  drawing.draw(graph);
+  // Uncomment this later
+  hist.push_history(graph);
+}
+
+function arrange_vertices_initial(graph) {
+  let numVertices = Math.ceil(Math.sqrt(Object.values(graph).length));
+  let size = drawing.canvas_size();
+  let currX = size[0] / 10;
+  let currY = size[1] / 10;
+  let verticesMoved = 0;
+  for(const vertex of Object.values(graph)) {
+    vertex.x = currX;
+    vertex.y = currY;
+    vertex.r = consts.DEFAULT_VERTEX_RADIUS;
+    console.log(currX + " " + currY);
+
+    verticesMoved++;
+    currX += 250;
+    if(verticesMoved % numVertices == 0) {
+      currY += 250;
+      currX = size[0] / 10;
     }
   }
+}
 
-  console.log("AFTER REARRANGE");
+/**
+ * Initializes a map of graph vertices to their net forces with the necessary values
+ * @param {Object} graph 
+ * @param {Map<Object, Array<float>>} forceMap 
+ */
+function init_forces(graph, forceMap) {
   for(const vertex of Object.values(graph)) {
-    console.log(vertex.x + " " + vertex.y);
+    forceMap.set(vertex, [0, 0]);
   }
+
+  for(const from of Object.values(graph)) {
+    let forceFrom = forceMap.get(from);
+    let repulsionForce = [0, 0];
+
+    for(const vertex of Object.values(graph)) {
+      if(vertex.name != from.name) {
+        let directionVector = [from.x - vertex.x, from.y - vertex.y];
+        let unitVector = linalg.normalize(directionVector);
+        let dist = linalg.vec_len(directionVector)
+        repulsionForce = linalg.add(repulsionForce, linalg.scale(2.5*Math.pow(10, 7)/(dist*dist), unitVector));
+      }
+    }
+
+    forceFrom = linalg.add(forceFrom, repulsionForce);
+    // console.log(from.name + " " + repulsionForce);
+
+    for(const edge of from.out) {
+      const [start, end, mid] = drawing.compute_edge_geometry(graph, edge);
+      const to = graph[edge.to];
+      
+      let forceTo = forceMap.get(to);
+      forceFrom = linalg.add(forceFrom, compute_force([end[0] - from.x, end[1] - from.y]));
+      forceTo = linalg.add(forceTo, compute_force([start[0] - to.x, start[1] - to.y]));
+
+      forceMap.set(from, forceFrom);
+      forceMap.set(to, forceTo);
+    }
+  }
+}
+
+/**
+ * Computes the spring force that the given vector exerts on a vertex, assuming equilibrium length of 350
+ * @param {Array<float>} vec 
+ * @returns {Array<float>} Vector representing the spring force
+ */
+function compute_force(vec) {
+  const unit_vector = linalg.normalize(vec);
+  const eq_length = linalg.vec_len(vec) - 350;
+  return linalg.scale(eq_length, unit_vector);
 }

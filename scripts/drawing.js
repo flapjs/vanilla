@@ -24,7 +24,7 @@ export function event_position_on_canvas(e) {
   return [x, y];
 }
 
-function canvas_size() {
+export function canvas_size() {
   const rect = get_canvas().getBoundingClientRect();
   return [rect.right*window.devicePixelRatio, rect.bottom*window.devicePixelRatio];
 }

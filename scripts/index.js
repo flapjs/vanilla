@@ -26,6 +26,7 @@ function bind_double_click() {
       return;
     }  // shifted, don't create
     const [x, y] = drawing.event_position_on_canvas(e);
+    console.log(x + " " + y);
     const v = drawing.in_any_vertex(graph, x, y);
     if (v) {
       graph_ops.toggle_final(graph, v);
@@ -403,10 +404,9 @@ function bind_mousemove() {
 }
 
 function bind_rearrange_graph() {
-  const rearrange_menu = document.getElementById('rearrange_graph_menu');
-  rearrange_menu.addEventListener('change', () => {
+  const rearrange_menu = document.getElementById('rearrange-graph');
+  rearrange_menu.addEventListener('click', () => {
     graph_ops.rearrange_graph(graph);
-    console.log('FUUUUUCK');
   });
 }
 
@@ -423,6 +423,7 @@ function init() {
   bind_dd();
   bind_permalink();
   bind_mousemove();
+  bind_rearrange_graph();
   ui_setup.bind_plus_minus();
   ui_setup.add_input_bar(); // called so one input bar appears on opening of homepage
   ui_setup.htmlSetUp(); // initiate eventlisteners for sidenavbar, second sidenavbar, and popup tutorial
