@@ -402,12 +402,26 @@ function bind_mousemove() {
   });
 }
 
+/** bind context menu for side nav bar and secondary side navbar */
+function bind_context_menu_navbar(){
+  const navbar = document.querySelector('.nav')
+  const secondBar = document.querySelector('#secondbar')
+  navbar.addEventListener('click', () => {menus.remove_context_menu()})
+  secondBar.addEventListener('click', () => {menus.remove_context_menu()})
+  /*
+  for(var btns of navbar){
+    btns.addEventListener('click', () => {remove_context_menu()})
+  }
+  */
+}
+
 /** run after all the contents are loaded to hook up callbacks */
 function init() {
   bind_switch_machine();
   bind_double_click();
   bind_drag();
   bind_context_menu();
+  bind_context_menu_navbar();
   bind_machine_transform();
   bind_save_drawing();
   bind_undo_redo();
