@@ -300,11 +300,13 @@ export function NFA_to_DFA(NFA) {
  *  3. More testing
  */
 export function rearrange_graph(graph) {
+  let vertices = Object.values(graph);
+
   arrange_vertices_initial(graph);
   const forceMap = new Map();
   const speedMap = new Map();
 
-  for(const vertex of Object.values(graph)) {
+  for(const vertex of vertices) {
     speedMap.set(vertex, [0, 0]);
   }
 
@@ -321,7 +323,7 @@ export function rearrange_graph(graph) {
   // Run the simulation for 500 iterations
   for(let i = 0; i < 500; i++) {
     // Update each vertex's speed according to the net force acting on it
-    for(const vertex of Object.values(graph)) {
+    for(const vertex of vertices) {
       let force = forceMap.get(vertex);
       let speed = speedMap.get(vertex);
       speed = linalg.add(speed, linalg.scale(0.00005, force));
@@ -335,8 +337,26 @@ export function rearrange_graph(graph) {
     init_forces(graph, forceMap);
   }
 
-  for(const vertex of Object.values(graph)) {
-    console.log(vertex.name + " " + speedMap.get(vertex));
+  // Get "center of mass" of vertices
+  let centerX = 0;
+  let centerY = 0;
+  for(const vertex of vertices) {
+    console.log(vertex.name + " " + vertex.x + " " + vertex.y);
+    centerX += vertex.x;
+    centerY += vertex.y;
+  }
+
+  centerX /= vertices.length;
+  centerY /= vertices.length;
+  console.log(centerX + " " + centerY);
+
+  let size = drawing.canvas_size();
+  let canvasCenX = size[0] / 2;
+  let canvasCenY = size[1] / 2;
+
+  for(const vertex of vertices) {
+    vertex.x -= (centerX - canvasCenX);
+    vertex.y -= (centerY - canvasCenY);
   }
 
   /* let rangeX = [Infinity, -Infinity];
@@ -357,7 +377,6 @@ export function rearrange_graph(graph) {
   } */
 
   drawing.draw(graph);
-  // Uncomment this later
   hist.push_history(graph);
 }
 
