@@ -230,6 +230,9 @@ export function bind_run_input() {
   const run_btn = new_input.querySelector('.run_btn');
   run_btn.addEventListener('click', () => {
     new_input.style.backgroundColor = consts.SECOND_BAR_COLOR;
+    if (menus.machine_type() === consts.MACHINE_TYPES.CFG) {
+      graph = cfg.CFG_to_PDA();
+    }
     drawing.highlight_states(graph, []);  // clear the highlighting
     computations[new_input_idx] = compute.run_input(graph, menus.machine_type(), textbox.value);  // noninteractive
     // eslint-disable-next-line no-unused-vars
@@ -397,21 +400,22 @@ function bind_machine_transform() {
 function bind_cfg_buttons() {
   const CFG_2_PDA_btn = document.getElementById('CFG_2_PDA');
   CFG_2_PDA_btn.addEventListener('click', () => {
-    graph = cfg.CFG_to_PDA(graph);
+    
+    graph = cfg.CFG_to_PDA();
     if (!graph) {
       return;
     }
-    drawing.draw(graph);
-    document.getElementsByClassName("step_btn")[0].hidden = false;
-    document.getElementsByClassName("reset_btn")[0].hidden = false;
-    drawing.get_canvas().hidden = false;
     const select = document.getElementById('select_machine');
     select.value = consts.MACHINE_TYPES.PDA;
     hist.set_history_keys(consts.MACHINE_TYPES.PDA);
     menus.display_UI_for(consts.MACHINE_TYPES.PDA);
-    hist.push_history(graph);
-    refresh_graph();  // switching graph
+    console.log(graph);
+    drawing.draw(graph);
+    document.getElementsByClassName("step_btn")[0].hidden = false;
+    document.getElementsByClassName("reset_btn")[0].hidden = false;
+    drawing.get_canvas().hidden = false;
     cfg.clear_rules(true);
+    hist.push_history(graph);
     history.replaceState(undefined, undefined, '#');  // clear the permalink
   });
 

@@ -75,10 +75,15 @@
     </div>
     <div class = "dropdown settings">
       <button class="NFA_specific" id="NFA_to_DFA" >NFA to DFA</button>
+      <button class="CFG_specific" id="CFG_2_PDA" hidden>CFG to PDA</button>
+      <button class="CFG_specific" id="CFG_CREATE" hidden>Create new rule</button>
+      <button class="CFG_specific" id="CFG_DELETE" hidden>Delete current rule</button>
+      <button class="CFG_specific" id="CFG_CLEAR" hidden>Clear all rules</button>
       <select id="select_machine">
         <option value="NFA">Finite Automata</option>
         <option value="PDA">Pushdown Automata</option>
         <option value="Turing">Turing Machine</option>
+        <option value="CFG">Context Free Language</option>
         <option value="Moore">Moore</option>
         <option value="Mealy">Mealy</option>
       </select>
@@ -152,5 +157,11 @@
   <!-- the big canvas that we draw on -->
   <canvas id='machine_drawing'>Your browser does not support canvas</canvas>
 
+  <section class="CFG_specific" id="cfg-section" hidden>
+    <div class = "CFG_specific" id="CFG_list">
+    <h2 class="CFG_specific">Starting symbol: <input type="text" id = "starting_symbol" maxlength="1" size="1ch"></h2>
+    <ul id="cfg-list">
+    </ul>
+  </section>
 </body>
 </html>

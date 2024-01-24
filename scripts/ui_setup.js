@@ -79,7 +79,7 @@ export function htmlSetUp(){
     expandIcon('home'); 
   });
   machineIcon.addEventListener('click', () => {
-    expandIcon('settings'); 
+    expandIcon('settings');
   });
   saveIcon.addEventListener('click', () => {
     expandIcon('save'); 
@@ -143,6 +143,8 @@ function closeMenu() {
   const secondbar = document.getElementById('secondbar');
   if (homeToggle || machineToggle || saveToggle) {
     secondbar.classList.remove('open');
+    let cfg = document.getElementById("CFG_list");
+    cfg.style.marginLeft = "0";
     homeToggle = false;
     machineToggle = false;
     saveToggle = false;
@@ -216,6 +218,8 @@ function toggleMenu(classname) {
 //updated on function when clicking on an icon 5/16/2023
 function expandIcon(nameOfClass){
   clearMenu();
+  let cfg = document.getElementById("CFG_list");
+  cfg.style.marginLeft = "7rem";
   var headerName = 'none';
   var currIcon;
   switch (nameOfClass) {

@@ -374,3 +374,20 @@ ul {
     margin-left: 4.5rem;
   }
 }
+
+.CFG_specific {
+  margin-top: 0.5rem;
+  margin-left: 7rem;
+}
+
+.cfg_list_object {
+  margin-left: 7rem;
+}
+
+.cfg_symbol {
+  width: 1.5ch;
+}
+
+.cfg_rule {
+  width: 7ch;
+}

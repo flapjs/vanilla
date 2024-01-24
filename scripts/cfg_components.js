@@ -3,7 +3,6 @@
 import * as consts from './consts.js';
 import * as hist from './history.js';
 import * as graph_components from './graph_components.js';
-import { machine_type } from './menus.js';
 
 // Keeps track of symbols and rules
 const list_of_rules = [];
@@ -18,7 +17,7 @@ let graph = consts.EMPTY_GRAPH;
 let curr_index = -1;
 
 // Starting symbol input text
-const start_symbol = document.getElementById("starting_symbol")
+const start_symbol = document.getElementById("starting_symbol");
 /**
  * CFG switch
  */
@@ -66,7 +65,10 @@ function isEmpty(obj) {
  * Create new rule
  */
 export function create_new_rule(enter=false, want_to_push = true) {
+
+    // Textbox used for symbol and rule
     const new_cfg = document.createElement("li");
+    new_cfg.className = "cfg_list_object";
     const new_symbol = document.createElement("input");
     new_symbol.className = "cfg_symbol";
     new_symbol.maxLength = 1;
@@ -82,10 +84,10 @@ export function create_new_rule(enter=false, want_to_push = true) {
     new_cfg.append(document.createTextNode('→'));
     new_cfg.appendChild(new_rule);
 
+    //Check if a rule is added at the end (by enter) or somewhere else
     if (!enter) {
         list.append(new_cfg);
     } else {
-        console.log(curr_index);
         list.insertBefore(new_cfg, list.children[curr_index+1]);
     }
 
@@ -95,27 +97,24 @@ export function create_new_rule(enter=false, want_to_push = true) {
         li: new_cfg
     };
 
-    // Timer is to be sure that focus out events happen first
+    // Timer is to be sure that focus out events happen first.
+    // It is used to know where a new rule should be created.
+    // For example, if there are currently two rules, and you
+    // want a new rule between both, then this section makes
+    // it is created between them.
     new_symbol.addEventListener("focusin", () => {
         setTimeout(function() {
             change_curr_index(rule_obj);
-        }, 50)
+        }, 20)
     });
 
     new_rule.addEventListener("focusin", () => {
         setTimeout(function() {
             change_curr_index(rule_obj);
-        }, 50)
+        }, 20)
     });
 
-    new_symbol.addEventListener("focosout", () => {
-        curr_index = -1;
-    });
-
-    new_rule.addEventListener("focusout", () => {
-        curr_index = -1;
-    });
-
+    // Any changes are pushed.
     new_symbol.addEventListener('change', function() {
         push_to_history();
     });
@@ -124,9 +123,12 @@ export function create_new_rule(enter=false, want_to_push = true) {
         push_to_history();
     });
 
+    // Add +,-, and X button.
     new_cfg.append(get_new_plus_btn(rule_obj, new_cfg));
     new_cfg.append(document.createTextNode(' / '));
     new_cfg.append(get_new_minus_btn(rule_obj, new_cfg));
+    new_cfg.append(document.createTextNode(' / '));
+    new_cfg.append(get_new_delete_btn(rule_obj, new_cfg));
 
     list_of_rules.splice(curr_index + 1, 0, rule_obj);
     if (want_to_push) {
@@ -134,13 +136,14 @@ export function create_new_rule(enter=false, want_to_push = true) {
     }
 }
 
+// Change "index" to the current rule selected
 function change_curr_index(rule_obj) {
     curr_index = list_of_rules.indexOf(rule_obj);
-    console.log(curr_index);
 }
 
+// Resize rule textbox if necessary
 function autoResize() {
-    this.style.width = (this.value.length+3) + "ch";
+    this.style.width = (this.value.length+7) + "ch";
 }
 
 /**
@@ -148,7 +151,7 @@ function autoResize() {
  * @param {Object} CFG - set of CFG rules to be converted to PDA
  * @returns {Object} - graph of a PDA equivalent to the CFG rules
  */
-export function CFG_to_PDA(CFG) {
+export function CFG_to_PDA() {
     graph = consts.EMPTY_GRAPH;
     const start = start_symbol.value;
     if (start == " " || start.length < 1) {
@@ -165,6 +168,10 @@ export function CFG_to_PDA(CFG) {
     return graph;
 }
 
+// Creates the edges of the PDA by making a path from
+// the loop vertex to the empty vertex after emptying
+// the portion of the stack, representing the word and
+// back to the loop vertex.
 function make_edges() {
     graph['final'] = graph_components.make_vertex('final', 3*consts.CFG_EDGE_X_DISTANCE + 50, 0, consts.DEFAULT_VERTEX_RADIUS, false, true);
     graph['loop'] = graph_components.make_vertex('loop', 2*consts.CFG_EDGE_X_DISTANCE + 50, 0, consts.DEFAULT_VERTEX_RADIUS, false, false, 
@@ -185,8 +192,8 @@ function make_edges() {
     const strs = [];
     let failed = false;
 
+    // Go through every rule.
     for (let i = 0; i < list_of_rules.length; i++) {
-        
         const ruleObj = list_of_rules[i];
         const l = ruleObj.symbol.value;
         if (l.length != 1) {
@@ -197,7 +204,6 @@ function make_edges() {
             alphabet.add(l);
         }
         if (terminal_symbols.indexOf(l) < 0) {
-            console.log(terminal_symbols);
             terminal_symbols.push(l);
         }
         
@@ -226,7 +232,7 @@ function make_edges() {
                 consts.CFG_EDGE_Y_DISTANCE + row*consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false, 
                     [graph_components.make_edge('q' + vertexCnt, 'EMPTY', undefined, undefined, undefined, undefined,
                     undefined, undefined, rule[0])]);
-                    vertexCnt--;
+                vertexCnt--;
                 if (terminal_symbols.indexOf(rule[0]) < 0) {
                     terminal_symbols.push(rule[0]);
                 }
@@ -250,7 +256,8 @@ function make_edges() {
         });
     }
 
-    graph['EMPTY'] = graph_components.make_vertex('EMPTY', (longest + 3)*consts.CFG_EDGE_X_DISTANCE, (row/2 + 1) *consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false,
+    // Creates the EMPTY vertex far enough away so that the edges are visible
+    graph['EMPTY'] = graph_components.make_vertex('EMPTY', (longest + 3)*consts.CFG_EDGE_X_DISTANCE, (row/2 + 1)*consts.CFG_EDGE_Y_DISTANCE, consts.DEFAULT_VERTEX_RADIUS, false, false,
         [graph_components.make_edge('EMPTY', 'loop', undefined, 0.5, 8.55)]);
 
     const start = start_symbol.value;
@@ -259,6 +266,7 @@ function make_edges() {
         failed = true;
     }
 
+    // Add all terminal symbols to the loop vertex.
     terminal_symbols.forEach(symbol => {
         graph['loop'].out.push(graph_components.make_edge('loop', 'loop', symbol, cnt*0.1 + 0.3,
       -1 - cnt, -2.8, -1.1, symbol));
@@ -270,6 +278,7 @@ function make_edges() {
     return failed;
 }
 
+// Pushes to the history in a way that CFG can understand how to retrieve.
 function push_to_history() {
     const to_push = [];
     const start = start_symbol.value;
@@ -284,14 +293,16 @@ function push_to_history() {
     hist.push_history(to_push)
 }
 
+// Sidebar button to delete the currently selected rule (none if none are selected)
 export function delete_rule() {
-    list_of_rules.pop();
     if (list.childElementCount > 1) {
-        list.removeChild(list.childNodes[list.childElementCount -1]);
+        list_of_rules.splice(curr_index, 1);
+        list.removeChild(list.childNodes[curr_index]);
     }
     push_to_history();
 }
 
+// Clears all the rules and symbols.
 export function clear_rules(machine_switch = false) {
     while(list.firstChild){
         list_of_rules.pop();
@@ -302,8 +313,8 @@ export function clear_rules(machine_switch = false) {
     }
 }
 
+// Creates new empty rules and loads them with what is contained in the rules parameter.
 export function reload_rules(rules) {
-    console.log(rules);
     if (isEmpty(rules)) {
         create_new_rule(false, false);
         start_symbol.value = "";
@@ -314,6 +325,7 @@ export function reload_rules(rules) {
 
     for (let i = 1; i < rules.length; i++) {
         const new_cfg = document.createElement("li");
+        new_cfg.className = "cfg_list_object";
         list.appendChild(new_cfg);
         const new_symbol = document.createElement("input");
         new_symbol.className = "cfg_symbol";
@@ -325,7 +337,7 @@ export function reload_rules(rules) {
         new_symbol.addEventListener("focusin", () => {
             setTimeout(function() {
                 change_curr_index(rule_obj);
-            }, 50)
+            }, 20)
         });
 
         new_symbol.addEventListener("focosout", () => {
@@ -358,11 +370,7 @@ export function reload_rules(rules) {
             new_rule.addEventListener("focusin", () => {
                 setTimeout(function() {
                     change_curr_index(rule_obj);
-                }, 50)
-            });
-
-            new_rule.addEventListener("focusout", () => {
-                curr_index = -1;
+                }, 20)
             });
 
             new_rule.addEventListener('change', function() {
@@ -379,12 +387,15 @@ export function reload_rules(rules) {
         new_cfg.append(get_new_plus_btn(rule_obj, new_cfg));
         new_cfg.append(document.createTextNode(' / '));
         new_cfg.append(get_new_minus_btn(rule_obj, new_cfg));
+        new_cfg.append(document.createTextNode(' / '));
+        new_cfg.append(get_new_delete_btn(rule_obj, new_cfg,));
 
         list_of_rules.splice(i - 1, 0, rule_obj);
         list.appendChild(new_cfg);
     };
 }
 
+// Creates a plus button that adds a new rule.
 function get_new_plus_btn(rule_obj, new_cfg) {
     let plus_btn = document.createElement('button');
         plus_btn.textContent = ' + ';
@@ -398,24 +409,22 @@ function get_new_plus_btn(rule_obj, new_cfg) {
             added_rule.addEventListener("focusin", () => {
                 setTimeout(function() {
                     change_curr_index(rule_obj);
-                }, 50)
-            });
-            added_rule.addEventListener("focusout", () => {
-                curr_index = -1;
+                }, 20)
             });
             added_rule.addEventListener('change', function() {
                 push_to_history();
             });
             const line = document.createElement('text');
             line.textContent = " | ";
-            new_cfg.insertBefore(line, new_cfg.children[new_cfg.children.length - 2]);
-            new_cfg.insertBefore(added_rule, new_cfg.children[new_cfg.children.length - 2]);
+            new_cfg.insertBefore(added_rule, new_cfg.children[new_cfg.children.length - 3]);
+            new_cfg.insertBefore(line, new_cfg.children[new_cfg.children.length - 4]);
             push_to_history();
         });
 
         return plus_btn;
 }
 
+// Creates a button that deletes the last rule of the associated line.
 function get_new_minus_btn(rule_obj, new_cfg) {
     let minus_btn = document.createElement('button');
     minus_btn.textContent = ' - ';
@@ -424,9 +433,25 @@ function get_new_minus_btn(rule_obj, new_cfg) {
             return;
         }
         rule_obj.rules.pop();
-        new_cfg.removeChild(new_cfg.children[new_cfg.children.length - 3]);
-        new_cfg.removeChild(new_cfg.children[new_cfg.children.length - 3]);
+        new_cfg.removeChild(new_cfg.children[new_cfg.children.length - 4]);
+        new_cfg.removeChild(new_cfg.children[new_cfg.children.length - 4]);
         push_to_history();
     });
     return minus_btn;
+}
+
+// Creates a button that removes all the rules of that line.
+function get_new_delete_btn(rule_obj, new_cfg) {
+    let delete_btn = document.createElement('button');
+    delete_btn.textContent = ' X ';
+    delete_btn.addEventListener("click", () => {
+        let curr_index = list_of_rules.indexOf(rule_obj);
+        list.removeChild(list.childNodes[curr_index + 1]);
+        list_of_rules.splice(curr_index, 1);
+        if (list_of_rules.length == 0) {
+            create_new_rule();
+        }
+        push_to_history();
+    });
+    return delete_btn;
 }

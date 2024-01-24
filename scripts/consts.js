@@ -67,6 +67,9 @@ export const ARROW_WIDTH = 10;
 /** @constant {string} EMPTY_SYMBOL - no operation stack symbol */
 export const EMPTY_SYMBOL = 'ε';
 
+/** @constant {string} EMPTY_GRAPH - empty graph */
+export const EMPTY_GRAPH = [];
+
 /** @constant {string} EMPTY_TYPE - symbol for an empty cell of a Turing Machine */
 export const EMPTY_TAPE = '☐';
 
