@@ -17,10 +17,10 @@ export function injectConcatSymbols(expressionString) {
     result += currChar;
     if (i + 1 < expressionString.length) {
       let nextChar = expressionString.charAt(i + 1);
-      if (currChar != consts.OPEN && currChar != consts.UNION
-                && currChar != consts.CONCAT && nextChar != consts.CLOSE
-                && nextChar != consts.UNION && nextChar != consts.KLEENE
-                && nextChar != consts.PLUS && nextChar != consts.CONCAT) {
+      if (currChar !== consts.OPEN && currChar !== consts.UNION
+                && currChar !== consts.CONCAT && nextChar !== consts.CLOSE
+                && nextChar !== consts.UNION && nextChar !== consts.KLEENE
+                && nextChar !== consts.PLUS && nextChar !== consts.CONCAT) {
         result += consts.CONCAT;
       }
     }
@@ -74,7 +74,7 @@ export function shunting_yard(string) {
     }
     // case if ch is )
     else if (ch === consts.CLOSE) {
-      while (stack.peek() != consts.OPEN) {
+      while (stack.peek() !== consts.OPEN) {
         queue.enqueue(stack.pop());
       }
       stack.pop();
