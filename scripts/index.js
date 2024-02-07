@@ -403,6 +403,19 @@ function bind_mousemove() {
   });
 }
 
+/** bind context menu for side nav bar and secondary side navbar */
+function bind_context_menu_navbar(){
+  const navbar = document.querySelector('.nav')
+  const secondBar = document.querySelector('#secondbar')
+  navbar.addEventListener('click', () => {menus.remove_context_menu()})
+  secondBar.addEventListener('click', () => {menus.remove_context_menu()})
+  /*
+  for(var btns of navbar){
+    btns.addEventListener('click', () => {remove_context_menu()})
+  }
+  */
+}
+
 function bind_regex() {
   // let [input_field, open_btn, close_btn, union_btn, concat_btn, kleene_btn, sigma_btn, empty_btn, convert] = regex.create_buttons();
   regex.create_buttons();
