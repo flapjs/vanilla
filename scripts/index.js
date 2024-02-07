@@ -442,6 +442,7 @@ function init() {
   bind_double_click();
   bind_drag();
   bind_context_menu();
+  bind_context_menu_navbar();
   bind_machine_transform();
   bind_save_drawing();
   bind_undo_redo();
