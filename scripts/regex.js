@@ -383,8 +383,8 @@ export function areParenthesisBalanced(expressionString)
     {
         let symbol = expressionString.charAt(i);
 
-        if (symbol === OPEN) count++;
-        else if (symbol === CLOSE) count--;
+        if (symbol === consts.OPEN) count++;
+        else if (symbol === consts.CLOSE) count--;
 
         if (count < 0) return false;
     }
