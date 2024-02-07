@@ -299,7 +299,7 @@ export function create_buttons() {
   let input_field = document.getElementById('regex_string');
 
   const insertChar = (char) => {
-    if (input_field.selectionStart || input_field.selectionStart == '0') {
+    if (input_field.selectionStart || input_field.selectionStart === '0') {
       var startPos = input_field.selectionStart;
       var endPos = input_field.selectionEnd;
       input_field.value = input_field.value.substring(0, startPos)
@@ -383,12 +383,12 @@ export function areParenthesisBalanced(expressionString)
     {
         let symbol = expressionString.charAt(i);
 
-        if (symbol == OPEN) count++;
-        else if (symbol == CLOSE) count--;
+        if (symbol === OPEN) count++;
+        else if (symbol === CLOSE) count--;
 
         if (count < 0) return false;
     }
-    return count == 0;
+    return count === 0;
 }
 
 export function isValidRegex(string) {
