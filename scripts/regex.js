@@ -371,6 +371,56 @@ export function create_buttons() {
   });
 }
 
+// add function to check for valid regex string
+// 4. check for valid character, instant reject for non valid characters
+// 5. handle case with empty set
+
+// function taken from https://github.com/flapjs/webapp/blob/master/src/modules/re/machine/RegularExpression.js
+export function areParenthesisBalanced(expressionString)
+{
+    let count = 0;
+    for (let i = 0; i < expressionString.length; i++)
+    {
+        let symbol = expressionString.charAt(i);
+
+        if (symbol == OPEN) count++;
+        else if (symbol == CLOSE) count--;
+
+        if (count < 0) return false;
+    }
+    return count == 0;
+}
+
+export function isValidRegex(string) {
+  // remove spaces from input string
+  string = string.replace(/\s+/g, '');
+
+  // check for invalid parentheses and empty string
+  if (!areParenthesisBalanced(string) || string === "") {
+    return false;
+  }
+  let prev;
+
+  for (const char of string) {
+    // first character of string
+    if (prev === undefined) {
+      prev = char;
+    }
+
+    // check case that we have two operators in a row
+    if ((char === consts.UNION || char === consts.KLEENE || char === consts.CONCAT) 
+        && 
+        (prev === consts.UNION || prev === consts.KLEENE || prev === consts.CONCAT)
+      ) {
+        return false;
+      }
+
+    prev = char;
+  }
+
+  return true;
+}
+
 export function process_string(string) {
   let injectedConcat = injectConcatSymbols(string);
   let postfix = shunting_yard(injectedConcat);

@@ -409,20 +409,29 @@ function bind_regex() {
   const convert_to_nfa_btn = document.getElementById('convert_to_nfa');
   convert_to_nfa_btn.addEventListener('click', () => {
     console.log(document.getElementById('regex_string').value);
-    graph = regex.process_string(document.getElementById('regex_string').value);
-    menus.display_UI_for('NFA');
-    document.getElementById('select_machine').value = 'NFA';
-    drawing.draw(graph);
-    // hist.push_history(graph); NEED TO IMPLEMENT HISTORY BEFORE UNCOMMENTING
+    if (regex.isValidRegex(document.getElementById('regex_string').value)) {
+      graph = regex.process_string(document.getElementById('regex_string').value);
+      menus.display_UI_for('NFA');
+      document.getElementById('select_machine').value = 'NFA';
+      drawing.draw(graph);
+      // hist.push_history(graph); NEED TO IMPLEMENT HISTORY BEFORE UNCOMMENTING
+    } else {
+      alert("Invalid regular expression.")
+    }
   });
   const input_field = document.getElementById('regex_string');
   input_field.addEventListener('keypress', (e) => {
     if (e.key === "Enter") {
       console.log(document.getElementById('regex_string').value);
-      graph = regex.process_string(document.getElementById('regex_string').value);
-      menus.display_UI_for('NFA');
-      document.getElementById('select_machine').value = 'NFA';
-      drawing.draw(graph);
+      if (regex.isValidRegex(document.getElementById('regex_string').value)) {
+        graph = regex.process_string(document.getElementById('regex_string').value);
+        menus.display_UI_for('NFA');
+        document.getElementById('select_machine').value = 'NFA';
+        drawing.draw(graph);
+        // hist.push_history(graph); NEED TO IMPLEMENT HISTORY BEFORE UNCOMMENTING
+      } else {
+        alert("Invalid regular expression.")
+      }
     }
   })
 }
