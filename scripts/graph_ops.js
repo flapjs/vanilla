@@ -312,14 +312,6 @@ export function rearrange_graph(graph) {
 
   init_forces(graph, forceMap);
 
-  // assign each vertex a new random position
-  /* for(const vertex of Object.values(graph)) {
-    const newX = Math.random() * 1500;             // replace with width and height of screen
-    const newY = Math.random() * 1000;
-    vertex.x = newX;
-    vertex.y = newY;
-  } */
-
   // Run the simulation for 500 iterations
   for(let i = 0; i < 500; i++) {
     // Update each vertex's speed according to the net force acting on it
@@ -350,6 +342,7 @@ export function rearrange_graph(graph) {
   centerY /= vertices.length;
   console.log(centerX + " " + centerY);
 
+  // Move the center of mass to the center of the screen
   let size = drawing.canvas_size();
   let canvasCenX = size[0] / 2;
   let canvasCenY = size[1] / 2;
@@ -380,6 +373,7 @@ export function rearrange_graph(graph) {
   hist.push_history(graph);
 }
 
+// Start by arranging all vertices in a grid formation spaced 250px apart
 function arrange_vertices_initial(graph) {
   let numVertices = Math.ceil(Math.sqrt(Object.values(graph).length));
   let size = drawing.canvas_size();
@@ -450,4 +444,24 @@ function compute_force(vec) {
   const unit_vector = linalg.normalize(vec);
   const eq_length = linalg.vec_len(vec) - 350;
   return linalg.scale(eq_length, unit_vector);
+}
+
+// Creates a random graph with the specified number of vertices (mostly for testing rearrange graph)
+function rng_graph(num_vertices) {
+  let graph = {};
+  let size = drawing.canvas_size();
+  for(let i = 0; i < num_vertices; i++) {
+    let name = `q${i}`;
+    let vertex = graph_components.make_vertex(name, Math.random()*size[0], Math.random()*size[1]);
+    graph[name] = vertex;
+  }
+
+  for(let i = 0; i < num_vertices*num_vertices / 2; i++) {
+    let v1 = `q${Math.floor(Math.random()*10)}`;
+    let v2 = `q${Math.floor(Math.random()*10)}`;
+
+    graph_components.make_edge(v1, v2);
+  }
+
+  return graph;
 }
