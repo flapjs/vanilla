@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: permalink</title>
+    <title>JSDoc: Module: regex</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: permalink</h1>
+    <h1 class="page-title">Module: regex</h1>
 
     
 
@@ -64,7 +64,7 @@
     
 
     
-    <h4 class="name" id=".deserialize"><span class="type-signature">(static) </span>deserialize<span class="signature">(graph_str)</span><span class="type-signature"> &rarr; {Array.&lt;(string|Object)>}</span></h4>
+    <h4 class="name" id=".concat"><span class="type-signature">(static) </span>concat<span class="signature">(graph1, graph2)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
 
     
@@ -72,7 +72,7 @@
 
 
 <div class="description">
-    basically the 'fromString' method for the graph
+    performs the concatenation operation on two graphs
 </div>
 
 
@@ -108,7 +108,7 @@
 
         <tr>
             
-                <td class="name"><code>graph_str</code></td>
+                <td class="name"><code>graph1</code></td>
             
 
             <td class="type">
@@ -124,7 +124,30 @@
 
             
 
-            <td class="description last">the string representation of the graph</td>
+            <td class="description last">the first graph</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>graph2</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the second graph</td>
         </tr>
 
     
@@ -165,7 +188,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="permalink.js.html">permalink.js</a>, <a href="permalink.js.html#line99">line 99</a>
+        <a href="regex.js.html">regex.js</a>, <a href="regex.js.html#line167">line 167</a>
     </li></ul></dd>
     
 
@@ -194,7 +217,7 @@
 
         
 <div class="param-desc">
-    type of the graph in {'NFA', 'PDA', 'Turing'} and the graph
+    the new resulting graph of the concatenation operation
 </div>
 
 
@@ -205,7 +228,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Array.&lt;(string|Object)></span>
+<span class="param-type">string</span>
 
 
     </dd>
@@ -223,7 +246,7 @@
     
 
     
-    <h4 class="name" id=".serialize"><span class="type-signature">(static) </span>serialize<span class="signature">(type, graph)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    <h4 class="name" id=".getPrecendence"><span class="type-signature">(static) </span>getPrecendence<span class="signature">(key)</span><span class="type-signature"> &rarr; {Number}</span></h4>
     
 
     
@@ -231,7 +254,7 @@
 
 
 <div class="description">
-    basically the 'toString' method for the graph
+    given an operator, gets the operator's precedence
 </div>
 
 
@@ -267,7 +290,7 @@
 
         <tr>
             
-                <td class="name"><code>type</code></td>
+                <td class="name"><code>key</code></td>
             
 
             <td class="type">
@@ -283,9 +306,304 @@
 
             
 
-            <td class="description last">the type of the graph in {'NFA', 'PDA', 'Turing'}</td>
+            <td class="description last">the operator to get the predecence of</td>
         </tr>
 
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="regex.js.html">regex.js</a>, <a href="regex.js.html#line36">line 36</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    the predecence of the operator as an int
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Number</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".injectConcatSymbols"><span class="type-signature">(static) </span>injectConcatSymbols<span class="signature">(expressionString)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    inserts omitted concatenation symbols in regular expression
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>expressionString</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the string to inject concatenation symbols in</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="regex.js.html">regex.js</a>, <a href="regex.js.html#line13">line 13</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    the string with concatenation symbols inserted
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".kleene"><span class="type-signature">(static) </span>kleene<span class="signature">(graph)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    performs the union operation on two graphs
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
     
 
         <tr>
@@ -296,7 +614,7 @@
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">string</span>
 
 
             
@@ -306,7 +624,7 @@
 
             
 
-            <td class="description last">check 'graph_components.js' for the structure of the graph</td>
+            <td class="description last">the graph</td>
         </tr>
 
     
@@ -347,7 +665,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="permalink.js.html">permalink.js</a>, <a href="permalink.js.html#line43">line 43</a>
+        <a href="regex.js.html">regex.js</a>, <a href="regex.js.html#line226">line 226</a>
     </li></ul></dd>
     
 
@@ -376,7 +694,7 @@
 
         
 <div class="param-desc">
-    the graph as a string
+    the new resulting graph of the kleene operation
 </div>
 
 
@@ -405,7 +723,7 @@
     
 
     
-    <h4 class="name" id="~char_url_compliance"><span class="type-signature">(inner) </span>char_url_compliance<span class="signature">(c)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    <h4 class="name" id=".shunting_yard"><span class="type-signature">(static) </span>shunting_yard<span class="signature">(string)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
 
     
@@ -413,7 +731,7 @@
 
 
 <div class="description">
-    makes a character url compliant and makes sure it does not clash with the delimiters
+    applies the shunting-yard algorithm to convert regular expression to postfix notation
 </div>
 
 
@@ -449,7 +767,7 @@
 
         <tr>
             
-                <td class="name"><code>c</code></td>
+                <td class="name"><code>string</code></td>
             
 
             <td class="type">
@@ -465,7 +783,7 @@
 
             
 
-            <td class="description last">the character to be made url compliant</td>
+            <td class="description last">the string to convert to postfix</td>
         </tr>
 
     
@@ -506,7 +824,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="permalink.js.html">permalink.js</a>, <a href="permalink.js.html#line11">line 11</a>
+        <a href="regex.js.html">regex.js</a>, <a href="regex.js.html#line54">line 54</a>
     </li></ul></dd>
     
 
@@ -535,7 +853,7 @@
 
         
 <div class="param-desc">
-    the url compliant character
+    the string in postfix notation
 </div>
 
 
@@ -564,7 +882,7 @@
     
 
     
-    <h4 class="name" id="~parse_type"><span class="type-signature">(inner) </span>parse_type<span class="signature">(graph_str)</span><span class="type-signature"> &rarr; {Array.&lt;string>}</span></h4>
+    <h4 class="name" id=".union"><span class="type-signature">(static) </span>union<span class="signature">(graph1, graph2)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
 
     
@@ -572,7 +890,7 @@
 
 
 <div class="description">
-    find the type of the graph and return it along with the rest of the unparsed graph string
+    performs the union operation on two graphs
 </div>
 
 
@@ -608,7 +926,7 @@
 
         <tr>
             
-                <td class="name"><code>graph_str</code></td>
+                <td class="name"><code>graph1</code></td>
             
 
             <td class="type">
@@ -624,159 +942,20 @@
 
             
 
-            <td class="description last">the string representation of the graph</td>
+            <td class="description last">the first graph</td>
         </tr>
 
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="permalink.js.html">permalink.js</a>, <a href="permalink.js.html#line85">line 85</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    type of the graph in {'NFA', 'PDA', 'Turing'} and the rest of the unparsed graph string
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Array.&lt;string></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="~to_string_field"><span class="type-signature">(inner) </span>to_string_field<span class="signature">(field)</span><span class="type-signature"> &rarr; {string}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    turn a field into a string
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>field</code></td>
+                <td class="name"><code>graph2</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">string</span>
-|
-
-<span class="param-type">float</span>
 
 
             
@@ -786,7 +965,7 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last">the second graph</td>
         </tr>
 
     
@@ -827,7 +1006,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="permalink.js.html">permalink.js</a>, <a href="permalink.js.html#line28">line 28</a>
+        <a href="regex.js.html">regex.js</a>, <a href="regex.js.html#line104">line 104</a>
     </li></ul></dd>
     
 
@@ -856,7 +1035,7 @@
 
         
 <div class="param-desc">
-    the string repr of the field
+    the new resulting graph of the union operation
 </div>
 
 
