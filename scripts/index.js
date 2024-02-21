@@ -10,6 +10,7 @@ import * as menus from './menus.js';
 import * as permalink from './permalink.js';
 import * as util from './util.js';
 import * as ui_setup from './ui_setup.js';
+import * as regex from './regex.js';
 
 // if not in browser, don't run
 if (typeof document !== 'undefined') {
@@ -415,6 +416,43 @@ function bind_context_menu_navbar(){
   */
 }
 
+function bind_regex() {
+  // let [input_field, open_btn, close_btn, union_btn, concat_btn, kleene_btn, sigma_btn, empty_btn, convert] = regex.create_buttons();
+  regex.create_buttons();
+  const convert_to_nfa_btn = document.getElementById('convert_to_nfa');
+  convert_to_nfa_btn.addEventListener('click', () => {
+    console.log(document.getElementById('regex_string').value);
+    let inputString = document.getElementById('regex_string').value
+    inputString = inputString.replace(/\s/g, '');
+    if (regex.isValidRegex(inputString)) {
+      graph = regex.process_string(inputString);
+      menus.display_UI_for('NFA');
+      document.getElementById('select_machine').value = 'NFA';
+      drawing.draw(graph);
+      // hist.push_history(graph); NEED TO IMPLEMENT HISTORY BEFORE UNCOMMENTING
+    } else {
+      alert("Invalid regular expression.")
+    }
+  });
+  const input_field = document.getElementById('regex_string');
+  input_field.addEventListener('keypress', (e) => {
+    if (e.key === "Enter") {
+      console.log(document.getElementById('regex_string').value);
+      let inputString = document.getElementById('regex_string').value
+      inputString = inputString.replace(/\s/g, '');
+      if (regex.isValidRegex(inputString)) {
+        graph = regex.process_string(inputString);
+        menus.display_UI_for('NFA');
+        document.getElementById('select_machine').value = 'NFA';
+        drawing.draw(graph);
+        // hist.push_history(graph); NEED TO IMPLEMENT HISTORY BEFORE UNCOMMENTING
+      } else {
+        alert("Invalid regular expression.")
+      }
+    }
+  })
+}
+
 /** run after all the contents are loaded to hook up callbacks */
 function init() {
   bind_switch_machine();
@@ -432,5 +470,6 @@ function init() {
   ui_setup.bind_plus_minus();
   ui_setup.add_input_bar(); // called so one input bar appears on opening of homepage
   ui_setup.htmlSetUp(); // initiate eventlisteners for sidenavbar, second sidenavbar, and popup tutorial
+  bind_regex();
   init_graph();  // leave this last since we want it to override some of the above
 }

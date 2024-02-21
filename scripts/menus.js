@@ -57,6 +57,14 @@ export function is_Moore() {
 }
 
 /**
+ * reports the type of machine the user is working on
+ * @returns {boolean} true or false 
+ */
+export function is_Regex() {
+  return machine_type() === consts.MACHINE_TYPES.Regex;
+}
+
+/**
  * creates the context menu to change a vertex and display it
  * @param {Object} graph - the graph containing the vertex v
  * @param {string} v - the vertex we clicked on and want to change
@@ -186,7 +194,7 @@ export function set_UI_visibility(machine, visible) {
   }
 }
 
-/** displays exactly those UI elements specific to the machine from {NFA, PDA, Turing} */
+/** displays exactly those UI elements specific to the machine from {NFA, PDA, Turing, Regex} */
 export function display_UI_for(machine) {
   for (const machine_type of Object.values(consts.MACHINE_TYPES)) {
     set_UI_visibility(machine_type, false);  // hide all UI elements

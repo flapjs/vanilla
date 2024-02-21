@@ -88,10 +88,11 @@ export const MACHINE_TYPES = {
   PDA: 'PDA',
   Turing: 'Turing',
   Moore: 'Moore',
-  Mealy: 'Mealy'
+  Mealy: 'Mealy',
+  Regex: 'Regex'
 };
 
-/** @constant {string} DEFAULT_MACHINE - choice from ['NFA', 'PDA', 'Turing'] */
+/** @constant {string} DEFAULT_MACHINE - choice from ['NFA', 'PDA', 'Turing', 'Regex'] */
 export const DEFAULT_MACHINE = MACHINE_TYPES.NFA;
 
 /** @constant {Object} HIST_KEYS - localstore key to the history stack */
@@ -100,7 +101,8 @@ export const HIST_KEYS = {
   PDA: '%PDA_history',
   Turing: '%turing_history',
   Moore: '%moore_history',
-  Mealy: '%mealy_history'
+  Mealy: '%mealy_history',
+  Regex: '%regex_history'
 };
 
 /** @constant {Object} HIST_TIP_KEYS - localstore key to pointer to the top of the history stack */
@@ -109,7 +111,8 @@ export const HIST_TIP_KEYS = {
   PDA: '%PDA_hist_tip',
   Turing: '%turing_hist_tip',
   Moore: '%moore_hist_tip',
-  Mealy: '%mealy_history_tip'
+  Mealy: '%mealy_history_tip',
+  Regex: '%regex_hist_tip'
 };
 
 /** @constant {Object} HIST_PTR_KEYS - localstore key to pointer to the currently displayed graph */
@@ -118,7 +121,8 @@ export const HIST_PTR_KEYS = {
   PDA: '%PDA_hist_ptr',
   Turing: '%turing_hist_ptr',
   Moore: '%moore_hist_ptr',
-  Mealy: '%mealy_history_ptr'
+  Mealy: '%mealy_history_ptr',
+  Regex: '%regex_hist_ptr'
 };
 
 /** @constant {float} ZOOM_SPEED - final zoom is ZOOM_SPEED*scroll_wheel_ticks */
@@ -169,3 +173,26 @@ export const ACCEPT_COLOR = 'green';
 
 /** @constant {string} REJECT_COLOR - color of machine input when rejected  */
 export const REJECT_COLOR = 'darkRed';
+/** @constant {string} OPEN - opening parentheses for regular expressions */
+export const OPEN = '(';
+
+/** @constant {string} CLOSE - closing parentheses for regular expressions */
+export const CLOSE = ')';
+
+/** @constant {string} UNION - union of sets for regular expressions */
+export const UNION = '\u222A';
+
+/** @constant {string} CONCAT - concatenation of symbols for regular expressions */
+export const CONCAT = '\u25E6';
+
+/** @constant {string} KLEENE - kleene star for regular expressions */
+export const KLEENE = '*';
+
+/** @constant {string} PLUS - plus symbol (one or more) for regular expressions */
+export const PLUS = '\u207A';
+
+/** @constant {string} SIGMA - alphabet symbol for regular expressions */
+export const SIGMA = '\u03A3';
+
+/** @constant {string} EMPTY_SET - empty set symbol for regular expressions */
+export const EMPTY_SET = '\u2205';

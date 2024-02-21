@@ -71,8 +71,10 @@ export function delete_vertex(graph, v) {
  * @param {*} new_name - new name of the vertex
  * @param {string} new_moore_output - side effect of entering the state
  */
-export function rename_vertex(graph, v, new_name, new_moore_output) {
-  menus.remove_context_menu();
+export function rename_vertex(graph, v, new_name, new_moore_output, no_gui) {
+  if (!no_gui) {
+    menus.remove_context_menu();
+  }
   if (v === new_name && graph[v].moore_output === new_moore_output) {  // nothing to do
     return;
   } else if (new_name in graph && new_moore_output === undefined) {  // not moore and name already exists
@@ -102,8 +104,10 @@ export function rename_vertex(graph, v, new_name, new_moore_output) {
       graph[new_name].moore_output = new_moore_output;
     }
   
-    drawing.draw(graph);
-    hist.push_history(graph);
+    if (!no_gui) {
+      drawing.draw(graph);
+      hist.push_history(graph);
+    }
   }
 }
 
