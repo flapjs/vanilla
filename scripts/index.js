@@ -422,8 +422,10 @@ function bind_regex() {
   const convert_to_nfa_btn = document.getElementById('convert_to_nfa');
   convert_to_nfa_btn.addEventListener('click', () => {
     console.log(document.getElementById('regex_string').value);
-    if (regex.isValidRegex(document.getElementById('regex_string').value)) {
-      graph = regex.process_string(document.getElementById('regex_string').value);
+    let inputString = document.getElementById('regex_string').value
+    inputString = inputString.replace(/\s/g, '');
+    if (regex.isValidRegex(inputString)) {
+      graph = regex.process_string(inputString);
       menus.display_UI_for('NFA');
       document.getElementById('select_machine').value = 'NFA';
       drawing.draw(graph);
@@ -436,8 +438,10 @@ function bind_regex() {
   input_field.addEventListener('keypress', (e) => {
     if (e.key === "Enter") {
       console.log(document.getElementById('regex_string').value);
-      if (regex.isValidRegex(document.getElementById('regex_string').value)) {
-        graph = regex.process_string(document.getElementById('regex_string').value);
+      let inputString = document.getElementById('regex_string').value
+      inputString = inputString.replace(/\s/g, '');
+      if (regex.isValidRegex(inputString)) {
+        graph = regex.process_string(inputString);
         menus.display_UI_for('NFA');
         document.getElementById('select_machine').value = 'NFA';
         drawing.draw(graph);
