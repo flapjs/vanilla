@@ -1,0 +1,10 @@
+101
+rejected
+01
+accepted
+
+accepted
+0011
+accepted
+00111
+rejected

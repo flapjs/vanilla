@@ -393,7 +393,7 @@ function* run_input_Moore(graph, input, interactive) {
  * @param {string} input - input string
  * @param {boolean} interactive - whether to step through and highlight the computation
  * @returns {Iterable} return a generator that
- *                     if noninteractive, evaluates to  the final accept/reject immediately in one step
+ *                     if noninteractive, evaluates to the final accept/reject immediately in one step
  *                     if interactive, evaluates step by step with highlight
  */
 export function run_input(graph, machine_type, input, interactive=false) {
