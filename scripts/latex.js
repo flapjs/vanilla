@@ -31,6 +31,19 @@ function closestTo(arr, vert1) {
     return closest;
 }
 
+// v1 is the vertex to position around v2
+function getRelativePos(v1, v2) {
+    let xDiff = v2.x - v1.x; 
+    let yDiff = v2.y - v1.y;
+
+    if(xDiff < 0) return "right";
+    if(xDiff > 0) return "left";
+    if(yDiff < 0) return "below";
+    if(yDiff > 0) return "above";
+    
+    return "";
+}
+
 /**
  * @return string representation of graph in latex tikzpicture
  */
@@ -46,13 +59,16 @@ export function serialize(graph) {
         if(v.is_start) inner += 'initial,';
         if(v.is_final) inner += 'accepting';
 
-        let vertex = closestTo(vertices, v);
-        if(!vertex) {
+        let positional = '';
+
+        let neighbor = closestTo(vertices, v);
+        if(!neighbor || v.is_start) {
             console.log(`${v.name}: start`);
         } else {
-            console.log(`${v.name}: ${vertex.name}`);
+            positional = getRelativePos(v, neighbor);
         }
-        output += `\\node[${inner}] (${v.name}) {${v.name}} \n`;
+        output += `\\node[${inner}] (${v.name}) [${positional} of=${neighbor.name}]` +
+            ` {$${v.name}$}; \n`;
     }
 
     console.log(output);
