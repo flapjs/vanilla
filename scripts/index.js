@@ -11,6 +11,7 @@ import * as permalink from './permalink.js';
 import * as util from './util.js';
 import * as ui_setup from './ui_setup.js';
 import * as regex from './regex.js';
+import * as latex from './latex.js';
 
 // if not in browser, don't run
 if (typeof document !== 'undefined') {
@@ -389,6 +390,19 @@ function bind_permalink() {
   window.addEventListener('hashchange', hash_change_handler);
 }
 
+/** button to generate latex text */
+function bind_latex() {
+  // TODO
+  const latex_button = document.getElementById('latex');
+  latex_button.addEventListener('click', () => {
+    // no need to check type because we only export
+    const latex_str = latex.serialize(graph);
+    navigator.clipboard.writeText(latex_str)
+      .then(() => alert('Latex text copied to clipboard'));
+  });
+  return;
+}
+
 /** change cursor style when hovering over certain elements */
 function bind_mousemove() {
   const canvas = drawing.get_canvas();
@@ -466,6 +480,7 @@ function init() {
   bind_scroll();
   bind_dd();
   bind_permalink();
+  bind_latex();
   bind_mousemove();
   ui_setup.bind_plus_minus();
   ui_setup.add_input_bar(); // called so one input bar appears on opening of homepage
