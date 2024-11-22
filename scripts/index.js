@@ -419,10 +419,14 @@ function bind_mousemove() {
 
 /** bind context menu for side nav bar and secondary side navbar */
 function bind_context_menu_navbar(){
-  const navbar = document.querySelector('.nav')
-  const secondBar = document.querySelector('#secondbar')
-  navbar.addEventListener('click', () => {menus.remove_context_menu()})
-  secondBar.addEventListener('click', () => {menus.remove_context_menu()})
+  const navbar = document.querySelector('.nav');
+  const secondBar = document.querySelector('#secondbar');
+  navbar.addEventListener('click', () => {
+    menus.remove_context_menu();
+  });
+  secondBar.addEventListener('click', () => {
+    menus.remove_context_menu();
+  });
   /*
   for(var btns of navbar){
     btns.addEventListener('click', () => {remove_context_menu()})
@@ -436,7 +440,7 @@ function bind_regex() {
   const convert_to_nfa_btn = document.getElementById('convert_to_nfa');
   convert_to_nfa_btn.addEventListener('click', () => {
     console.log(document.getElementById('regex_string').value);
-    let inputString = document.getElementById('regex_string').value
+    let inputString = document.getElementById('regex_string').value;
     inputString = inputString.replace(/\s/g, '');
     if (regex.isValidRegex(inputString)) {
       graph = regex.process_string(inputString);
@@ -445,14 +449,14 @@ function bind_regex() {
       drawing.draw(graph);
       // hist.push_history(graph); NEED TO IMPLEMENT HISTORY BEFORE UNCOMMENTING
     } else {
-      alert("Invalid regular expression.")
+      alert('Invalid regular expression.');
     }
   });
   const input_field = document.getElementById('regex_string');
   input_field.addEventListener('keypress', (e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       console.log(document.getElementById('regex_string').value);
-      let inputString = document.getElementById('regex_string').value
+      let inputString = document.getElementById('regex_string').value;
       inputString = inputString.replace(/\s/g, '');
       if (regex.isValidRegex(inputString)) {
         graph = regex.process_string(inputString);
@@ -461,10 +465,10 @@ function bind_regex() {
         drawing.draw(graph);
         // hist.push_history(graph); NEED TO IMPLEMENT HISTORY BEFORE UNCOMMENTING
       } else {
-        alert("Invalid regular expression.")
+        alert('Invalid regular expression.');
       }
     }
-  })
+  });
 }
 
 /** run after all the contents are loaded to hook up callbacks */

@@ -376,19 +376,22 @@ export function create_buttons() {
 // 5. handle case with empty set
 
 // function taken from https://github.com/flapjs/webapp/blob/master/src/modules/re/machine/RegularExpression.js
-export function areParenthesisBalanced(expressionString)
-{
-    let count = 0;
-    for (let i = 0; i < expressionString.length; i++)
-    {
-        let symbol = expressionString.charAt(i);
+export function areParenthesisBalanced(expressionString) {
+  let count = 0;
+  for (let i = 0; i < expressionString.length; i++) {
+    let symbol = expressionString.charAt(i);
 
-        if (symbol === consts.OPEN) count++;
-        else if (symbol === consts.CLOSE) count--;
-
-        if (count < 0) return false;
+    if (symbol === consts.OPEN) {
+      count++;
+    } else if (symbol === consts.CLOSE) {
+      count--;
     }
-    return count === 0;
+
+    if (count < 0) {
+      return false;
+    }
+  }
+  return count === 0;
 }
 
 export function isValidRegex(string) {
@@ -396,7 +399,7 @@ export function isValidRegex(string) {
   string = string.replace(/\s+/g, '');
 
   // check for invalid parentheses and empty string
-  if (!areParenthesisBalanced(string) || string === "") {
+  if (!areParenthesisBalanced(string) || string === '') {
     return false;
   }
   let prev;
@@ -411,9 +414,9 @@ export function isValidRegex(string) {
     if ((char === consts.UNION || char === consts.KLEENE || char === consts.CONCAT) 
         && 
         (prev === consts.UNION || prev === consts.KLEENE || prev === consts.CONCAT)
-      ) {
-        return false;
-      }
+    ) {
+      return false;
+    }
 
     prev = char;
   }
@@ -426,5 +429,5 @@ export function process_string(string) {
   let postfix = shunting_yard(injectedConcat);
   let finalGraph = thompson(postfix);
 
-  return finalGraph
+  return finalGraph;
 }
