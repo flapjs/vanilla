@@ -240,18 +240,6 @@ function combine_state_labels(states) {
 }
 
 /**
- * 
- * @param {Object} graph - the graph containing the states
- * @returns {Object} state - the start state of the graph
- */
-export function find_start(graph) {
-  for(let state of Object.values(graph)) {
-    if(state.is_start) return state;
-  }
-  return null;
-}
-
-/**
  * Converts a graph of an NFA to a DFA
  * @param {Object} NFA - graph of an NFA to be converted to DFA
  * @returns {Object} - graph of a DFA equivalent to the NFA
