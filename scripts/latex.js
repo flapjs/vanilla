@@ -12,20 +12,20 @@
 // - clipboard only available in secure contexts
 //----------------------------------------------
 
-import find_start from './graph_ops'
+import * as graph_ops from './graph_ops.js';
 
 function dist(v1, v2) {
   return Math.sqrt(Math.pow((v1.x - v2.x),2) + Math.pow((v1.y - v2.y),2));
 }
 
-function closestTo(arr, vert1) {
+function closestTo(arr, state1) {
   let closest = null;
   let minDist = Number.MAX_VALUE;
   for(const state of arr) {
-    if(state.name === vert1.name) {
+    if(state.name === state.name) {
       continue;
     }
-    let distance = dist(vert1, state);
+    let distance = dist(state1, state);
     if(distance < minDist) {
       closest = state;
       minDist = distance;
@@ -55,10 +55,37 @@ function getRelativePos(s1, s2) {
     return 'below';
   }
   if(yDiff > 0) {
-    return 'abose';
+    return 'above';
   }
     
   return '';
+}
+
+/**
+ * 
+ * @param {Array<Object>} comareTo - the states which can be used for positional comparison
+ * @param {Object} state - the state which will be converted to string
+ * @returns Touple (neighbor, String) which is detoupled to iterate through all states 
+ */
+function stateToString(comareTo, state) {
+  let inner = 'state,';
+  if (current.is_start) {
+    inner += 'initial,';
+  }
+  if (current.is_final) {
+    inner += 'accepting';
+  }
+
+  if (state.is_start) {
+    return `\\node[${inner}] (${current.name}) {$${current.name}$};\n`;
+  }
+
+  let neighbor = closestTo(comareTo, state);
+  let positional = getRelativePos(state, neighbor);
+  if(mutatable) mutatable.push(neighbor);
+
+  return  (neighbor, `\\node[${inner}] (${current.name}) [${positional} of=${neighbor.name}]` +
+    `{$${current.name}$};\n`);
 }
 
 /**
@@ -71,26 +98,15 @@ export function serialize(graph) {
   output += '\\tikzstyle{every state}=[text=black, fill=none]\n';
 
   const states = Object.values(graph); 
+  let current = graph_ops.find_start(graph);
+  let checked = [current];
 
-  for(const s of states) {
-    let inner = 'state,';
-    if(s.is_start) {
-      inner += 'initial,';
-    }
-    if(s.is_final) {
-      inner += 'accepting';
-    }
+  let neighbor, asStr = stateToString(states, current);
+  output += asStr;
+  checked.push(neighbor);
 
-    let positional = '';
-
-    let neighbor = closestTo(states, s);
-    if(!neighbor || s.is_start) {
-      console.log(`${s.name}: start`);
-    } else {
-      positional = getRelativePos(s, neighbor);
-    }
-    output += `\\node[${inner}] (${s.name}) [${positional} of=${neighbor.name}]` +
-            ` {$${s.name}$}; \n`;
+  while(checked.length !== states.length) {
+    neighbor, asStr = stateToString(checked, neighbor)
   }
 
   console.log(output);

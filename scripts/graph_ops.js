@@ -245,7 +245,7 @@ function combine_state_labels(states) {
  * @returns {Object} state - the start state of the graph
  */
 export function find_start(graph) {
-  for(let state of graph) {
+  for(let state of Object.values(graph)) {
     if(state.is_start) return state;
   }
   return null;
