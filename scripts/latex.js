@@ -12,6 +12,7 @@
 // - clipboard only available in secure contexts
 //----------------------------------------------
 
+import * as consts from './consts.js';
 import * as linalg from './linalg.js';
 
 function dist(v1, v2) {
@@ -72,17 +73,37 @@ function getInner(state) {
   return inner;
 }
 
-function edgeToString(edge, labelPos) {
+function edgeToString(type, edge, labelPos) {
   let inner = '';
-  let output = `(${edge.from}) edge [${inner}] node[${labelPos}] {$${edge.transition}$} (${edge.to})\n`;
-  return output;
+  let label = `${edge.transition}`; 
+
+  switch (type) {
+    case "PDA":
+      {
+        //let pop = (edge.pop_symbol == consts.EMPTY_SYMBOL) ? '\\epsilon' : edge.pop_symbol;
+        //let push = (edge.push_symbol == consts.EMPTY_SYMBOL) ? '\\epsilon' : edge.push_symbol;
+        label += `,${edge.pop_symbol} \\rightarrow ${edge.push_symbol}`;
+      }
+      break;
+    case "Turing":
+      {
+        //let push = (edge.push_symbol == consts.EMPTY_TAPE) ? '\\square' : edge.push_symbol;
+        label += ` \\rightarrow ${edge.push_symbol}, ${edge.move}`;
+      }
+      break;
+    default:
+      break;
+  }
+
+  let output = `(${edge.from}) edge [${inner}] node[${labelPos}] {$${label}$} (${edge.to})\n`;
+  return output.replaceAll(consts.EMPTY_SYMBOL, '\\epsilon').replaceAll(consts.EMPTY_TAPE, '\\square');
 }
 
 /**
  * @param {Object} graph - graph to be converted to latex
  * @return {String} representation of graph in latex tikzpicture
  */
-export function serialize(graph) {
+export function serialize(type, graph) {
   // setup
   let output = '\\begin{tikzpicture}[->,>=stealth\',shorten >=1pt, auto, node distance=2cm, semithick]\n';
   output += '\\tikzstyle{every state}=[text=black, fill=none]\n';
@@ -129,7 +150,7 @@ export function serialize(graph) {
         labelPosition = 'right';
       }
 
-      output += edgeToString(edge, labelPosition);
+      output += edgeToString(type, edge, labelPosition);
     }
   }
   output += ';\n';
