@@ -72,9 +72,9 @@ function getInner(state) {
   return inner;
 }
 
-function edgeToString(edge) {
+function edgeToString(edge, labelPos) {
   let inner = '';
-  let output = `(${edge.from}) edge [${inner}] node[above] {$${edge.transition}$} (${edge.to})\n`;
+  let output = `(${edge.from}) edge [${inner}] node[${labelPos}] {$${edge.transition}$} (${edge.to})\n`;
   return output;
 }
 
@@ -117,13 +117,19 @@ export function serialize(graph) {
 
     for(let j = 0; j < edges.length; j++) {
       let edge = edges[j];
+      let labelPosition = 'above';
+
       let startState = graph[edge.from];
       let endState = graph[edge.to];
-      console.log(`angle from ${startState.name} to ${endState.name}: ` +
-        `${linalg.angle([startState.x, startState.y], [endState.x, endState.y])}`);
-      console.log(`${startState.x}, ${startState.y} and ${endState.x}, ${endState.y}`);
+      let angle = linalg.angle([startState.x, startState.y], [endState.x, endState.y]);
 
-      output += edgeToString(edge);
+      if(angle <= -80 && angle >= -110) {
+        labelPosition = 'left';
+      } else if(angle >= 80 && angle <= 110) {
+        labelPosition = 'right';
+      }
+
+      output += edgeToString(edge, labelPosition);
     }
   }
   output += ';\n';
