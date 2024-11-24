@@ -70,6 +70,12 @@ function getInner(state) {
   return inner;
 }
 
+function edgeToString(edge) {
+  let inner = '';
+  let output = `(${edge.from}) edge [${inner}] node[above] {$${edge.transition}$} (${edge.to})\n`;
+  return output;
+}
+
 /**
  * @param {Object} graph - graph to be converted to latex
  * @return {String} representation of graph in latex tikzpicture
@@ -85,7 +91,7 @@ export function serialize(graph) {
   let availableNeighbors = [start];
 
   let inner = getInner(start);
-  output += `\\node[${inner}] (${start.name}) {$${start.name}$}\n`
+  output += `\\node[${inner}] (${start.name}) {$${start.name}$};\n`
 
   for(let i = 1; i < states.length; i++) {
     let current = states[i];
@@ -97,8 +103,21 @@ export function serialize(graph) {
     let positioning = getRelativePos(current, neighbor);
 
     output += `\\node[${inner}] (${current.name}) [${positioning} of=${neighbor.name}] ` 
-      + `{$${current.name}$}\n`;
+      + `{$${current.name}$};\n`;
   }
+
+  output += '\n';
+  output += '\\path\n';
+
+  for(let i = 0; i < states.length; i++) {
+    let current = states[i];
+    let edges = current.out; // array of edges
+
+    for(let j = 0; j < edges.length; j++) {
+      output += edgeToString(edges[j]);
+    }
+  }
+  output += ';\n';
 
   output += '\\end{tikzpicture}';
   console.log(output);
