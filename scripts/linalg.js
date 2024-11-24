@@ -120,3 +120,25 @@ export function inv(v1, v2) {
   const inv_det = 1/det(v1, v2);
   return [scale(inv_det, [v2[1], -v1[1]]), scale(inv_det, [-v2[0], v1[0]])];
 }
+
+/**
+ * computes angle between v1, v2 in degrees from x-axis
+ * @param {Array<float>} v1 - vector to compute angle from
+ * @param {Array<float>} v2 - vector to compute angle to
+ * @returns {float} angle between v1, v2
+ */
+export function angle(v1, v2) {
+  let direction = [v2[0] - v1[0], v2[1] - v1[1]];
+  let base = [1, 0]; // x axis
+
+  let dotProd = dot(direction, base);
+  let mult = vec_len(direction); // |base| = 1
+
+  let angle = Math.acos(dotProd/mult) * (180 / Math.PI);
+
+  // start is above 
+  if(v1[1] < v2[1]) {
+    angle *= -1;
+  }
+  return angle;
+}

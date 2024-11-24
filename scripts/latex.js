@@ -12,6 +12,8 @@
 // - clipboard only available in secure contexts
 //----------------------------------------------
 
+import * as linalg from './linalg.js';
+
 function dist(v1, v2) {
   return Math.sqrt(Math.pow((v1.x - v2.x),2) + Math.pow((v1.y - v2.y),2));
 }
@@ -114,7 +116,14 @@ export function serialize(graph) {
     let edges = current.out; // array of edges
 
     for(let j = 0; j < edges.length; j++) {
-      output += edgeToString(edges[j]);
+      let edge = edges[j];
+      let startState = graph[edge.from];
+      let endState = graph[edge.to];
+      console.log(`angle from ${startState.name} to ${endState.name}: ` +
+        `${linalg.angle([startState.x, startState.y], [endState.x, endState.y])}`);
+      console.log(`${startState.x}, ${startState.y} and ${endState.x}, ${endState.y}`);
+
+      output += edgeToString(edge);
     }
   }
   output += ';\n';
