@@ -79,17 +79,10 @@ function edgeToString(type, edge, labelPos) {
 
   switch (type) {
     case "PDA":
-      {
-        //let pop = (edge.pop_symbol == consts.EMPTY_SYMBOL) ? '\\epsilon' : edge.pop_symbol;
-        //let push = (edge.push_symbol == consts.EMPTY_SYMBOL) ? '\\epsilon' : edge.push_symbol;
-        label += `,${edge.pop_symbol} \\rightarrow ${edge.push_symbol}`;
-      }
+      label += `,${edge.pop_symbol} \\rightarrow ${edge.push_symbol}`;
       break;
     case "Turing":
-      {
-        //let push = (edge.push_symbol == consts.EMPTY_TAPE) ? '\\square' : edge.push_symbol;
-        label += ` \\rightarrow ${edge.push_symbol}, ${edge.move}`;
-      }
+      label += ` \\rightarrow ${edge.push_symbol}, ${edge.move}`;
       break;
     default:
       break;
@@ -105,7 +98,17 @@ function edgeToString(type, edge, labelPos) {
  */
 export function serialize(type, graph) {
   // setup
-  let output = '\\begin{tikzpicture}[->,>=stealth\',shorten >=1pt, auto, node distance=2cm, semithick]\n';
+  let distance = '2cm';
+  switch(type) {
+    case "PDA":
+    case "Turing":
+      distance = '5cm';
+      break;
+    default:
+      distance = '2cm';
+  }
+
+  let output = `\\begin{tikzpicture}[->,>=stealth\',shorten >=1pt, auto, node distance=${distance}, semithick]\n`;
   output += '\\tikzstyle{every state}=[text=black, fill=none]\n';
 
   let states = Object.values(graph);
