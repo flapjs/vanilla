@@ -14,28 +14,15 @@
 
 import * as consts from './consts.js';
 import * as linalg from './linalg.js';
+
 /**
- * normalizes two vectors and places them based on given distance 
- * @param {Object} s1 - the state to be positioned
- * @param {Object} s2 - the state to position around
- * @returns {String} (x,y) position of s1
+ * compresses graph to tikz space 
+ * @param {Array<Object>} states - the states of the graph
+ * @returns {Array<String>} formatted positions of states
  */
-function getRelativePos(s1, s2, distance) {
-  function compress(x) {
-    let numer = Math.log(Math.abs(x) + 1);
-    let denom = Math.log(scaleFactor + 1);
-    return numer / denom * distance;
-  }
+function compressPlanar(states) {
+  const distance = 8; // arbitary tweaking
 
-  let xDiff = s2.x - s1.x, yDiff = s2.y - s1.y;
-
-  let mapped = [compress(xDiff), compress(yDiff)];
-  console.log(`mapped: ${mapped}`);
-
-  return `(${mapped[0].toFixed(2)}, ${-1 * mapped[1].toFixed(2)})`;
-}
-
-function compressPlanar(states, distance) {
   let centroidX = 0, centroidY = 0;
   let n = states.length;
 
@@ -59,7 +46,7 @@ function compressPlanar(states, distance) {
     maxDist = Math.max(maxDist, linalg.vec_len(output[i]));
   }
 
-  let scaleFactor = 8 / (2 * maxDist);
+  let scaleFactor = distance / (2 * maxDist);
   let formatted = output.map((v) => {
     let scaled = linalg.scale(scaleFactor, v);
     return `(${scaled[0].toFixed(2)},${-1 * scaled[1].toFixed(2)})`;
@@ -82,6 +69,13 @@ function getStateType(state) {
   return inner;
 }
 
+/**
+ * converts an edge to tikz string representation
+ * @param {String} type - type of graph (NFA, DFA, ...)
+ * @param {Object} edge - edge to convert to string
+ * @param {String} labelPos - where to position label on edge
+ * @returns {String} - tikz string representaiton of edge
+ */
 function edgeToString(type, edge, labelPos) {
   let inner = '';
   let label = `${edge.transition}`; 
