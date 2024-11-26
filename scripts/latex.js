@@ -21,8 +21,6 @@ import * as linalg from './linalg.js';
  * @returns {String} (x,y) position of s1
  */
 function getRelativePos(s1, s2, distance) {
-  const scaleFactor = 1000;
-
   function compress(x) {
     let numer = Math.log(Math.abs(x) + 1);
     let denom = Math.log(scaleFactor + 1);
@@ -35,6 +33,40 @@ function getRelativePos(s1, s2, distance) {
   console.log(`mapped: ${mapped}`);
 
   return `(${mapped[0].toFixed(2)}, ${-1 * mapped[1].toFixed(2)})`;
+}
+
+function compressPlanar(states, distance) {
+  let centroidX = 0, centroidY = 0;
+  let n = states.length;
+
+  let output = Array(n);
+
+  for(let i = 0; i < n; i++) {
+    let state = states[i];
+    centroidX += state.x;
+    centroidY += state.y;
+    output[i] = [state.x, state.y];
+  }
+  console.log(output);
+
+  centroidX /= n;
+  centroidY /= n;
+  let center = [centroidX, centroidY];
+
+  let maxDist = Number.MIN_VALUE;
+  for(let i = 0; i < n; i++) {
+    output[i] = linalg.sub(output[i], center);
+    maxDist = Math.max(maxDist, linalg.vec_len(output[i]));
+  }
+
+  let scaleFactor = 8 / (2 * maxDist);
+  let formatted = output.map((v) => {
+    let scaled = linalg.scale(scaleFactor, v);
+    return `(${scaled[0].toFixed(2)},${-1 * scaled[1].toFixed(2)})`;
+  });
+
+  console.log(formatted);
+  return formatted;
 }
 
 /**
@@ -92,14 +124,16 @@ export function serialize(type, graph) {
   let states = Object.values(graph);
   states.sort((a,b) => a.x - b.x); // sorts the states from left to right
 
+  let statePositions = compressPlanar(states, distance);
+
   let start = states[0];
   let inner = getStateType(start);
-  output += `\\node[${inner}] (${start.name}) at (0,0) {$${start.name}$};\n`; // start as (0,0)
+  //output += `\\node[${inner}] (${start.name}) at (0,0) {$${start.name}$};\n`; // start as (0,0)
 
-  for(let i = 1; i < states.length; i++) {
+  for(let i = 0; i < states.length; i++) {
     let current = states[i];
     inner = getStateType(current);
-    let position = getRelativePos(current, start, 2);
+    let position = statePositions[i];
     output += `\\node[${inner}] (${current.name}) at ${position} {$${current.name}$};\n`;
   }
 
