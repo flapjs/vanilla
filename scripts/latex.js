@@ -114,22 +114,19 @@ export function serialize(type, graph) {
   let states = Object.values(graph);
   states.sort((a,b) => a.x - b.x); // sorts the states from left to right
   let start = states[0];
-  let availableNeighbors = [start];
+  let xFactor = start.x;
+  let yFactor = start.y;
 
-  let inner = getInner(start);
-  output += `\\node[${inner}] (${start.name}) {$${start.name}$};\n`
+  for(const state of states) {
+    state.x = (state.x * 4/ xFactor).toFixed(2);
+    state.y = (state.y * 4/ yFactor).toFixed(2);
+  }
 
-  for(let i = 1; i < states.length; i++) {
+  for(let i = 0; i < states.length; i++) {
     let current = states[i];
-    let neighbor = closestTo(availableNeighbors, current);
-
-    inner = getInner(current);
-
-    availableNeighbors.push(current);
-    let positioning = getRelativePos(current, neighbor);
-
-    output += `\\node[${inner}] (${current.name}) [${positioning} of=${neighbor.name}] ` 
-      + `{$${current.name}$};\n`;
+    let inner = getInner(current);
+    let position = `(${current.x},${current.y})`;
+    output += `\\node[${inner}] (${current.name}) at ${position} {$${current.name}$};\n`;
   }
 
   output += '\n';
