@@ -13,15 +13,28 @@
 //----------------------------------------------
 
 import * as consts from './consts.js';
+import * as drawing from './drawing.js';
 import * as linalg from './linalg.js';
+
+let debug = false; // change this to disable logging
 
 /**
  * compresses graph to tikz space 
+ * @param {String} type - type of graph (DFA, NFA, ...)
  * @param {Array<Object>} states - the states of the graph
  * @returns {Array<String>} formatted positions of states
  */
-function compressPlanar(states) {
-  const distance = 8; // arbitary tweaking
+function compressPlanar(type, states) {
+  let distance = 8;
+  switch(type) {
+    case 'PDA':
+    case 'Turing':
+      distance = 16;
+      break;
+    default:
+      distance = 8;
+      break;
+  }
 
   let centroidX = 0, centroidY = 0;
   let n = states.length;
@@ -34,7 +47,7 @@ function compressPlanar(states) {
     centroidY += state.y;
     output[i] = [state.x, state.y];
   }
-  console.log(output);
+  if(debug) console.log(output);
 
   centroidX /= n;
   centroidY /= n;
@@ -52,7 +65,7 @@ function compressPlanar(states) {
     return `(${scaled[0].toFixed(2)},${-1 * scaled[1].toFixed(2)})`;
   });
 
-  console.log(formatted);
+  if(debug) console.log(formatted);
   return formatted;
 }
 
@@ -71,14 +84,19 @@ function getStateType(state) {
 
 /**
  * converts an edge to tikz string representation
- * @param {String} type - type of graph (NFA, DFA, ...)
+ * @param {String} type - type of graph (DFA, NFA, ...)
  * @param {Object} edge - edge to convert to string
  * @param {String} labelPos - where to position label on edge
  * @returns {String} - tikz string representaiton of edge
  */
 function edgeToString(type, edge, labelPos) {
-  let inner = '';
+  const multScale = 8;
+  let bendAngle = Math.floor(edge.a2) * multScale;
+  let inner = `bend right=${bendAngle}`;
   let label = `${edge.transition}`; 
+
+  if(bendAngle > multScale) labelPos = 'right';
+  else if(bendAngle < 0) labelPos = 'left';
 
   switch (type) {
     case "PDA":
@@ -90,6 +108,7 @@ function edgeToString(type, edge, labelPos) {
     default:
       break;
   }
+
 
   let output = `(${edge.from}) edge [${inner}] node[${labelPos}] {$${label}$} (${edge.to})\n`;
   return output.replaceAll(consts.EMPTY_SYMBOL, '\\epsilon').replaceAll(consts.EMPTY_TAPE, '\\square');
@@ -118,7 +137,7 @@ export function serialize(type, graph) {
   let states = Object.values(graph);
   states.sort((a,b) => a.x - b.x); // sorts the states from left to right
 
-  let statePositions = compressPlanar(states, distance);
+  let statePositions = compressPlanar(type, states);
 
   let start = states[0];
   let inner = getStateType(start);
