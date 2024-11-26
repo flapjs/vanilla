@@ -14,7 +14,6 @@
 
 import * as consts from './consts.js';
 import * as linalg from './linalg.js';
-
 /**
  * normalizes two vectors and places them based on given distance 
  * @param {Object} s1 - the state to be positioned
@@ -22,10 +21,20 @@ import * as linalg from './linalg.js';
  * @returns {String} (x,y) position of s1
  */
 function getRelativePos(s1, s2, distance) {
-  let vect = linalg.sub([s1.x, s1.y], [s2.x, s2.y]);
-  let norm = linalg.scale(distance, linalg.normalize(vect));
+  const scaleFactor = 1000;
 
-  return `(${norm[0].toFixed(2)}, ${-1 * norm[1].toFixed(2)})`;
+  function compress(x) {
+    let numer = Math.log(Math.abs(x) + 1);
+    let denom = Math.log(scaleFactor + 1);
+    return numer / denom * distance;
+  }
+
+  let xDiff = s2.x - s1.x, yDiff = s2.y - s1.y;
+
+  let mapped = [compress(xDiff), compress(yDiff)];
+  console.log(`mapped: ${mapped}`);
+
+  return `(${mapped[0].toFixed(2)}, ${-1 * mapped[1].toFixed(2)})`;
 }
 
 /**
@@ -90,7 +99,7 @@ export function serialize(type, graph) {
   for(let i = 1; i < states.length; i++) {
     let current = states[i];
     inner = getStateType(current);
-    let position = getRelativePos(current, start, 5);
+    let position = getRelativePos(current, start, 2);
     output += `\\node[${inner}] (${current.name}) at ${position} {$${current.name}$};\n`;
   }
 
