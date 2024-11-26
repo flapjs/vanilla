@@ -15,57 +15,25 @@
 import * as consts from './consts.js';
 import * as linalg from './linalg.js';
 
-function dist(v1, v2) {
-  return Math.sqrt(Math.pow((v1.x - v2.x),2) + Math.pow((v1.y - v2.y),2));
-}
+/**
+ * normalizes two vectors and places them based on given distance 
+ * @param {Object} s1 - the state to be positioned
+ * @param {Object} s2 - the state to position around
+ * @returns {String} (x,y) position of s1
+ */
+function getRelativePos(s1, s2, distance) {
+  let vect = linalg.sub([s1.x, s1.y], [s2.x, s2.y]);
+  let norm = linalg.scale(distance, linalg.normalize(vect));
 
-function closestTo(arr, stateIn) {
-  let closest = null;
-  let minDist = Number.MAX_VALUE;
-  for(const state of arr) {
-    if(state.name === stateIn.name) {
-      continue;
-    }
-    let distance = dist(stateIn, state);
-    if(distance < minDist) {
-      closest = state;
-      minDist = distance;
-    }
-  }
-
-  return closest;
+  return `(${norm[0].toFixed(2)}, ${-1 * norm[1].toFixed(2)})`;
 }
 
 /**
- * 
- * @param {Object} s1 - the state to be positioned
- * @param {Object} s2 - the state to position around
- * @returns {String} relation of s1's position to v2
+ * Computes the type of a given state 
+ * @param {Object} state
+ * @returns {String} tikz labels for the type of state
  */
-function getRelativePos(s1, s2) {
-  let xDiff = s2.x - s1.x; 
-  let yDiff = s2.y - s1.y;
-
-  if (Math.abs(yDiff) > Math.abs(xDiff)) {
-    if (yDiff < 0) {
-      return 'below';
-    }
-    if (yDiff > 0) {
-      return 'above';
-    }
-  }
-
-  if(xDiff < 0) {
-    return 'right';
-  }
-  if(xDiff > 0) {
-    return 'left';
-  }
-   
-  return '';
-}
-
-function getInner(state) {
+function getStateType(state) {
   let inner = 'state,';
   if(state.is_start) inner += 'initial,'
   if(state.is_final) inner += 'accepting,'
@@ -98,34 +66,31 @@ function edgeToString(type, edge, labelPos) {
  */
 export function serialize(type, graph) {
   // setup
-  let distance = '2cm';
+  let distance = 2;
   switch(type) {
     case "PDA":
     case "Turing":
-      distance = '5cm';
+      distance = 5;
       break;
     default:
-      distance = '2cm';
+      distance = 2;
   }
 
-  let output = `\\begin{tikzpicture}[->,>=stealth\',shorten >=1pt, auto, node distance=${distance}, semithick]\n`;
+  let output = `\\begin{tikzpicture}[->,>=stealth\',shorten >=1pt, auto, node distance=${distance}cm, semithick]\n`;
   output += '\\tikzstyle{every state}=[text=black, fill=none]\n';
 
+  // initializing nodes
   let states = Object.values(graph);
   states.sort((a,b) => a.x - b.x); // sorts the states from left to right
+
   let start = states[0];
-  let xFactor = start.x;
-  let yFactor = start.y;
+  let inner = getStateType(start);
+  output += `\\node[${inner}] (${start.name}) at (0,0) {$${start.name}$};\n`; // start as (0,0)
 
-  for(const state of states) {
-    state.x = (state.x * 4/ xFactor).toFixed(2);
-    state.y = (state.y * 4/ yFactor).toFixed(2);
-  }
-
-  for(let i = 0; i < states.length; i++) {
+  for(let i = 1; i < states.length; i++) {
     let current = states[i];
-    let inner = getInner(current);
-    let position = `(${current.x},${current.y})`;
+    inner = getStateType(current);
+    let position = getRelativePos(current, start, 5);
     output += `\\node[${inner}] (${current.name}) at ${position} {$${current.name}$};\n`;
   }
 
