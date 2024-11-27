@@ -14,9 +14,10 @@
 
 //----------------------------------------------
 // Current TODO:
-// 1. horizontally bend angles have label on the left
-// 2. fix more complicated state names
-// 3. overlapping labels for self loops
+// 1. Self loops only go above
+// 2. Horizontally bend angles have label on the left
+// 3. Fix more complicated state names
+// 4. Overlapping labels for self loops
 //----------------------------------------------
 
 import * as consts from './consts.js';
