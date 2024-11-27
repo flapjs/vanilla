@@ -12,8 +12,14 @@
 // - clipboard only available in secure contexts
 //----------------------------------------------
 
+//----------------------------------------------
+// Current TODO:
+// 1. horizontally bend angles have label on the left
+// 2. fix more complicated state names
+// 3. overlapping labels for self loops
+//----------------------------------------------
+
 import * as consts from './consts.js';
-import * as drawing from './drawing.js';
 import * as linalg from './linalg.js';
 
 let debug = false; // change this to enable/disable logging
@@ -24,17 +30,8 @@ let debug = false; // change this to enable/disable logging
  * @param {Array<Object>} states - the states of the graph
  * @returns {Array<String>} formatted positions of states
  */
-function compressPlanar(type, states) {
-  let distance = 8;
-  switch(type) {
-    case 'PDA':
-    case 'Turing':
-      distance = 16;
-      break;
-    default:
-      distance = 8;
-      break;
-  }
+function compressPlanar(states) {
+  const distance = 8;
 
   let centroidX = 0, centroidY = 0;
   let n = states.length;
@@ -100,14 +97,15 @@ function edgeToString(type, edge, labelPos) {
 
   if(edge.from === edge.to) {
     inner = 'loop above';
+    labelPos = 'above'
   }
 
   switch (type) {
     case "PDA":
-      label += `,${edge.pop_symbol} \\rightarrow ${edge.push_symbol}`;
+      label += `,${edge.pop_symbol} \\rightarrow ${edge.push_symbol}`.replaceAll('$', '\\$');
       break;
     case "Turing":
-      label += ` \\rightarrow ${edge.push_symbol}, ${edge.move}`;
+      label += ` \\rightarrow ${edge.push_symbol}, ${edge.move}`.replaceAll('$', '\\$');
       break;
     default:
       break;
@@ -115,7 +113,7 @@ function edgeToString(type, edge, labelPos) {
 
 
   let output = `(${edge.from}) edge [${inner}] node[${labelPos}] {$${label}$} (${edge.to})\n`;
-  return output.replaceAll(consts.EMPTY_SYMBOL, '\\epsilon').replaceAll(consts.EMPTY_TAPE, '\\square');
+  return output.replaceAll(consts.EMPTY_SYMBOL, '\\epsilon').replaceAll(consts.EMPTY_TAPE, '\\square')
 }
 
 /**
@@ -125,14 +123,6 @@ function edgeToString(type, edge, labelPos) {
 export function serialize(type, graph) {
   // setup
   let distance = 2;
-  switch(type) {
-    case "PDA":
-    case "Turing":
-      distance = 5;
-      break;
-    default:
-      distance = 2;
-  }
 
   let output = `\\begin{tikzpicture}[->,>=stealth\',shorten >=1pt, auto, node distance=${distance}cm, semithick]\n`;
   output += '\\tikzstyle{every state}=[text=black, fill=none]\n';
@@ -141,11 +131,10 @@ export function serialize(type, graph) {
   let states = Object.values(graph);
   states.sort((a,b) => a.x - b.x); // sorts the states from left to right
 
-  let statePositions = compressPlanar(type, states);
+  let statePositions = compressPlanar(states);
 
   let start = states[0];
   let inner = getStateType(start);
-  //output += `\\node[${inner}] (${start.name}) at (0,0) {$${start.name}$};\n`; // start as (0,0)
 
   for(let i = 0; i < states.length; i++) {
     let current = states[i];
