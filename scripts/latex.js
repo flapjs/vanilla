@@ -16,7 +16,7 @@ import * as consts from './consts.js';
 import * as drawing from './drawing.js';
 import * as linalg from './linalg.js';
 
-let debug = false; // change this to disable logging
+let debug = false; // change this to enable/disable logging
 
 /**
  * compresses graph to tikz space 
@@ -90,13 +90,17 @@ function getStateType(state) {
  * @returns {String} - tikz string representaiton of edge
  */
 function edgeToString(type, edge, labelPos) {
-  const multScale = 8;
-  let bendAngle = Math.floor(edge.a2) * multScale;
+  if(debug) console.log(edge);
+  let bendAngle = Math.floor(edge.a2) * consts.LATEX_ANGLE_SCALE;
   let inner = `bend right=${bendAngle}`;
   let label = `${edge.transition}`; 
 
-  if(bendAngle > multScale) labelPos = 'right';
+  if(bendAngle > consts.LATEX_ANGLE_SCALE) labelPos = 'right';
   else if(bendAngle < 0) labelPos = 'left';
+
+  if(edge.from === edge.to) {
+    inner = 'loop above';
+  }
 
   switch (type) {
     case "PDA":
