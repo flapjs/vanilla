@@ -12,78 +12,164 @@
 // - clipboard only available in secure contexts
 //----------------------------------------------
 
-function dist(v1, v2) {
-  return Math.sqrt(Math.pow((v1.x - v2.x),2) + Math.pow((v1.y - v2.y),2));
-}
+//----------------------------------------------
+// Current TODO:
+// 1. Self loops only go above
+// 2. Horizontally bend angles have label on the left
+// 3. Fix more complicated state names
+// 4. Overlapping labels for self loops
+//----------------------------------------------
 
-function closestTo(arr, vert1) {
-  let closest = null;
-  let minDist = Number.MAX_VALUE;
-  for(const vert2 of arr) {
-    if(vert2.name === vert1.name) {
-      continue;
-    }
-    let distance = dist(vert1, vert2);
-    if(distance < minDist) {
-      closest = vert2;
-      minDist = distance;
-    }
+import * as consts from './consts.js';
+import * as linalg from './linalg.js';
+
+let debug = false; // change this to enable/disable logging
+
+/**
+ * compresses graph to tikz space 
+ * @param {String} type - type of graph (DFA, NFA, ...)
+ * @param {Array<Object>} states - the states of the graph
+ * @returns {Array<String>} formatted positions of states
+ */
+function compressPlanar(states) {
+  const distance = 8;
+
+  let centroidX = 0, centroidY = 0;
+  let n = states.length;
+
+  let output = Array(n);
+
+  for(let i = 0; i < n; i++) {
+    let state = states[i];
+    centroidX += state.x;
+    centroidY += state.y;
+    output[i] = [state.x, state.y];
+  }
+  if(debug) console.log(output);
+
+  centroidX /= n;
+  centroidY /= n;
+  let center = [centroidX, centroidY];
+
+  let maxDist = Number.MIN_VALUE;
+  for(let i = 0; i < n; i++) {
+    output[i] = linalg.sub(output[i], center);
+    maxDist = Math.max(maxDist, linalg.vec_len(output[i]));
   }
 
-  return closest;
-}
+  let scaleFactor = distance / (2 * maxDist);
+  let formatted = output.map((v) => {
+    let scaled = linalg.scale(scaleFactor, v);
+    return `(${scaled[0].toFixed(2)},${-1 * scaled[1].toFixed(2)})`;
+  });
 
-// v1 is the vertex to position around v2
-function getRelativePos(v1, v2) {
-  let xDiff = v2.x - v1.x; 
-  let yDiff = v2.y - v1.y;
-
-  if(xDiff < 0) {
-    return 'right';
-  }
-  if(xDiff > 0) {
-    return 'left';
-  }
-  if(yDiff < 0) {
-    return 'below';
-  }
-  if(yDiff > 0) {
-    return 'above';
-  }
-    
-  return '';
+  if(debug) console.log(formatted);
+  return formatted;
 }
 
 /**
- * @return string representation of graph in latex tikzpicture
+ * Computes the type of a given state 
+ * @param {Object} state
+ * @returns {String} tikz labels for the type of state
  */
-export function serialize(graph) {
-  // setup
-  let output = '\\begin{tikzpicture}[->,>=stealth\',shorten >=1pt, auto, node distance=2cm, semithick]\n';
-  output += '\\tikzstyle{every state}=[text=black, fill=none]\n';
+function getStateType(state) {
+  let inner = 'state,';
+  if(state.is_start) inner += 'initial,'
+  if(state.is_final) inner += 'accepting,'
 
-  const vertices = Object.values(graph); 
+  return inner;
+}
 
-  for(const v of vertices) {
-    let inner = 'state,';
-    if(v.is_start) {
-      inner += 'initial,';
-    }
-    if(v.is_final) {
-      inner += 'accepting';
-    }
+/**
+ * converts an edge to tikz string representation
+ * @param {String} type - type of graph (DFA, NFA, ...)
+ * @param {Object} edge - edge to convert to string
+ * @param {String} labelPos - where to position label on edge
+ * @returns {String} - tikz string representaiton of edge
+ */
+function edgeToString(type, edge, labelPos) {
+  if(debug) console.log(edge);
+  let bendAngle = Math.floor(edge.a2) * consts.LATEX_ANGLE_SCALE;
+  let inner = `bend right=${bendAngle}`;
+  let label = `${edge.transition}`; 
 
-    let positional = '';
+  if(bendAngle > consts.LATEX_ANGLE_SCALE) labelPos = 'right';
+  else if(bendAngle < 0) labelPos = 'left';
 
-    let neighbor = closestTo(vertices, v);
-    if(!neighbor || v.is_start) {
-      console.log(`${v.name}: start`);
-    } else {
-      positional = getRelativePos(v, neighbor);
-    }
-    output += `\\node[${inner}] (${v.name}) [${positional} of=${neighbor.name}]` +
-            ` {$${v.name}$}; \n`;
+  if(edge.from === edge.to) {
+    inner = 'loop above';
+    labelPos = 'above'
   }
 
+  switch (type) {
+    case "PDA":
+      label += `,${edge.pop_symbol} \\rightarrow ${edge.push_symbol}`.replaceAll('$', '\\$');
+      break;
+    case "Turing":
+      label += ` \\rightarrow ${edge.push_symbol}, ${edge.move}`.replaceAll('$', '\\$');
+      break;
+    default:
+      break;
+  }
+
+
+  let output = `(${edge.from}) edge [${inner}] node[${labelPos}] {$${label}$} (${edge.to})\n`;
+  return output.replaceAll(consts.EMPTY_SYMBOL, '\\epsilon').replaceAll(consts.EMPTY_TAPE, '\\square')
+}
+
+/**
+ * @param {Object} graph - graph to be converted to latex
+ * @return {String} representation of graph in latex tikzpicture
+ */
+export function serialize(type, graph) {
+  // setup
+  let distance = 2;
+
+  let output = `\\begin{tikzpicture}[->,>=stealth\',shorten >=1pt, auto, node distance=${distance}cm, semithick]\n`;
+  output += '\\tikzstyle{every state}=[text=black, fill=none]\n';
+
+  // initializing nodes
+  let states = Object.values(graph);
+  states.sort((a,b) => a.x - b.x); // sorts the states from left to right
+
+  let statePositions = compressPlanar(states);
+
+  let start = states[0];
+  let inner = getStateType(start);
+
+  for(let i = 0; i < states.length; i++) {
+    let current = states[i];
+    inner = getStateType(current);
+    let position = statePositions[i];
+    output += `\\node[${inner}] (${current.name}) at ${position} {$${current.name}$};\n`;
+  }
+
+  output += '\n';
+  output += '\\path\n';
+
+  for(let i = 0; i < states.length; i++) {
+    let current = states[i];
+    let edges = current.out; // array of edges
+
+    for(let j = 0; j < edges.length; j++) {
+      let edge = edges[j];
+      let labelPosition = 'above';
+
+      let startState = graph[edge.from];
+      let endState = graph[edge.to];
+      let angle = linalg.angle([startState.x, startState.y], [endState.x, endState.y]);
+
+      if(angle <= -80 && angle >= -110) {
+        labelPosition = 'left';
+      } else if(angle >= 80 && angle <= 110) {
+        labelPosition = 'right';
+      }
+
+      output += edgeToString(type, edge, labelPosition);
+    }
+  }
+  output += ';\n';
+
+  output += '\\end{tikzpicture}';
   console.log(output);
 }

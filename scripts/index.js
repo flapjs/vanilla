@@ -395,8 +395,8 @@ function bind_latex() {
   // TODO
   const latex_button = document.getElementById('latex');
   latex_button.addEventListener('click', () => {
-    // no need to check type because we only export
-    const latex_str = latex.serialize(graph);
+    const select = document.getElementById('select_machine');
+    const latex_str = latex.serialize(select.value, graph);
     navigator.clipboard.writeText(latex_str)
       .then(() => alert('Latex text copied to clipboard'));
   });
