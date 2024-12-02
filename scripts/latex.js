@@ -45,7 +45,9 @@ function compressPlanar(states) {
     centroidY += state.y;
     output[i] = [state.x, state.y];
   }
-  if(debug) console.log(output);
+  if(debug) {
+    console.log(output);
+  }
 
   centroidX /= n;
   centroidY /= n;
@@ -63,7 +65,9 @@ function compressPlanar(states) {
     return `(${scaled[0].toFixed(2)},${-1 * scaled[1].toFixed(2)})`;
   });
 
-  if(debug) console.log(formatted);
+  if(debug) {
+    console.log(formatted);
+  }
   return formatted;
 }
 
@@ -74,8 +78,12 @@ function compressPlanar(states) {
  */
 function getStateType(state) {
   let inner = 'state,';
-  if(state.is_start) inner += 'initial,'
-  if(state.is_final) inner += 'accepting,'
+  if(state.is_start) {
+    inner += 'initial,';
+  }
+  if(state.is_final) {
+    inner += 'accepting,';
+  }
 
   return inner;
 }
@@ -88,33 +96,38 @@ function getStateType(state) {
  * @returns {String} - tikz string representaiton of edge
  */
 function edgeToString(type, edge, labelPos) {
-  if(debug) console.log(edge);
+  if(debug) {
+    console.log(edge);
+  }
   let bendAngle = Math.floor(edge.a2) * consts.LATEX_ANGLE_SCALE;
   let inner = `bend right=${bendAngle}`;
   let label = `${edge.transition}`; 
 
-  if(bendAngle > consts.LATEX_ANGLE_SCALE) labelPos = 'right';
-  else if(bendAngle < 0) labelPos = 'left';
+  if(bendAngle > consts.LATEX_ANGLE_SCALE) {
+    labelPos = 'right';
+  } else if(bendAngle < 0) {
+    labelPos = 'left';
+  }
 
   if(edge.from === edge.to) {
     inner = 'loop above';
-    labelPos = 'above'
+    labelPos = 'above';
   }
 
   switch (type) {
-    case "PDA":
-      label += `,${edge.pop_symbol} \\rightarrow ${edge.push_symbol}`.replaceAll('$', '\\$');
-      break;
-    case "Turing":
-      label += ` \\rightarrow ${edge.push_symbol}, ${edge.move}`.replaceAll('$', '\\$');
-      break;
-    default:
-      break;
+  case 'PDA':
+    label += `,${edge.pop_symbol} \\rightarrow ${edge.push_symbol}`.replaceAll('$', '\\$');
+    break;
+  case 'Turing':
+    label += ` \\rightarrow ${edge.push_symbol}, ${edge.move}`.replaceAll('$', '\\$');
+    break;
+  default:
+    break;
   }
 
 
   let output = `(${edge.from}) edge [${inner}] node[${labelPos}] {$${label}$} (${edge.to})\n`;
-  return output.replaceAll(consts.EMPTY_SYMBOL, '\\epsilon').replaceAll(consts.EMPTY_TAPE, '\\square')
+  return output.replaceAll(consts.EMPTY_SYMBOL, '\\epsilon').replaceAll(consts.EMPTY_TAPE, '\\square');
 }
 
 /**
