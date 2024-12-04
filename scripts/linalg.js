@@ -122,13 +122,13 @@ export function inv(v1, v2) {
 }
 
 /**
- * computes angle between v1, v2 in degrees from x-axis
- * @param {Array<float>} v1 - vector to compute angle from
- * @param {Array<float>} v2 - vector to compute angle to
- * @returns {float} angle between v1, v2
+ * computes angle between two points in degrees with 0deg = x-axis, increasing counterclockwise
+ * @param {Array<float>} pt1 - point to compute angle from
+ * @param {Array<float>} pt2 - point to compute angle to
+ * @returns {float} angle between pt1, pt2 
  */
-export function angle(v1, v2) {
-  let direction = [v2[0] - v1[0], v2[1] - v1[1]];
+export function angle(pt1, pt2) {
+  let direction = [pt2[0] - pt1[0], pt2[1] - pt1[1]];
   let base = [1, 0]; // x axis
 
   let dotProd = dot(direction, base);
@@ -137,7 +137,7 @@ export function angle(v1, v2) {
   let angle = Math.acos(dotProd/mult) * (180 / Math.PI);
 
   // start is above 
-  if(v1[1] < v2[1]) {
+  if(pt1[1] < pt2[1]) {
     angle *= -1;
   }
   return angle;

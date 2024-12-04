@@ -392,7 +392,6 @@ function bind_permalink() {
 
 /** button to generate latex text */
 function bind_latex() {
-  // TODO
   const latex_button = document.getElementById('latex');
   latex_button.addEventListener('click', () => {
     const select = document.getElementById('select_machine');
