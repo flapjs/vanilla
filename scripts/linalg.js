@@ -122,7 +122,7 @@ export function inv(v1, v2) {
 }
 
 /**
- * computes angle between two points in degrees with 0deg = x-axis, increasing counterclockwise
+ * computes the angle between the x-axis and the vector starting in pt1 and ending in pt2
  * @param {Array<float>} pt1 - point to compute angle from
  * @param {Array<float>} pt2 - point to compute angle to
  * @returns {float} angle between pt1, pt2 

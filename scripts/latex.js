@@ -184,7 +184,9 @@ export function serialize(type, graph) {
   output += ';\n';
 
   output += '\\end{tikzpicture}';
+
   if(debug) {
     console.log(output);
   }
+
 }
