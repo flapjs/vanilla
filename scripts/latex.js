@@ -33,7 +33,7 @@ let debug = false; // change this to enable/disable logging
  * @param {Array<Object>} states - the states of the graph
  * @returns {Array<String>} formatted positions of states
  */
-function compressPlanar(states) {
+function compress_planar(states) {
   const distance = 8;
 
   let centroidX = 0, centroidY = 0;
@@ -78,7 +78,7 @@ function compressPlanar(states) {
  * @param {Object} state
  * @returns {String} tikz labels for the type of state
  */
-function getStateType(state) {
+function get_state_type(state) {
   let inner = 'state,';
   if(state.is_start) {
     inner += 'initial,';
@@ -94,10 +94,10 @@ function getStateType(state) {
  * Edge to position self loop around 
  * @param {Object} edge - edge which contains a self loop
  */
-function getSelfLoopPos(graph, edge) {
+function get_self_loop_pos(graph, edge) {
   if(debug) {
     if(edge.from !== edge.to) {
-      console.log('Edge is not a self loop');
+      console.log("Edge is not a self loop");
     }
   }
   
@@ -115,7 +115,7 @@ function getSelfLoopPos(graph, edge) {
  * @param {String} labelPos - where to position label on edge
  * @returns {String} - tikz string representaiton of edge
  */
-function edgeToString(graph, type, edge, labelPos) {
+function edge_to_string(graph, type, edge, labelPos) {
   if(debug) {
     console.log(edge);
   }
@@ -131,7 +131,7 @@ function edgeToString(graph, type, edge, labelPos) {
 
   if(edge.from === edge.to) {
     inner = 'loop above';
-    labelPos = getSelfLoopPos(graph, edge);
+    labelPos = get_self_loop_pos(graph, edge);
   }
 
   switch (type) {
@@ -165,14 +165,14 @@ export function serialize(type, graph) {
   let states = Object.values(graph);
   states.sort((a,b) => a.x - b.x); // sorts the states from left to right
 
-  let statePositions = compressPlanar(states);
+  let statePositions = compress_planar(states);
 
   let start = states[0];
-  let inner = getStateType(start);
+  let inner = get_state_type(start);
 
   for(let i = 0; i < states.length; i++) {
     let current = states[i];
-    inner = getStateType(current);
+    inner = get_state_type(current);
     let position = statePositions[i];
     output += `\\node[${inner}] (${current.name}) at ${position} {$${current.name}$};\n`;
   }
@@ -198,7 +198,7 @@ export function serialize(type, graph) {
         labelPosition = 'right';
       }
 
-      output += edgeToString(graph, type, edge, labelPosition);
+      output += edge_to_string(graph, type, edge, labelPosition);
     }
   }
   output += ';\n';
