@@ -189,4 +189,5 @@ export function serialize(type, graph) {
     console.log(output);
   }
 
+  return output;
 }
