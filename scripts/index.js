@@ -11,6 +11,7 @@ import * as permalink from './permalink.js';
 import * as util from './util.js';
 import * as ui_setup from './ui_setup.js';
 import * as regex from './regex.js';
+import * as latex from './latex.js';
 
 // if not in browser, don't run
 if (typeof document !== 'undefined') {
@@ -389,6 +390,19 @@ function bind_permalink() {
   window.addEventListener('hashchange', hash_change_handler);
 }
 
+/** button to generate latex text */
+function bind_latex() {
+  const latex_button = document.getElementById('latex');
+  latex_button.addEventListener('click', () => {
+    const select = document.getElementById('select_machine');
+    const latex_str = latex.serialize(select.value, graph);
+    navigator.clipboard.writeText(latex_str)
+      .then(() => alert('Latex text copied to clipboard \n Please make sure to include the following in your Latex document:' +
+        '\\usepackage{tikz} and \\usetikzlibrary{automata,positioning,arrows,}'));
+  });
+  return;
+}
+
 /** change cursor style when hovering over certain elements */
 function bind_mousemove() {
   const canvas = drawing.get_canvas();
@@ -405,10 +419,14 @@ function bind_mousemove() {
 
 /** bind context menu for side nav bar and secondary side navbar */
 function bind_context_menu_navbar(){
-  const navbar = document.querySelector('.nav')
-  const secondBar = document.querySelector('#secondbar')
-  navbar.addEventListener('click', () => {menus.remove_context_menu()})
-  secondBar.addEventListener('click', () => {menus.remove_context_menu()})
+  const navbar = document.querySelector('.nav');
+  const secondBar = document.querySelector('#secondbar');
+  navbar.addEventListener('click', () => {
+    menus.remove_context_menu();
+  });
+  secondBar.addEventListener('click', () => {
+    menus.remove_context_menu();
+  });
   /*
   for(var btns of navbar){
     btns.addEventListener('click', () => {remove_context_menu()})
@@ -422,7 +440,7 @@ function bind_regex() {
   const convert_to_nfa_btn = document.getElementById('convert_to_nfa');
   convert_to_nfa_btn.addEventListener('click', () => {
     console.log(document.getElementById('regex_string').value);
-    let inputString = document.getElementById('regex_string').value
+    let inputString = document.getElementById('regex_string').value;
     inputString = inputString.replace(/\s/g, '');
     if (regex.isValidRegex(inputString)) {
       graph = regex.process_string(inputString);
@@ -431,14 +449,14 @@ function bind_regex() {
       drawing.draw(graph);
       // hist.push_history(graph); NEED TO IMPLEMENT HISTORY BEFORE UNCOMMENTING
     } else {
-      alert("Invalid regular expression.")
+      alert('Invalid regular expression.');
     }
   });
   const input_field = document.getElementById('regex_string');
   input_field.addEventListener('keypress', (e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       console.log(document.getElementById('regex_string').value);
-      let inputString = document.getElementById('regex_string').value
+      let inputString = document.getElementById('regex_string').value;
       inputString = inputString.replace(/\s/g, '');
       if (regex.isValidRegex(inputString)) {
         graph = regex.process_string(inputString);
@@ -447,10 +465,10 @@ function bind_regex() {
         drawing.draw(graph);
         // hist.push_history(graph); NEED TO IMPLEMENT HISTORY BEFORE UNCOMMENTING
       } else {
-        alert("Invalid regular expression.")
+        alert('Invalid regular expression.');
       }
     }
-  })
+  });
 }
 
 /** run after all the contents are loaded to hook up callbacks */
@@ -466,6 +484,7 @@ function init() {
   bind_scroll();
   bind_dd();
   bind_permalink();
+  bind_latex();
   bind_mousemove();
   ui_setup.bind_plus_minus();
   ui_setup.add_input_bar(); // called so one input bar appears on opening of homepage

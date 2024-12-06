@@ -21,6 +21,9 @@
             "error",
             "always"
         ],
+        "no-useless-escape": [
+            "off"
+        ],
         "no-unused-vars": [
             "warn",
             { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }

@@ -196,3 +196,6 @@ export const SIGMA = '\u03A3';
 
 /** @constant {string} EMPTY_SET - empty set symbol for regular expressions */
 export const EMPTY_SET = '\u2205';
+
+/** @constant {float} LATEX_ANGLE_SCALE - used to scale angels for curved edges in tikzpicture*/
+export const LATEX_ANGLE_SCALE = 8;
