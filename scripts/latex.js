@@ -18,10 +18,12 @@
 // 2. Horizontally bend angles have label on the left
 // 3. Fix more complicated state names
 // 4. Overlapping labels for self loops
+// 5. Single state machine does not position 
 //----------------------------------------------
 
 import * as consts from './consts.js';
 import * as linalg from './linalg.js';
+import * as drawing from './drawing.js';
 
 let debug = false; // change this to enable/disable logging
 
@@ -89,13 +91,31 @@ function getStateType(state) {
 }
 
 /**
+ * Edge to position self loop around 
+ * @param {Object} edge - edge which contains a self loop
+ */
+function getSelfLoopPos(graph, edge) {
+  if(debug) {
+    if(edge.from !== edge.to) {
+      console.log('Edge is not a self loop');
+    }
+  }
+  
+  let [v, ] = drawing.compute_edge_start_end(graph, edge);
+  let mid_vec = linalg.linear_comb(v, v, edge.a1, edge.a2);
+  let mid = linalg.add(v, mid_vec);
+
+  console.log(`mid of ${edge.from}: ${mid_vec}`);
+}
+
+/**
  * converts an edge to tikz string representation
  * @param {String} type - type of graph (DFA, NFA, ...)
  * @param {Object} edge - edge to convert to string
  * @param {String} labelPos - where to position label on edge
  * @returns {String} - tikz string representaiton of edge
  */
-function edgeToString(type, edge, labelPos) {
+function edgeToString(graph, type, edge, labelPos) {
   if(debug) {
     console.log(edge);
   }
@@ -111,7 +131,7 @@ function edgeToString(type, edge, labelPos) {
 
   if(edge.from === edge.to) {
     inner = 'loop above';
-    labelPos = 'above';
+    labelPos = getSelfLoopPos(graph, edge);
   }
 
   switch (type) {
@@ -178,7 +198,7 @@ export function serialize(type, graph) {
         labelPosition = 'right';
       }
 
-      output += edgeToString(type, edge, labelPosition);
+      output += edgeToString(graph, type, edge, labelPosition);
     }
   }
   output += ';\n';
