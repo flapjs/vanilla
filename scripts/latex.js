@@ -25,7 +25,7 @@ import * as consts from './consts.js';
 import * as linalg from './linalg.js';
 import * as drawing from './drawing.js';
 
-let debug = false; // change this to enable/disable logging
+let debug = true; // change this to enable/disable logging
 
 /**
  * compresses graph to tikz space 
@@ -91,8 +91,9 @@ function get_state_type(state) {
 }
 
 /**
- * Edge to position self loop around 
+ * Edge to return self loop positioning of
  * @param {Object} edge - edge which contains a self loop
+ * @return {String} position of self loop
  */
 function get_self_loop_pos(graph, edge) {
   if(debug) {
@@ -101,11 +102,22 @@ function get_self_loop_pos(graph, edge) {
     }
   }
   
-  let [v, ] = drawing.compute_edge_start_end(graph, edge);
-  let mid_vec = linalg.linear_comb(v, v, edge.a1, edge.a2);
-  let mid = linalg.add(v, mid_vec);
+  let [v1, v2, mid] = drawing.compute_edge_geometry(graph, edge);
 
-  console.log(`mid of ${edge.from}: ${mid_vec}`);
+  // keep in mind that html canvas grows down in y values
+  if(mid[1] > v1[1] && mid[1] > v2[1]) {
+    // control point below both anchors
+    return "below";
+  } else if(mid[1] < v1[1] && mid[1] < v2[1]) {
+    // control point above both anchors
+    return "above";
+  }
+  // control point in between the anchors
+  if (mid[0] > v1[0] && mid[0] > v2[0]) {
+    return "right";
+  }
+
+  return "left";
 }
 
 /**
@@ -130,8 +142,9 @@ function edge_to_string(graph, type, edge, labelPos) {
   }
 
   if(edge.from === edge.to) {
-    inner = 'loop above';
-    labelPos = get_self_loop_pos(graph, edge);
+    let pos = get_self_loop_pos(graph, edge);
+    inner = `loop ${pos}`;
+    labelPos = `${pos}`;
   }
 
   switch (type) {
