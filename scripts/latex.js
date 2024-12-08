@@ -14,8 +14,8 @@
 
 //----------------------------------------------
 // Current TODO:
-// 1. Self loops only go above
-// 2. Horizontally bend angles have label on the left
+// 1. -Done Self loops only go above
+// 2. -Done Horizontally bend angles have label on the left
 // 3. Fix more complicated state names
 // 4. Overlapping labels for self loops
 // 5. Single state machine does not position 
@@ -25,7 +25,7 @@ import * as consts from './consts.js';
 import * as linalg from './linalg.js';
 import * as drawing from './drawing.js';
 
-let debug = true; // change this to enable/disable logging
+let debug = false; // change this to enable/disable logging
 
 /**
  * compresses graph to tikz space 
@@ -91,11 +91,11 @@ function get_state_type(state) {
 }
 
 /**
- * Edge to return self loop positioning of
- * @param {Object} edge - edge which contains a self loop
- * @return {String} position of self loop
+ * gives the position to place label at
+ * @param {Object} edge 
+ * @return {String} position of label around edge 
  */
-function get_self_loop_pos(graph, edge) {
+function get_label_pos(graph, edge) {
   if(debug) {
     if(edge.from !== edge.to) {
       console.log("Edge is not a self loop");
@@ -127,24 +127,17 @@ function get_self_loop_pos(graph, edge) {
  * @param {String} labelPos - where to position label on edge
  * @returns {String} - tikz string representaiton of edge
  */
-function edge_to_string(graph, type, edge, labelPos) {
+function edge_to_string(graph, type, edge) {
   if(debug) {
     console.log(edge);
   }
+  let labelPos = get_label_pos(graph, edge);
   let bendAngle = Math.floor(edge.a2) * consts.LATEX_ANGLE_SCALE;
   let inner = `bend right=${bendAngle}`;
   let label = `${edge.transition}`; 
 
-  if(bendAngle > consts.LATEX_ANGLE_SCALE) {
-    labelPos = 'right';
-  } else if(bendAngle < 0) {
-    labelPos = 'left';
-  }
-
   if(edge.from === edge.to) {
-    let pos = get_self_loop_pos(graph, edge);
-    inner = `loop ${pos}`;
-    labelPos = `${pos}`;
+    inner = `loop ${labelPos}`;
   }
 
   switch (type) {
@@ -222,4 +215,5 @@ export function serialize(type, graph) {
     console.log(output);
   }
 
+  return output;
 }
