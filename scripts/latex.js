@@ -25,7 +25,7 @@ import * as consts from './consts.js';
 import * as linalg from './linalg.js';
 import * as drawing from './drawing.js';
 
-let debug = false; // change this to enable/disable logging
+let debug = true; // change this to enable/disable logging
 
 /**
  * compresses graph to tikz space 
