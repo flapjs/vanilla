@@ -98,7 +98,7 @@ function get_state_type(state) {
 function get_label_pos(graph, edge) {
   if(debug) {
     if(edge.from !== edge.to) {
-      console.log("Edge is not a self loop");
+      console.log('Edge is not a self loop');
     }
   }
   
@@ -107,17 +107,17 @@ function get_label_pos(graph, edge) {
   // keep in mind that html canvas grows down in y values
   if(mid[1] > v1[1] && mid[1] > v2[1]) {
     // control point below both anchors
-    return "below";
+    return 'below';
   } else if(mid[1] < v1[1] && mid[1] < v2[1]) {
     // control point above both anchors
-    return "above";
+    return 'above';
   }
   // control point in between the anchors
   if (mid[0] > v1[0] && mid[0] > v2[0]) {
-    return "right";
+    return 'right';
   }
 
-  return "left";
+  return 'left';
 }
 
 /**
