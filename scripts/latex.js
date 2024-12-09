@@ -192,19 +192,7 @@ export function serialize(type, graph) {
 
     for(let j = 0; j < edges.length; j++) {
       let edge = edges[j];
-      let labelPosition = 'above';
-
-      let startState = graph[edge.from];
-      let endState = graph[edge.to];
-      let angle = linalg.angle([startState.x, startState.y], [endState.x, endState.y]);
-
-      if(angle <= -80 && angle >= -110) {
-        labelPosition = 'left';
-      } else if(angle >= 80 && angle <= 110) {
-        labelPosition = 'right';
-      }
-
-      output += edge_to_string(graph, type, edge, labelPosition);
+      output += edge_to_string(graph, type, edge);
     }
   }
   output += ';\n';
