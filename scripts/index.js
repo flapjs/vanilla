@@ -15,11 +15,15 @@ import * as latex from './latex.js';
 
 // if not in browser, don't run
 if (typeof document !== 'undefined') {
-  document.addEventListener('DOMContentLoaded', init);
-  window.addEventListener('resize', () => drawing.draw(graph));
+  // get current page
+  const cur_file_path = window.location.pathname;
+  if (!cur_file_path.includes('grade.html')) {
+    document.addEventListener('DOMContentLoaded', init);
+    window.addEventListener('resize', () => drawing.draw(graph));
+  }
 }
 
-let graph = {};  // global graph
+let graph = {};  // global graph, initially empty
 
 /** handles double click */
 function bind_double_click() {
@@ -486,7 +490,7 @@ function init() {
   bind_permalink();
   bind_latex();
   bind_mousemove();
-  ui_setup.bind_plus_minus();
+  ui_setup.bind_plus_minus(``);
   ui_setup.add_input_bar(); // called so one input bar appears on opening of homepage
   ui_setup.htmlSetUp(); // initiate eventlisteners for sidenavbar, second sidenavbar, and popup tutorial
   bind_regex();
