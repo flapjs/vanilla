@@ -115,9 +115,11 @@ function get_label_pos(graph, edge) {
   // control point in between the anchors
   if (mid[0] > v1[0] && mid[0] > v2[0]) {
     return 'right';
+  } if(mid[0] < v1[0] && mid[0] < v2[0]) {
+    return 'left';
   }
 
-  return 'left';
+  return 'above';
 }
 
 /**
