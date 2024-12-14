@@ -14,18 +14,16 @@
 
 //----------------------------------------------
 // Current TODO:
-// 1. -Done Self loops only go above
-// 2. -Done Horizontally bend angles have label on the left
-// 3. Fix more complicated state names
-// 4. Overlapping labels for self loops
-// 5. Single state machine does not position 
+// 1. Fix more complicated state names
+// 2. Overlapping labels for self loops
+// 3. Single state machine does not position 
 //----------------------------------------------
 
 import * as consts from './consts.js';
 import * as linalg from './linalg.js';
 import * as drawing from './drawing.js';
 
-let debug = true; // change this to enable/disable logging
+let debug = false; // change this to enable/disable logging
 
 /**
  * compresses graph to tikz space 
