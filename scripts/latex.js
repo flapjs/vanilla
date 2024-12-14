@@ -14,14 +14,14 @@
 
 //----------------------------------------------
 // Current TODO:
-// 1. Self loops only go above
-// 2. Horizontally bend angles have label on the left
-// 3. Fix more complicated state names
-// 4. Overlapping labels for self loops
+// 1. Fix more complicated state names
+// 2. Overlapping labels for self loops
+// 3. Single state machine does not position 
 //----------------------------------------------
 
 import * as consts from './consts.js';
 import * as linalg from './linalg.js';
+import * as drawing from './drawing.js';
 
 let debug = false; // change this to enable/disable logging
 
@@ -31,7 +31,7 @@ let debug = false; // change this to enable/disable logging
  * @param {Array<Object>} states - the states of the graph
  * @returns {Array<String>} formatted positions of states
  */
-function compressPlanar(states) {
+function compress_planar(states) {
   const distance = 8;
 
   let centroidX = 0, centroidY = 0;
@@ -76,7 +76,7 @@ function compressPlanar(states) {
  * @param {Object} state
  * @returns {String} tikz labels for the type of state
  */
-function getStateType(state) {
+function get_state_type(state) {
   let inner = 'state,';
   if(state.is_start) {
     inner += 'initial,';
@@ -89,29 +89,55 @@ function getStateType(state) {
 }
 
 /**
+ * gives the position to place label at
+ * @param {Object} edge 
+ * @return {String} position of label around edge 
+ */
+function get_label_pos(graph, edge) {
+  if(debug) {
+    if(edge.from !== edge.to) {
+      console.log('Edge is not a self loop');
+    }
+  }
+  
+  let [v1, v2, mid] = drawing.compute_edge_geometry(graph, edge);
+
+  // keep in mind that html canvas grows down in y values
+  if(mid[1] > v1[1] && mid[1] > v2[1]) {
+    // control point below both anchors
+    return 'below';
+  } else if(mid[1] < v1[1] && mid[1] < v2[1]) {
+    // control point above both anchors
+    return 'above';
+  }
+  // control point in between the anchors
+  if (mid[0] > v1[0] && mid[0] > v2[0]) {
+    return 'right';
+  } if(mid[0] < v1[0] && mid[0] < v2[0]) {
+    return 'left';
+  }
+
+  return 'above';
+}
+
+/**
  * converts an edge to tikz string representation
  * @param {String} type - type of graph (DFA, NFA, ...)
  * @param {Object} edge - edge to convert to string
  * @param {String} labelPos - where to position label on edge
  * @returns {String} - tikz string representaiton of edge
  */
-function edgeToString(type, edge, labelPos) {
+function edge_to_string(graph, type, edge) {
   if(debug) {
     console.log(edge);
   }
+  let labelPos = get_label_pos(graph, edge);
   let bendAngle = Math.floor(edge.a2) * consts.LATEX_ANGLE_SCALE;
   let inner = `bend right=${bendAngle}`;
   let label = `${edge.transition}`; 
 
-  if(bendAngle > consts.LATEX_ANGLE_SCALE) {
-    labelPos = 'right';
-  } else if(bendAngle < 0) {
-    labelPos = 'left';
-  }
-
   if(edge.from === edge.to) {
-    inner = 'loop above';
-    labelPos = 'above';
+    inner = `loop ${labelPos}`;
   }
 
   switch (type) {
@@ -145,14 +171,14 @@ export function serialize(type, graph) {
   let states = Object.values(graph);
   states.sort((a,b) => a.x - b.x); // sorts the states from left to right
 
-  let statePositions = compressPlanar(states);
+  let statePositions = compress_planar(states);
 
   let start = states[0];
-  let inner = getStateType(start);
+  let inner = get_state_type(start);
 
   for(let i = 0; i < states.length; i++) {
     let current = states[i];
-    inner = getStateType(current);
+    inner = get_state_type(current);
     let position = statePositions[i];
     output += `\\node[${inner}] (${current.name}) at ${position} {$${current.name}$};\n`;
   }
@@ -166,19 +192,7 @@ export function serialize(type, graph) {
 
     for(let j = 0; j < edges.length; j++) {
       let edge = edges[j];
-      let labelPosition = 'above';
-
-      let startState = graph[edge.from];
-      let endState = graph[edge.to];
-      let angle = linalg.angle([startState.x, startState.y], [endState.x, endState.y]);
-
-      if(angle <= -80 && angle >= -110) {
-        labelPosition = 'left';
-      } else if(angle >= 80 && angle <= 110) {
-        labelPosition = 'right';
-      }
-
-      output += edgeToString(type, edge, labelPosition);
+      output += edge_to_string(graph, type, edge);
     }
   }
   output += ';\n';

@@ -396,8 +396,8 @@ function bind_latex() {
   latex_button.addEventListener('click', () => {
     const select = document.getElementById('select_machine');
     const latex_str = latex.serialize(select.value, graph);
-    navigator.clipboard.writeText(latex_str)
-      .then(() => alert('Latex text copied to clipboard \n Please make sure to include the following in your Latex document:' +
+    navigator.clipboard.writeText(latex_str).then(() => 
+      alert('Latex text copied to clipboard \n Please make sure to include the following in your Latex document:' +
         '\\usepackage{tikz} and \\usetikzlibrary{automata,positioning,arrows,}'));
   });
   return;
