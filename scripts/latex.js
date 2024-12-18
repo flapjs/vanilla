@@ -14,7 +14,7 @@
 
 //----------------------------------------------
 // Current TODO:
-// 1. Fix more complicated state names
+// 1. -Done Fix more complicated state names
 // 2. Overlapping labels for self loops
 // 3. Single state machine does not position 
 //----------------------------------------------
@@ -24,6 +24,7 @@ import * as linalg from './linalg.js';
 import * as drawing from './drawing.js';
 
 let debug = false; // change this to enable/disable logging
+const tikzLabel = {}; // maps name of vertex in graph to it's tikz label used for reference
 
 /**
  * compresses graph to tikz space 
@@ -151,8 +152,7 @@ function edge_to_string(graph, type, edge) {
     break;
   }
 
-
-  let output = `(${edge.from}) edge [${inner}] node[${labelPos}] {$${label}$} (${edge.to})\n`;
+  let output = `(${tikzLabel[edge.from]}) edge [${inner}] node[${labelPos}] {$${label}$} (${tikzLabel[edge.to]})\n`;
   return output.replaceAll(consts.EMPTY_SYMBOL, '\\epsilon').replaceAll(consts.EMPTY_TAPE, '\\square');
 }
 
@@ -178,9 +178,10 @@ export function serialize(type, graph) {
 
   for(let i = 0; i < states.length; i++) {
     let current = states[i];
+    tikzLabel[current.name] = `s${i}`;
     inner = get_state_type(current);
     let position = statePositions[i];
-    output += `\\node[${inner}] (${current.name}) at ${position} {$${current.name}$};\n`;
+    output += `\\node[${inner}] (${tikzLabel[current.name]}) at ${position} {$${current.name}$};\n`;
   }
 
   output += '\n';
