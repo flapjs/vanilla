@@ -14,9 +14,8 @@
 
 //----------------------------------------------
 // Current TODO:
-// 1. -Done Fix more complicated state names
-// 2. Overlapping labels for self loops
-// 3. Single state machine does not position 
+// 1. Overlapping labels for self loops
+// -Done Single state machine does not position 
 //----------------------------------------------
 
 import * as consts from './consts.js';
@@ -33,7 +32,7 @@ const tikzLabel = {}; // maps name of vertex in graph to it's tikz label used fo
  * @returns {Array<String>} formatted positions of states
  */
 function compress_planar(states) {
-  const distance = 8;
+  const distance = 6;
 
   let centroidX = 0, centroidY = 0;
   let n = states.length;
@@ -172,6 +171,10 @@ export function serialize(type, graph) {
   states.sort((a,b) => a.x - b.x); // sorts the states from left to right
 
   let statePositions = compress_planar(states);
+
+  if(states.length === 1) {
+    statePositions = ["(0,0)"];
+  }
 
   let start = states[0];
   let inner = get_state_type(start);
